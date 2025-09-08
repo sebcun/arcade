@@ -1,1 +1,60 @@
 # Arcade
+
+![ArcadeLogo](https://hc-cdn.hel1.your-objectstorage.com/s/v3/ce15a76fdcd526402543776f617eff5b5e264ef3_arcadelogo.png)
+
+Arcade is a site where you can create an account, play games, level up, customize your avatar, and rank up on the leaderboards. This was created for the [HackClub](https://hackclub.com) YSWS (You Ship We Ship) [Siege](https://siege.hackclub.com).
+
+## Features
+
+- Signup and login.
+- Ability to view peoples profiles.
+- Ability to change usernames.
+
+## Planned Features
+
+- Ability to customize avatars.
+- Ability to play pixel art type games and earn levels.
+- Ability to level up.
+- Ability to buy avatar items.
+
+## Installation
+
+1. **Clone the repo**
+
+```bash
+git clone https://github.com/sebcun/arcade.git
+cd arcade
+```
+
+2.  **Install the requirements**
+
+```py
+pip install -r requirements.txt
+```
+
+3. **Setup .env**
+   Create a file named `.env` with the following contents:
+
+```env
+SECRET_KEY=YourWebsiteSecretKey
+WEBSITE=https://YourWebsite.com
+```
+
+## Usage
+
+**Run the app**
+
+```py
+py app.py
+```
+
+**Access the website**
+By default, the website will be accessable on [https://localhost:5000](https://localhost:5000).
+
+## Contributing
+
+Pull requests are welcome. For major changes, please open an issue first to discuss.
+
+## License
+
+This project uses the [GNU GENERAL PUBLIC LICENSE](https://github.com/sebcun/arcade/blob/main/LICENSE)
