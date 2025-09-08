@@ -1,0 +1,116 @@
+.profile-modal-content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 200px;
+  padding: 20px;
+  margin: 0;
+  overflow: hidden;
+}
+
+.profile-scrollable {
+  display: flex;
+  align-items: flex-start;
+  max-height: 400px;
+  overflow-y: auto;
+  flex: 1;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.profile-scrollable::-webkit-scrollbar {
+  display: none;
+}
+
+.profile-avatar {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  border-radius: 7px;
+  margin-right: 20px;
+  flex-shrink: 0;
+  padding: 5px;
+  background-color: blue;
+}
+
+.profile-avatar img {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 85%;
+  height: auto;
+}
+
+.profile-avatar .level-image {
+  position: absolute;
+  width: 28px;
+  height: 28px;
+  bottom: 0;
+  right: 0;
+  top: auto;
+  left: auto;
+  transform: none;
+}
+
+.profile-details {
+  text-align: left;
+  flex: 1;
+  word-wrap: break-word;
+}
+
+.profile-badges {
+  margin-left: 2px;
+  display: inline-flex;
+  gap: 5px;
+  align-items: center;
+}
+
+.profile-badges .badge-image {
+  width: 25px;
+  height: 25px;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.profile-badges .badge-image:hover {
+  transform: scale(1.1);
+}
+
+.profile-details h2 {
+  margin: 0 0 10px 0;
+}
+
+.profile-details p {
+  margin: 5px 0;
+  line-height: 1.5;
+}
+
+.profile-buttons {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  display: flex;
+  gap: 5px;
+  padding: 5px;
+  border-radius: 4px;
+  z-index: 1;
+}
+
+.profile-buttons img {
+  width: 50px;
+  height: 50px;
+  transition: opacity 0.2s;
+  cursor: default;
+}
+
+.profile-buttons img:hover {
+  opacity: 0.65;
+  cursor: pointer;
+}
+
+.profile-details::after {
+  content: "";
+  display: block;
+  height: 1px;
+  margin: 15px 0;
+}

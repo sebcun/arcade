@@ -1,0 +1,210 @@
+.modal {
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.modal.show {
+  display: flex;
+  opacity: 1;
+  background-color: rgba(0, 0, 0, 0.7);
+}
+
+.modal-content {
+  background-color: rgb(20, 36, 63);
+  margin: 0 auto;
+  padding: 5px 20px 20px 20px;
+  border: 5px solid #0e0e2d;
+  width: 90%;
+  max-width: 600px;
+  border-radius: 8px;
+  color: white;
+  position: relative;
+  text-align: center;
+  transform: scale(0.7);
+  opacity: 0;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.modal.show .modal-content {
+  transform: scale(1);
+  opacity: 1;
+}
+
+.close {
+  color: #aaa;
+  position: absolute;
+  top: 0;
+  right: 0;
+  font-size: 64px;
+  cursor: pointer;
+  transition: font-weight 0.1s ease, color 0.1s ease;
+}
+
+.close:hover,
+.close:focus {
+  color: #fff;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.modal-content > *:first-child {
+  margin-top: -20px;
+  margin-right: 10px;
+}
+.modal-content h2 {
+  margin-bottom: 5px;
+  font-weight: 500;
+}
+
+.modal-content p {
+  margin-top: 0;
+  color: #b0b0b0;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+@media (max-width: 768px) {
+  .modal-content {
+    width: 50%;
+    padding: 5px 15px 15px 15px;
+  }
+  .close {
+    font-size: 24px;
+    top: 10px;
+    right: 5px;
+  }
+}
+
+@media (max-width: 480px) {
+  .modal-content {
+    width: 90%;
+    padding: 5px 10px 10px 10px;
+  }
+  .close {
+    font-size: 30px;
+    top: 15px;
+    right: 3px;
+  }
+}
+
+.modal-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  align-items: center;
+}
+
+.long-button {
+  position: relative;
+  border: none;
+  background: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.long-button img {
+  width: 250px;
+  height: auto;
+  transition: opacity 0.2s;
+}
+
+.long-button:disabled {
+  cursor: default;
+}
+.long-button:disabled img {
+  opacity: 0.65;
+}
+
+.long-button img:hover {
+  opacity: 0.65;
+}
+
+.long-button span {
+  position: absolute;
+  top: 46%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-size: 16px;
+}
+
+/* Login/Register Modal */
+.login-form,
+.register-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.login-form-group,
+.register-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.login-form label,
+.register-form label {
+  color: #b0b0b0;
+}
+
+.login-form input[type="email"],
+.login-form input[type="password"],
+.register-form input[type="text"],
+.register-form input[type="email"],
+.register-form input[type="password"] {
+  padding: 12px;
+  border: 2px solid #171843;
+  border-radius: 8px;
+  font-size: 16px;
+  transition: border-color 0.3s ease;
+  background-color: #2b2c6d;
+}
+
+.login-form input[type="email"]:focus,
+.login-form input[type="password"]:focus,
+.register-form input[type="text"]:focus,
+.register-form input[type="email"]:focus,
+.register-form
+  input[type="password"]:focus
+  .register-form
+  input[type="username"]:focus {
+  border-color: #27285f;
+  outline: none;
+}
+
+.login-form input[type="email"]:blur,
+.login-form input[type="password"]:blur,
+.login-register input[type="text"]:blur,
+.login-register input[type="email"]:blur,
+.login-register input[type="password"]:blur,
+.register-form input[type="username"]:blur {
+  border-color: #ddd;
+}
+
+.login-form input[type="email"].error,
+.login-form input[type="password"].error,
+.register-form input[type="email"].error,
+.register-form input[type="password"].error,
+.register-form input[type="username"].error {
+  border: 2px solid red !important;
+}
+
+.modal-seperator {
+  display: flex;
+  align-items: center;
+  margin: 4px 0;
+  color: #666;
+  font-weight: bold;
+  font-size: 14px;
+}

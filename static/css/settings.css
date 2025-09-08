@@ -1,0 +1,63 @@
+.settings-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.settings-form-group-row {
+  display: flex;
+  position: relative;
+}
+
+.settings-form-group label {
+  color: #b0b0b0;
+}
+
+.settings-label {
+  margin-right: 10px;
+}
+
+.settings-form-group input[type="text"] {
+  padding: 12px;
+  padding-right: 40px;
+  border: 2px solid #171843;
+  border-radius: 8px;
+  font-size: 16px;
+  transition: border-color 0.3s ease;
+  background-color: #2b2c6d;
+  position: relative;
+  box-sizing: border-box;
+}
+
+.settings-form-group input[type="text"]:disabled {
+  color: #dadada;
+}
+
+.settings-input {
+  flex: 1;
+}
+
+.settings-edit-btn {
+  border: none;
+  background: none;
+  cursor: pointer;
+  position: absolute;
+  right: 10px;
+  top: 32.5px;
+  padding: 0;
+}
+
+.settings-edit-img {
+  width: 32px;
+  height: 32px;
+  transition: opacity 0.2s;
+}
+
+.settings-edit-img.disabled {
+  cursor: default;
+  opacity: 0.65;
+}
+
+.settings-edit-img:hover {
+  opacity: 0.65;
+}
