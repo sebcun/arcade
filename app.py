@@ -25,6 +25,15 @@ def index():
     return render_template("index.html", LOGGEDIN=False, WEBSITE=websiteURL)
 
 
+@app.route("/create")
+def create():
+    websiteURL = os.getenv("WEBSITE", "https://arcade.sebcun.com")
+
+    if "email" in session:
+        return render_template("create.html", LOGGEDIN=True, WEBSITE=websiteURL)
+    return render_template("create.html", LOGGEDIN=False, WEBSITE=websiteURL)
+
+
 # Api Routes
 @app.route("/api/register", methods=["POST"])
 def register():

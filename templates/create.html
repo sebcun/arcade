@@ -1,0 +1,38 @@
+{% extends 'base.html' %} {% block styles %}
+<link
+  rel="stylesheet"
+  href="{{ url_for('static', filename='css/create.css') }}"
+/>
+{% endblock %} {% block scripts %}
+<script src="{{ url_for('static', filename='js/codeParser.js') }}"></script>
+<script src="{{ url_for('static', filename='js/create.js') }}"></script>
+{% endblock %} {% block content %} {% if LOGGEDIN %}
+<div class="create-container">
+  {# Sprite/pixel editor #}
+  <div class="pixel-editor-section">
+    <h3>Sprite Editor</h3>
+    <canvas id="pixelCanvas" width="320" height="320"></canvas>
+    <div class="tools">
+      <input type="color" id="colorPicker" value="#000000" />
+      <button id="clearButton">Clear</button>
+      <button id="saveSpriteButton">Save Sprite</button>
+    </div>
+    <div id="spritesList"></div>
+  </div>
+
+  {# Code Editor #}
+  <div class="code-section">
+    <h3>Code Editor</h3>
+    <textarea id="codeBox" rows="20" cols="50" placeholder="ON 'e'"></textarea>
+    <button id="runButton">Run</button>
+    <button id="resetButton">Reset</button>
+  </div>
+
+  {# Preview #}
+  <div class="preview-section">
+    <h3>Preview</h3>
+    <canvas id="previewCanvas" width="640" height="480"></canvas>
+    <span id="cursorPosition">Cursor: Not on canvas</span>
+  </div>
+</div>
+{% endif %} {% endblock %}

@@ -1,0 +1,137 @@
+.create-container {
+  display: flex;
+  justify-content: flex-start;
+  padding: 20px;
+  gap: 20px;
+  background-color: #111d35;
+  overflow-x: auto;
+  overflow-y: auto;
+  min-height: 100vh;
+}
+
+.pixel-editor-section {
+  flex: 0 0 auto;
+  width: 360px;
+  background-color: #171843;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #2b2c6d;
+}
+
+.code-section {
+  flex: 0 0 auto;
+  width: 550px;
+  background-color: #171843;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #2b2c6d;
+}
+
+.preview-section {
+  flex: 1;
+  background-color: #171843;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #2b2c6d;
+}
+
+#pixelCanvas {
+  border: 2px solid #2b2c6d;
+  cursor: crosshair;
+  background-color: #111d35;
+  display: block;
+  margin: 0 auto;
+}
+
+.tools {
+  margin-top: 10px;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.tools button,
+#runButton,
+#resetButton {
+  background-color: #2b2c6d;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: "Rowdies", sans-serif;
+  font-weight: 300;
+  transition: background-color 0.3s ease;
+}
+
+.tools button:hover,
+#runButton:hover,
+#resetButton:hover {
+  background-color: #171843;
+}
+
+#spritesList {
+  margin-top: 10px;
+}
+
+#spritesList div {
+  margin: 5px 0;
+  padding: 5px;
+  background-color: #2b2c6d;
+  color: white;
+  border: 1px solid #171843;
+  border-radius: 4px;
+}
+
+#codeBox {
+  width: 94%;
+  height: 400px;
+  font-family: monospace;
+  color: white;
+  background-color: #111d35;
+  border: 2px solid #2b2c6d;
+  border-radius: 4px;
+  padding: 10px;
+  resize: vertical;
+}
+
+#previewCanvas {
+  border: 2px solid #2b2c6d;
+  display: block;
+  background-color: #111d35;
+  margin: 0 auto;
+}
+
+@media (max-width: 1024px) {
+  .create-container {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .pixel-editor-section,
+  .code-section,
+  .preview-section {
+    width: 100%;
+    flex: none;
+  }
+
+  .tools {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 768px) {
+  .create-container {
+    padding: 10px;
+  }
+
+  #pixelCanvas,
+  #previewCanvas {
+    width: 100%;
+    height: auto;
+  }
+
+  #codeBox {
+    height: 300px;
+  }
+}
