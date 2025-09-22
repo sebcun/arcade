@@ -44,7 +44,8 @@ function showSettings() {
             <button class="settings-edit-btn" onclick="showEditUsername('${data.username}')">
               <img src="/static/images/Pencil.png" alt="Edit Username" title="Edit Username." class="settings-edit-img">
             </button>
-          </div>`;
+          </div>
+          `;
 
         showModal("Settings", settingsHTML, [
           {
@@ -207,4 +208,209 @@ function showEditUsername(username) {
   });
 
   saveButton.disabled = true;
+}
+
+function showEditAvatar() {
+  fetch("/api/me", {
+    method: "GET",
+    credentials: "include",
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      let currentAvatar = { face: "white", eyes: "blue", hair: "one_brown" };
+      if (data.avatar) {
+        try {
+          currentAvatar = JSON.parse(data.avatar);
+        } catch (e) {}
+      }
+      modalHTML = `
+            <div class="profile-modal-content">
+                <div class="profile-scrollable">
+                    <div class="profile-avatar"> 
+                      <img id="preview-face" src="/static/images/avatars/face/${currentAvatar.face}.png">
+                      <img id="preview-eyes" src="/static/images/avatars/eyes/${currentAvatar.eyes}.png">
+                      <img id="preview-hair" src="/static/images/avatars/hair/${currentAvatar.hair}.png">
+                    </div>
+
+                    <div class="profile-details">
+
+                      <div class="avatar-category">
+                        <label>Face:</label>
+                        <div class="avatar-options" id="face-options">
+                          <div class="avatar-option" data-value="white" title="White">
+                            <img src="/static/images/avatars/face/white.png" alt="White">
+                          </div>
+                          <div class="avatar-option" data-value="brown" title="Brown">
+                            <img src="/static/images/avatars/face/brown.png" alt="Brown">
+                          </div>
+                        </div>
+                      </div>     
+
+                      <div class="avatar-category">
+                        <label>Eyes:</label>
+                        <div class="avatar-options" id="eyes-options">
+                          <div class="avatar-option" data-value="blue" title="Blue">
+                            <img src="/static/images/avatars/eyes/blue.png" alt="Blue">
+                          </div>
+                          <div class="avatar-option" data-value="brown" title="Brown">
+                            <img src="/static/images/avatars/eyes/brown.png" alt="Brown">
+                          </div>
+                          <div class="avatar-option" data-value="gray" title="Gray">
+                            <img src="/static/images/avatars/eyes/gray.png" alt="Gray">
+                          </div>
+                          <div class="avatar-option" data-value="green" title="Green">
+                            <img src="/static/images/avatars/eyes/green.png" alt="Green">
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="avatar-category">
+                        <label>Hair:</label>
+                        <div class="avatar-options" id="hair-options">
+                          <div class="avatar-option" data-value="one_blonde" title="Blonde (Short)">
+                            <img src="/static/images/avatars/hair/one_blonde.png" alt="Blonde Short">
+                          </div>
+                          <div class="avatar-option" data-value="one_brown" title="Brown (Short)">
+                            <img src="/static/images/avatars/hair/one_brown.png" alt="Brown Short">
+                          </div>
+                          <div class="avatar-option" data-value="two_blonde" title="Blonde (Long)">
+                            <img src="/static/images/avatars/hair/two_blonde.png" alt="Blonde Long">
+                          </div>
+                          <div class="avatar-option" data-value="two_brown" title="Brown (Long)">
+                            <img src="/static/images/avatars/hair/two_brown.png" alt="Brown Long">
+                          </div>
+                        </div>
+                      </div>
+
+                    </div>
+                </div>
+            </div>
+      `;
+
+      showModal("Edit Avatar", modalHTML, [
+        {
+          text: "Save",
+          onClick: async () => {
+            // Get the selected face
+            const selectedFace = document.querySelector(
+              "#face-options .avatar-option.selected"
+            );
+            const face = selectedFace ? selectedFace.dataset.value : "white";
+
+            // Get the selected eyes
+            const selectedEyes = document.querySelector(
+              "#eyes-options .avatar-option.selected" // Fixed: was "#eye-options"
+            );
+            const eyes = selectedEyes ? selectedEyes.dataset.value : "blue";
+
+            // Get the selected hair
+            const selectedHair = document.querySelector(
+              "#hair-options .avatar-option.selected"
+            );
+            const hair = selectedHair
+              ? selectedHair.dataset.value
+              : "one_brown";
+
+            const newAvatar = JSON.stringify({ face, eyes, hair });
+
+            // Submit response
+            try {
+              const response = await fetch("/api/editprofile", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                credentials: "include",
+                body: JSON.stringify({ avatar: newAvatar }),
+              });
+              if (response.ok) {
+                showToast("Avatar updated!", { color: "success" });
+                showProfile();
+              } else {
+                showToast("An error occurred while updating avatar", {
+                  color: "error",
+                });
+              }
+            } catch (err) {
+              showToast("An error occurred while updating avatar", {
+                color: "error",
+              });
+            }
+          },
+          id: "save-avatar-btn",
+          textid: "save-avatar-text",
+        },
+      ]);
+
+      // Pre load selected option with the current options
+      document
+        .querySelectorAll("#face-options .avatar-option")
+        .forEach((option) => {
+          if (option.dataset.value === currentAvatar.face) {
+            option.classList.add("selected");
+          }
+        });
+      document
+        .querySelectorAll("#eyes-options .avatar-option")
+        .forEach((option) => {
+          if (option.dataset.value === currentAvatar.eyes) {
+            option.classList.add("selected");
+          }
+        });
+      document
+        .querySelectorAll("#hair-options .avatar-option")
+        .forEach((option) => {
+          if (option.dataset.value === currentAvatar.hair) {
+            option.classList.add("selected");
+          }
+        });
+
+      document
+        .querySelectorAll("#face-options .avatar-option")
+        .forEach((option) => {
+          option.addEventListener("click", function () {
+            document
+              .querySelectorAll("#face-options .avatar-option")
+              .forEach((opt) => opt.classList.remove("selected"));
+            this.classList.add("selected");
+            const value = this.dataset.value;
+            document.getElementById(
+              "preview-face"
+            ).src = `/static/images/avatars/face/${value}.png`;
+          });
+        });
+
+      // Add click listeners for eyes options
+      document
+        .querySelectorAll("#eyes-options .avatar-option")
+        .forEach((option) => {
+          option.addEventListener("click", function () {
+            document
+              .querySelectorAll("#eyes-options .avatar-option")
+              .forEach((opt) => opt.classList.remove("selected"));
+            this.classList.add("selected");
+            const value = this.dataset.value;
+            document.getElementById(
+              "preview-eyes"
+            ).src = `/static/images/avatars/eyes/${value}.png`;
+          });
+        });
+
+      // Add click listeners for hair options
+      document
+        .querySelectorAll("#hair-options .avatar-option")
+        .forEach((option) => {
+          option.addEventListener("click", function () {
+            document
+              .querySelectorAll("#hair-options .avatar-option")
+              .forEach((opt) => opt.classList.remove("selected"));
+            this.classList.add("selected");
+            const value = this.dataset.value;
+            document.getElementById(
+              "preview-hair"
+            ).src = `/static/images/avatars/hair/${value}.png`;
+          });
+        });
+    })
+    .catch((err) => {
+      showToast("Failed to load current avatar", { color: "error" });
+    });
 }

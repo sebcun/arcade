@@ -46,10 +46,27 @@
   width: 28px;
   height: 28px;
   bottom: 0;
-  right: 0;
+  right: 34;
   top: auto;
   left: auto;
   transform: none;
+}
+
+.profile-avatar .edit-avatar-btn {
+  position: absolute;
+  width: 25px;
+  height: 25px;
+  bottom: 3px;
+  right: 3px;
+  top: auto;
+  left: auto;
+  transform: none;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.profile-avatar .edit-avatar-btn:hover {
+  opacity: 0.65;
 }
 
 .profile-details {

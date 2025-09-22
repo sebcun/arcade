@@ -61,6 +61,16 @@ function showProfile(userid = null) {
             console.log(`Badge loading error: ${err}`);
           }
 
+          // Avatar
+          let avatar = { face: "white", eyes: "blue", hair: "one_brown" };
+          if (data.avatar) {
+            try {
+              avatar = JSON.parse(data.avatar);
+            } catch (e) {
+              console.log("Invalid avatar data");
+            }
+          }
+
           // Creation date of user
           let creationDate = "";
           const date = new Date(data.created_at);
@@ -101,11 +111,10 @@ function showProfile(userid = null) {
             <div class="profile-modal-content">
                 <div class="profile-scrollable">
                     <div class="profile-avatar"> 
-                      <img src="/static/images/avatars/face/white.png">
-                      <img src="/static/images/avatars/eyes/blue.png">
-                      <img src="/static/images/avatars/hair/two_blonde.png">
+                      <img src="/static/images/avatars/face/${avatar.face}.png">
+                      <img src="/static/images/avatars/eyes/${avatar.eyes}.png">
+                      <img src="/static/images/avatars/hair/${avatar.hair}.png">
                       <img src=${levelImage} class="level-image">
-
                     </div>
                     <div class="profile-details">
                         <h2>@${
@@ -197,6 +206,16 @@ function showProfile(userid = null) {
             console.log(`Badge loading error: ${err}`);
           }
 
+          // Avatar
+          let avatar = { face: "white", eyes: "blue", hair: "one_brown" };
+          if (data.avatar) {
+            try {
+              avatar = JSON.parse(data.avatar);
+            } catch (e) {
+              console.log("Invalid avatar data");
+            }
+          }
+
           // Creation Date of user
           let creationDate = "";
           const date = new Date(data.created_at);
@@ -230,21 +249,23 @@ function showProfile(userid = null) {
             `
             <div class="profile-modal-content">
                 <div class="profile-scrollable">
-                    <div class="profile-avatar"> 
-                      <img src="/static/images/avatars/face/white.png">
-                      <img src="/static/images/avatars/eyes/blue.png">
-                      <img src="/static/images/avatars/hair/one_brown.png">
-                      <img src=${levelImage} class="level-image">
-
-                    </div>
-                    <div class="profile-details">
+                  <div class="profile-avatar"> 
+                      <img src="/static/images/avatars/face/${avatar.face}.png">
+                      <img src="/static/images/avatars/eyes/${avatar.eyes}.png">
+                      <img src="/static/images/avatars/hair/${avatar.hair}.png">
+                      <div class="avatar-bottom">
+                        <img src="/static/images/Pencil.png" alt="Edit Avatar" onclick="showEditAvatar()" class="edit-avatar-btn">
+                        <img src=${levelImage} class="level-image">
+                      </div>
+                  </div>
+                  <div class="profile-details">
                         <h2>@${
                           data.username
                         } <span class="profile-badges">${badgesHTML}</span> </h2>
                         <p><strong>Level:</strong> ${data.level}</p>
                         <p><strong>Joined:</strong> ${creationDate}</p>
                         <p><strong>Bio:</strong> ${data.bio || "Not Set"}</p>
-                    </div>
+                  </div>
                 </div>
                 <div class="profile-buttons">
                     <a onclick="shareProfile()">

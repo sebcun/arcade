@@ -26,6 +26,10 @@
       rel="stylesheet"
       href="{{ url_for('static', filename='css/settings.css')}}"
     />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/loading.css')}}"
+    />
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -39,6 +43,13 @@
     />
   </head>
   <body>
+    <div id="loading-screen">
+      <div class="loading-content">
+        <div class="spinner"></div>
+        <p>Loading</p>
+      </div>
+    </div>
+
     <!-- Navbar -->
     <div class="navbar">
       <div class="navbar-brand">
@@ -160,5 +171,6 @@
     <script src="{{ url_for('static', filename='js/profile.js')}}"></script>
     <script src="{{ url_for('static', filename='js/settings.js')}}"></script>
     <script src="{{ url_for('static', filename='js/parameters.js')}}"></script>
+    <script src="{{ url_for('static', filename='js/loading.js')}}"></script>
   </body>
 </html>

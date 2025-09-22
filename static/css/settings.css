@@ -61,3 +61,44 @@
 .settings-edit-img:hover {
   opacity: 0.65;
 }
+
+.avatar-category {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-bottom: 15px;
+}
+
+.avatar-options {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.avatar-option {
+  width: 40px;
+  height: 40px;
+  border: 2px solid #171843;
+  border-radius: 8px;
+  background-color: #2b2c6d;
+  cursor: pointer;
+  transition: border-color 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px;
+}
+
+.avatar-option:hover {
+  border-color: #27285f;
+}
+
+.avatar-option.selected {
+  border-color: #6fd372; /* Green for selected */
+}
+
+.avatar-option img {
+  width: 100%;
+  height: 100%;
+  border-radius: 4px;
+}
