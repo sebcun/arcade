@@ -24,6 +24,14 @@ def index():
         return render_template("index.html", LOGGEDIN=True, WEBSITE=websiteURL)
     return render_template("index.html", LOGGEDIN=False, WEBSITE=websiteURL)
 
+@app.route("/docs")
+def docs():
+    websiteURL = os.getenv("WEBSITE", "https://arcade.sebcun.com")
+
+    if "email" in session:
+        return render_template("docs.html", LOGGEDIN=True, WEBSITE=websiteURL)
+    return render_template("docs.html", LOGGEDIN=False, WEBSITE=websiteURL)
+
 
 @app.route("/create")
 def create():

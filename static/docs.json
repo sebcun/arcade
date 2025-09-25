@@ -1,0 +1,259 @@
+{
+  "introduction": {
+    "title": "Introduction to Arcade",
+    "content": [
+      {
+        "type": "text",
+        "content": "Welcome to <b>Arcade!</b> <br> <br>Arcade is a website where you can play, and publish simple Sprite games with a high level programming language. Perfect for beginners."
+      },
+      { "type": "text", "content": "Hello world!" },
+      { "type": "sub", "content": "Hello world!" },
+      { "type": "code", "content": "Hello world!" }
+    ]
+  },
+  "commands": {
+    "WAIT": {
+      "title": "WAIT Command",
+      "content": [
+        {
+          "type": "text",
+          "content": "Pauses code for the specified amount of seconds."
+        },
+        {
+          "type": "sub",
+          "content": "Syntax"
+        },
+        {
+          "type": "code",
+          "content": "WAIT (seconds)"
+        },
+        {
+          "type": "sub",
+          "content": "Example Usage"
+        },
+        {
+          "type": "code",
+          "content": "WAIT 2"
+        },
+        {
+          "type": "br",
+          "content": ""
+        },
+        {
+          "type": "br",
+          "content": ""
+        },
+        {
+          "type": "code",
+          "content": "WAIT 0.5"
+        }
+      ]
+    },
+    "SPAWN": {
+      "title": "SPAWN Command",
+      "content": [
+        { "type": "text", "content": "Spawns a sprite at the given position." },
+        { "type": "sub", "content": "Syntax" },
+        { "type": "code", "content": "SPAWN (sprite) AT (x),(y)" },
+        { "type": "sub", "content": "Example Usage" },
+        { "type": "code", "content": "SPAWN sprite1 AT 10,10" },
+        { "type": "br", "content": "" },
+        { "type": "br", "content": "" },
+        {
+          "type": "code",
+          "content": "SPAWN sprite2 AT sprite1.x+3,sprite1.y+10"
+        },
+        { "type": "br", "content": "" },
+        { "type": "br", "content": "" },
+        { "type": "code", "content": "SPAWN sprite2 AT 10+5,posY" }
+      ]
+    },
+    "DESPAWN": {
+      "title": "DESPAWN Command",
+      "content": [
+        { "type": "text", "content": "Removes a spawned sprite." },
+        { "type": "sub", "content": "Syntax" },
+        { "type": "code", "content": "DESPAWN (sprite)" },
+        { "type": "sub", "content": "Example Usage" },
+        { "type": "code", "content": "DESPAWN sprite1" },
+        { "type": "br", "content": "" },
+        { "type": "br", "content": "" },
+        { "type": "code", "content": "DESPAWN sprite2" }
+      ]
+    },
+    "MOVE": {
+      "title": "MOVE Command",
+      "content": [
+        {
+          "type": "text",
+          "content": "Moves a sprite to the specified position."
+        },
+        { "type": "sub", "content": "Syntax" },
+        { "type": "code", "content": "MOVE (sprite) TO (x),(y)" },
+        { "type": "sub", "content": "Example Usage" },
+        { "type": "code", "content": "MOVE sprite1 TO 100,100" },
+        { "type": "br", "content": "" },
+        { "type": "br", "content": "" },
+        { "type": "code", "content": "MOVE sprite1 TO sprite1.x+5,sprite1.y" },
+        { "type": "br", "content": "" },
+        { "type": "br", "content": "" },
+        { "type": "code", "content": "MOVE sprite1 TO posX,15" }
+      ]
+    },
+    "SCALE": {
+      "title": "SCALE Command",
+      "content": [
+        {
+          "type": "text",
+          "content": "Scales a sprite by the specified multipler."
+        },
+        { "type": "sub", "content": "Syntax" },
+        { "type": "code", "content": "SCALE (sprite) TO (multiplier)" },
+        { "type": "sub", "content": "Example Usage" },
+        { "type": "code", "content": "SCALE sprite1 TO 0.5" },
+        { "type": "br", "content": "" },
+        { "type": "br", "content": "" },
+        { "type": "code", "content": "SCALE sprite1 TO 2" },
+        { "type": "br", "content": "" },
+        { "type": "br", "content": "" },
+        { "type": "code", "content": "SCALE sprite1 TO 1" }
+      ]
+    },
+    "TINT": {
+      "title": "TINT Command",
+      "content": [
+        {
+          "type": "text",
+          "content": "Applies a color tint to a sprite."
+        },
+        { "type": "sub", "content": "Syntax" },
+        { "type": "code", "content": "TINT (sprite) TO (hex)" },
+        { "type": "sub", "content": "Example Usage" },
+        { "type": "code", "content": "TINT sprite1 TO ff0000" },
+        { "type": "br", "content": "" },
+        { "type": "br", "content": "" },
+        { "type": "code", "content": "TINT sprite1 TO #ff0000" },
+        { "type": "br", "content": "" },
+        { "type": "br", "content": "" },
+        { "type": "code", "content": "TINT sprite1 TO #000000" }
+      ]
+    },
+    "ROTATE": {
+      "title": "ROTATE Command",
+      "content": [
+        {
+          "type": "text",
+          "content": "Rotates a sprite to the specified degree."
+        },
+        { "type": "sub", "content": "Syntax" },
+        { "type": "code", "content": "ROTATE (sprite) TO (degrees)" },
+        { "type": "sub", "content": "Example Usage" },
+        { "type": "code", "content": "ROTATE sprite1 TO 90" },
+        { "type": "br", "content": "" },
+        { "type": "br", "content": "" },
+        { "type": "code", "content": "ROTATE sprite1 TO 180" },
+        { "type": "br", "content": "" },
+        { "type": "br", "content": "" },
+        { "type": "code", "content": "ROTATE sprite1 TO 5" }
+      ]
+    },
+    "HIDE": {
+      "title": "HIDE Command",
+      "content": [
+        {
+          "type": "text",
+          "content": "Hides a sprite without despawning it. Commands such as MOVE can still be used on them."
+        },
+        { "type": "sub", "content": "Syntax" },
+        { "type": "code", "content": "HIDE (sprite)" },
+        { "type": "sub", "content": "Example Usage" },
+        { "type": "code", "content": "HIDE sprite1" },
+        { "type": "br", "content": "" },
+        { "type": "br", "content": "" },
+        { "type": "code", "content": "HIDE sprite2" }
+      ]
+    },
+    "SHOW": {
+      "title": "SHOW Command",
+      "content": [
+        {
+          "type": "text",
+          "content": "Shows a hidden sprite hidden using the HIDE command."
+        },
+        { "type": "sub", "content": "Syntax" },
+        { "type": "code", "content": "SHOW (sprite)" },
+        { "type": "sub", "content": "Example Usage" },
+        { "type": "code", "content": "SHOW sprite1" },
+        { "type": "br", "content": "" },
+        { "type": "br", "content": "" },
+        { "type": "code", "content": "SHOW sprite2" }
+      ]
+    },
+    "STORE": {
+      "title": "STORE Command",
+      "content": [
+        {
+          "type": "text",
+          "content": "Stores a command in a variable."
+        },
+        { "type": "sub", "content": "Syntax" },
+        { "type": "code", "content": "STORE (value) AS (varname)" },
+        { "type": "sub", "content": "Example Usage" },
+        { "type": "code", "content": "STORE 0 AS score" },
+        { "type": "br", "content": "" },
+        { "type": "br", "content": "" },
+        { "type": "code", "content": "STORE score+1 AS score" },
+        { "type": "br", "content": "" },
+        { "type": "br", "content": "" },
+        { "type": "code", "content": "STORE sprite1.x AS posX" }
+      ]
+    },
+    "LOG": {
+      "title": "LOG Command",
+      "content": [
+        {
+          "type": "text",
+          "content": "Logs a message or value to the console."
+        },
+        { "type": "sub", "content": "Syntax" },
+        { "type": "code", "content": "LOG (string or expression)" },
+        { "type": "sub", "content": "Example Usage" },
+        { "type": "code", "content": "LOG 10" },
+        { "type": "br", "content": "" },
+        { "type": "br", "content": "" },
+        { "type": "code", "content": "LOG score" },
+        { "type": "br", "content": "" },
+        { "type": "br", "content": "" },
+        { "type": "code", "content": "LOG sprite1.x" },
+        { "type": "br", "content": "" },
+        { "type": "br", "content": "" },
+        { "type": "code", "content": "LOG \"CURRENT SCORE: ${score}\"" }
+      ]
+    }
+  },
+  "events": {
+    "ON KEY": {
+      "title": "ON KEY Event",
+      "content": [
+        {
+          "type": "text",
+          "content": "Runs the code inside the block when a key on the keyboard is pressed."
+        },
+        { "type": "sub", "content": "Syntax" },
+        { "type": "code", "content": "ON KEY '(key)'\n\nEND ON" },
+        { "type": "sub", "content": "Example Usage" },
+        {
+          "type": "code",
+          "content": "ON KEY 'w'\n  MOVE sprite1 TO sprite1.x,sprite1.y-5\nEND ON"
+        },
+        { "type": "br", "content": "" },
+        { "type": "br", "content": "" },
+        {
+          "type": "code",
+          "content": "ON KEY 's'\n  MOVE sprite1 TO sprite1.x,sprite1.y+5\nEND ON"
+        }
+      ]
+    }
+  },
+  "api": {}
+}
