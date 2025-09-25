@@ -237,3 +237,51 @@ body {
     opacity: 0.5;
   }
 }
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.form-group label {
+  color: #b0b0b0;
+}
+
+.form-group input[type="email"],
+.form-group input[type="password"],
+.form-group input[type="text"],
+.form-group input[type="username"],
+.form-group textarea {
+  padding: 12px;
+  border: 2px solid #171843;
+  border-radius: 8px;
+  font-size: 16px;
+  transition: border-color 0.3s ease;
+  background-color: #2b2c6d;
+  resize: none;
+}
+
+.form-group input[type="email"]:focus,
+.form-group input[type="password"]:focus,
+.form-group input[type="text"]:focus,
+.form-group input[type="username"]:focus,
+.form-group textarea:focus {
+  border-color: #27285f;
+  outline: none;
+}
+
+.lorm-group input[type="email"]:blur,
+.form-group input[type="password"]:blur,
+.form-group input[type="text"]:blur,
+.form-group input[type="username"]:blur,
+.form-group textarea:blur {
+  border-color: #ddd;
+}
+
+.form-group input[type="email"].error,
+.form-group input[type="password"].error,
+.form-group input[type="username"].error,
+.form-group textarea.error {
+  border: 2px solid red !important;
+}

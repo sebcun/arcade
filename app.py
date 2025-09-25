@@ -6,9 +6,14 @@ from db import (
     getUserProfile,
     updateUserProfile,
     giveBadge,
+    createGame,
+    getUserGames,
+    getGame,
+    saveGame
 )
 from utils import *
 import os
+import json
 
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY", "YourSecretKey")
@@ -121,6 +126,45 @@ def get_images():
                 images.append(rel_path.replace("\\", "/"))
     return images
 
+@app.route('/api/games', methods=['GET'])
+def get_user_games():
+    if "userid" not in session:
+        return jsonify({"error": "Not logged in"}), 401
+    
+    games, status = getUserGames(session['userid'])
+    return jsonify(games), status
+
+@app.route("/api/games", methods=["POST"])
+def create_new_game():
+    if "userid" not in session:
+        return jsonify({"error": "Not logged in"}), 401
+    
+    data = request.get_json()
+    title = data.get("title")
+    description = data.get("description", "")
+    
+    result, status = createGame(session["userid"], title, description)
+    return jsonify(result), status
+
+@app.route("/api/games/<int:game_id>", methods=["GET"])
+def get_game_data(game_id):
+    if "userid" not in session:
+        return jsonify({"error": "Not logged in"}), 401
+    
+    result, status = getGame(game_id, session['userid'])
+    return jsonify(result), status
+
+@app.route("/api/games/<int:game_id>/save", methods=["POST"])
+def save_game_data(game_id):
+    if "userid" not in session:
+        return jsonify({"error": "Not logged in"}), 401
+    
+    data = request.get_json()
+    code = data.get("code", "")
+    sprites_data = data.get("sprites", [])
+    
+    result, status = saveGame(game_id, session["userid"], code, sprites_data)
+    return jsonify(result), status
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", debug=True)

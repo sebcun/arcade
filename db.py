@@ -1,9 +1,12 @@
 import sqlite3
 import json
 import os
+import base64
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 from utils import cleanEmail, cleanUsername, cleanPassword
+from PIL import Image
+from io import BytesIO
 
 
 def getDbConnection():
@@ -43,6 +46,17 @@ def initDb():
                         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                         FOREIGN KEY (user_id) REFERENCES users(id)
                     )''')
+    
+    # Games table
+    conn.execute('''CREATE TABLE IF NOT EXISTS games (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        user_id INTEGER NOT NULL,
+                        title TEXT NOT NULL,
+                        description TEXT,
+                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        FOREIGN KEY (user_id) REFERENCES users(id)
+                 )''')
 
 
     conn.commit()
@@ -204,3 +218,140 @@ def giveBadge(userid, badgeid, badgeName, badgeDescription, createdAt=None):
     if status == 200:
         return {"message": "Badge given."}, 200
     return result, status
+
+def createGame(user_id, title, description=""):
+    if not user_id or not title:
+        return {"error": "User ID and title are required"}, 400
+    
+    if len(title) > 100:
+        return {"error": "Title must be 100 characters or less"}, 400
+    
+    if len(description) > 500:
+        return {"error": "Description must be 500 characters or less"}, 400
+    
+    conn = getDbConnection()
+    try:
+        cursor = conn.execute(
+            'INSERT INTO games (user_id, title, description) VALUES (?, ?, ?)',
+            (user_id, title, description)
+        )
+        game_id = cursor.lastrowid
+        conn.commit()
+        
+        game_dir = f"static/games/{game_id}"
+        os.makedirs(game_dir, exist_ok=True)
+        
+        with open(f"{game_dir}/code.ar", 'w') as f:
+            f.write("")
+            
+        
+        with open(f"{game_dir}/sprites.json", 'w') as f:
+            json.dump([], f)
+            
+        return {"message": "Game created successfully", "game_id": game_id}, 201
+    except sqlite3.IntegrityError:
+        return {"error": "Failed to create game"}, 400
+    finally:
+        conn.close()
+        
+def getUserGames(user_id):
+    if not user_id:
+        return {"error": "User ID is requred"}, 400
+    
+    conn = getDbConnection()
+    games = conn.execute(
+        'SELECT id, title, description, created_at, updated_at FROM games WHERE user_id = ? ORDER BY updated_at DESC',
+        (user_id,)
+    ).fetchall()
+    conn.close()
+    
+    
+    return [{
+        "id": game['id'],
+        "title": game['title'],
+        "description": game['description'],
+        "created_at": game['created_at'],
+        "updated_at": game['updated_at']
+    } for game in games], 200
+    
+def getGame(game_id, user_id):
+    if not game_id or not user_id:
+        return {"error": "Game ID and User ID are requred"}, 400
+    
+    conn = getDbConnection()
+    game = conn.execute(
+        'SELECT * FROM games WHERE id = ? AND user_id = ?',
+        (game_id,user_id)
+    ).fetchone()
+    conn.close()
+    
+    if not game:
+        return {"error": "Game not found"}, 404
+    
+    game_dir = f"static/games/{game_id}"
+    code_content = ""
+    sprites = []
+    
+    try:
+        if os.path.exists(f"{game_dir}/code.ar"):
+            with open(f"{game_dir}/code.ar", 'r') as f:
+                code_content = f.read()
+                
+        if os.path.exists(f"{game_dir}/sprites.json"):
+            with open(f"{game_dir}/sprites.json", 'r') as f:
+                sprites = json.load(f)
+            
+    except Exception as e:
+        print(f"Error loading game files: {e}")
+        
+    return {
+        "id": game["id"],
+        "title": game["title"],
+        "description": game["description"], 
+        "created_at": game["created_at"],
+        "updated_at": game["updated_at"],
+        "code": code_content,
+        "sprites": sprites
+    }, 200
+    
+def saveGame(game_id, user_id, code="", sprites_data=None):
+    if not game_id or not user_id:
+        return {"error": "Game ID and User ID are requred"}, 400
+    
+    conn = getDbConnection()
+    game = conn.execute(
+        'SELECT id FROM games WHERE id = ? AND user_id = ?',
+        (game_id, user_id)
+    ).fetchone()
+    
+    if not game:
+        conn.close()
+        return {"error": "Game not found"}, 404
+    
+    try:
+        conn.execute(
+            'UPDATE games SET updated_at = CURRENT_TIMESTAMP where id = ?',
+            (game_id,)
+        )
+        conn.commit()
+        
+        game_dir = f"static/games/{game_id}"
+        
+        os.makedirs(game_dir, exist_ok=True)
+        
+        with open(f"{game_dir}/code.ar", 'w') as f:
+            f.write(code)
+            
+        if sprites_data:
+            with open(f"{game_dir}/sprites.json", 'w') as f:
+                json.dump(sprites_data, f)
+        else:
+            with open(f"{game_dir}/sprites.json", 'w') as f:
+                json.dump([], f)
+                
+        return {"message": "Game saved successfully"}, 200
+        
+    except Exception as e:
+        return {"error": "failed to save game"}, 400
+    finally:
+        conn.close()

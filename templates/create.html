@@ -8,31 +8,56 @@
 <script src="{{ url_for('static', filename='js/create.js') }}"></script>
 {% endblock %} {% block content %} {% if LOGGEDIN %}
 <div class="create-container">
-  {# Sprite/pixel editor #}
-  <div class="pixel-editor-section">
-    <h3>Sprite Editor</h3>
-    <canvas id="pixelCanvas" width="320" height="320"></canvas>
-    <div class="tools">
-      <input type="color" id="colorPicker" value="#000000" />
-      <button id="clearButton">Clear</button>
-      <button id="saveSpriteButton">Save Sprite</button>
+  {# Project Info Bar #}
+  <div class="project-info-bar">
+    <div class="project-info">
+      <h2 id="projectTitle">No Project Selected</h2>
     </div>
-    <div id="spritesList"></div>
+    <div class="project-actions">
+      <button id="resetButton" style="display: none">Reset</button>
+      <button id="runButton" style="display: none">Run</button>
+      <button id="saveButton" style="display: none">Save Project</button>
+      <button id="selectProjectButton">Select/Create Project</button>
+    </div>
   </div>
 
-  {# Code Editor #}
-  <div class="code-section">
-    <h3>Code Editor</h3>
-    <textarea id="codeBox" rows="20" cols="50" placeholder="ON 'e'"></textarea>
-    <button id="runButton">Run</button>
-    <button id="resetButton">Reset</button>
-  </div>
+  {# Main Editor Container #}
+  <div class="editor-container" id="editorContainer" style="display: none">
+    {# Sprite/pixel editor #}
+    <div class="pixel-editor-section">
+      <h3>Sprite Editor</h3>
+      <canvas id="pixelCanvas" width="320" height="320"></canvas>
+      <div class="tools">
+        <input type="color" id="colorPicker" value="#000000" />
+        <button id="clearButton">Clear</button>
+        <button id="saveSpriteButton">Save Sprite</button>
+      </div>
+      <div id="spritesList"></div>
+    </div>
 
-  {# Preview #}
-  <div class="preview-section">
-    <h3>Preview</h3>
-    <canvas id="previewCanvas" width="640" height="480"></canvas>
-    <span id="cursorPosition">Cursor: Not on canvas</span>
+    {# Code Editor #}
+    <div class="code-section">
+      <h3>Code Editor</h3>
+      <textarea
+        id="codeBox"
+        rows="20"
+        cols="50"
+        placeholder="ON 'e'"
+      ></textarea>
+    </div>
+
+    {# Preview #}
+    <div class="preview-section">
+      <h3>Preview</h3>
+      <canvas id="previewCanvas" width="640" height="480"></canvas>
+      <span id="cursorPosition">Cursor: Not on canvas</span>
+    </div>
   </div>
+</div>
+{% else %}
+<div class="not-logged-in">
+  <h2>Create Games</h2>
+  <p>Please log in to create and manage your games.</p>
+  <button onclick="showLoginModal()" class="login-btn">Login</button>
 </div>
 {% endif %} {% endblock %}

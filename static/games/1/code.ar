@@ -1,0 +1,3 @@
+SPAWN sprite1 AT 10,10
+WAIT 1
+MOVE sprite1 TO sprite1.x+50,sprite1.y

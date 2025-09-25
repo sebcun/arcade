@@ -138,68 +138,6 @@
   font-size: 16px;
 }
 
-/* Login/Register Modal */
-.login-form,
-.register-form {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-}
-
-.login-form-group,
-.register-form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
-
-.login-form label,
-.register-form label {
-  color: #b0b0b0;
-}
-
-.login-form input[type="email"],
-.login-form input[type="password"],
-.register-form input[type="text"],
-.register-form input[type="email"],
-.register-form input[type="password"] {
-  padding: 12px;
-  border: 2px solid #171843;
-  border-radius: 8px;
-  font-size: 16px;
-  transition: border-color 0.3s ease;
-  background-color: #2b2c6d;
-}
-
-.login-form input[type="email"]:focus,
-.login-form input[type="password"]:focus,
-.register-form input[type="text"]:focus,
-.register-form input[type="email"]:focus,
-.register-form
-  input[type="password"]:focus
-  .register-form
-  input[type="username"]:focus {
-  border-color: #27285f;
-  outline: none;
-}
-
-.login-form input[type="email"]:blur,
-.login-form input[type="password"]:blur,
-.login-register input[type="text"]:blur,
-.login-register input[type="email"]:blur,
-.login-register input[type="password"]:blur,
-.register-form input[type="username"]:blur {
-  border-color: #ddd;
-}
-
-.login-form input[type="email"].error,
-.login-form input[type="password"].error,
-.register-form input[type="email"].error,
-.register-form input[type="password"].error,
-.register-form input[type="username"].error {
-  border: 2px solid red !important;
-}
-
 .modal-seperator {
   display: flex;
   align-items: center;

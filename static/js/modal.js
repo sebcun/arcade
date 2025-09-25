@@ -59,7 +59,7 @@ function showLoginModal() {
     if (!response.ok) {
       const loginFormHTML = `
   <form id="login-form" class="login-form">
-    <div class="login-form-group">
+    <div class="form-group">
         <label for="email">Email:</label>
         <input
             type="email"
@@ -70,7 +70,7 @@ function showLoginModal() {
         />
     </div>
 
-    <div class="login-form-group" style="margin-bottom: 20px">
+    <div class="form-group" style="margin-bottom: 20px">
         <label for="password">Password:</label>
         <input
             type="password"
@@ -219,7 +219,7 @@ function showRegisterModal() {
     if (!response.ok) {
       const registerFormHTML = `
   <form id="register-form" class="register-form">
-    <div class="register-form-group">
+    <div class="form-group">
         <label for="email">Email:</label>
         <input
             type="email"
@@ -230,7 +230,7 @@ function showRegisterModal() {
         />
     </div>
 
-      <div class="register-form-group">
+      <div class="form-group">
         <label for="username">Username:</label>
         <input
             type="text"
@@ -241,7 +241,7 @@ function showRegisterModal() {
         />
     </div>
 
-    <div class="register-form-group" style="margin-bottom: 20px">
+    <div class="form-group" style="margin-bottom: 20px">
         <label for="password">Password:</label>
         <input
             type="password"

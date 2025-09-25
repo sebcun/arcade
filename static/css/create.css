@@ -1,6 +1,6 @@
 .create-container {
   display: flex;
-  justify-content: flex-start;
+  flex-direction: column; /* Changed to column to stack project info at top */
   padding: 20px;
   gap: 20px;
   background-color: #111d35;
@@ -9,9 +9,60 @@
   min-height: 100vh;
 }
 
+.project-info-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #171843;
+  padding: 15px 20px;
+  border-radius: 8px;
+  border: 1px solid #2b2c6d;
+  margin-bottom: 20px;
+}
+
+.project-info h2 {
+  margin: 0;
+}
+
+.project-info p {
+  margin: 5px 0 0 0;
+  font-size: 14px;
+}
+
+.project-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.project-actions button {
+  background-color: #2b2c6d;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 300;
+  transition: background-color 0.3s ease;
+}
+
+.project-actions button:hover:not(:disabled) {
+  background-color: #171843;
+}
+
+.project-actions button:disabled {
+  background-color: #444;
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.editor-container {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  gap: 20px; /* Added gap for spacing between sections */
+}
+
 .pixel-editor-section {
-  flex: 0 0 auto;
-  width: 360px;
+  flex: 0 0 20%; /* Changed to 20% width */
   background-color: #171843;
   padding: 10px;
   border-radius: 8px;
@@ -19,8 +70,7 @@
 }
 
 .code-section {
-  flex: 0 0 auto;
-  width: 550px;
+  flex: 0 0 30%; /* Changed to 30% width */
   background-color: #171843;
   padding: 10px;
   border-radius: 8px;
@@ -28,7 +78,7 @@
 }
 
 .preview-section {
-  flex: 1;
+  flex: 0 0 50%; /* Changed to 50% width */
   background-color: #171843;
   padding: 10px;
   border-radius: 8px;
