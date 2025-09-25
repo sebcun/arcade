@@ -149,7 +149,7 @@ async function executeCode(code, sprites, ctx) {
     } else if (cmd === "ROTATE") {
       if (parts.length >= 4 && parts[2] === "TO") {
         const spriteName = parts[1];
-        const degreesStr = parseFloat(degreesStr);
+        const degreesStr = parts[3];
         const degrees = parseFloat(degreesStr);
         if (isNaN(degrees)) {
           console.log(
