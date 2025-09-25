@@ -1,6 +1,7 @@
 const activeSprites = [];
 const keyHandlers = {};
 let keyListenerAdded = false;
+const variables = {};
 
 function buildContext() {
   const context = {};
@@ -13,6 +14,9 @@ function buildContext() {
       visible: s.visible,
     };
   });
+  for (const [key, value] of Object.entries(variables)) {
+    context[key] = value;
+  }
   return context;
 }
 
@@ -25,6 +29,16 @@ function evaluateExpression(expr, context) {
   } catch (e) {
     throw new Error(`Invalid expression: ${expr}. ${e.message}`);
   }
+}
+
+function interpolateString(str, context) {
+  return str.replace(/\$\{([^}]+)\}/g, (match, expr) => {
+    try {
+      return evaluateExpression(expr, context);
+    } catch (e) {
+      return match;
+    }
+  });
 }
 
 function sleep(ms) {
@@ -358,6 +372,65 @@ async function executeCode(code, sprites, ctx) {
       continue;
     }
 
+    if (cmd === "STORE") {
+      const asIndex = parts.indexOf("AS");
+      if (asIndex === -1 || asIndex < 2 || asIndex === parts.length - 1) {
+        console.log(
+          `${i + 1} STORE: invalid syntax. Expected STORE <value> AS <varname>`
+        );
+        i++;
+        continue;
+      }
+      const valueParts = parts.slice(1, asIndex);
+      const valueExpr = valueParts.join(" ");
+      const varname = parts[asIndex + 1];
+      if (parts.length > asIndex + 2) {
+        console.log(`${i + 1} STORE: variable name must be one word`);
+        i++;
+        continue;
+      }
+      if (/^sprite\d+$/i.test(varname)) {
+        console.log(`${i + 1} STORE: variable name cannot be sprite[number]`);
+        i++;
+        continue;
+      }
+      const context = buildContext();
+      try {
+        const value = evaluateExpression(valueExpr, context);
+        variables[varname] = value;
+      } catch (e) {
+        console.log(`${i + 1} STORE: ${e.message}`);
+      }
+      i++;
+      continue;
+    }
+
+    if (cmd === "LOG") {
+      if (parts.length < 2) {
+        console.log(`${i + 1} LOG: missing argument`);
+        i++;
+        continue;
+      }
+      const arg = parts.slice(1).join(" ");
+      if (arg.startsWith('"') && arg.endsWith('"')) {
+        // string, possibly interpolate
+        const str = arg.slice(1, -1);
+        const interpolated = interpolateString(str, buildContext());
+        console.log(interpolated);
+      } else {
+        // expression
+        const context = buildContext();
+        try {
+          const value = evaluateExpression(arg, context);
+          console.log(value);
+        } catch (e) {
+          console.log(`${i + 1} LOG: ${e.message}`);
+        }
+      }
+      i++;
+      continue;
+    }
+
     console.log(`${i + 1} UNKNOWN: '${cmd}' in line '${line}'`);
     i++;
   }
@@ -429,7 +502,6 @@ function despawnSprite(name, ctx, lineno, line) {
 
 function applyTint(s) {
   const ctx = s.canvas.getContext("2d");
-  // Create a copy of the original ImageData
   const imageData = new ImageData(
     new Uint8ClampedArray(s.originalImageData.data),
     s.originalImageData.width,
@@ -437,28 +509,23 @@ function applyTint(s) {
   );
   const data = imageData.data;
 
-  // Parse tint RGB (normalize to 0-1)
   let r, g, b;
   if (s.tint.length === 4) {
-    // 3-digit hex, expand to 6
     r = (parseInt(s.tint[1], 16) * 17) / 255;
     g = (parseInt(s.tint[2], 16) * 17) / 255;
     b = (parseInt(s.tint[3], 16) * 17) / 255;
   } else {
-    // 6-digit hex
     r = parseInt(s.tint.slice(1, 3), 16) / 255;
     g = parseInt(s.tint.slice(3, 5), 16) / 255;
     b = parseInt(s.tint.slice(5, 7), 16) / 255;
   }
 
-  // Apply overlay blend for tint (only on opaque pixels)
   for (let i = 0; i < data.length; i += 4) {
     if (data[i + 3] > 0) {
       let or = data[i] / 255;
       let og = data[i + 1] / 255;
       let ob = data[i + 2] / 255;
 
-      // Overlay formula
       let nr = or < 0.5 ? 2 * or * r : 1 - 2 * (1 - or) * (1 - r);
       let ng = og < 0.5 ? 2 * og * g : 1 - 2 * (1 - og) * (1 - g);
       let nb = ob < 0.5 ? 2 * ob * b : 1 - 2 * (1 - ob) * (1 - b);
