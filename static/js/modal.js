@@ -345,8 +345,10 @@ function showLoginModal() {
 
   const emailInput = document.getElementById("email");
 
+  // clear previous buttons
   modalButtons.innerHTML = "";
 
+  // Next button
   const nextButton = document.createElement("button");
   nextButton.className = "long-button";
   nextButton.id = "login-next-btn";
@@ -364,6 +366,7 @@ function showLoginModal() {
   nextButton.disabled = true;
   modalButtons.appendChild(nextButton);
 
+  // OR separator
   const seperator = document.createElement("div");
   seperator.className = "modal-seperator";
   seperator.innerHTML = `
@@ -371,9 +374,11 @@ function showLoginModal() {
   `;
   modalButtons.appendChild(seperator);
 
+  // Create an Account (long button)
   const registerButton = document.createElement("button");
   registerButton.className = "long-button";
-  registerButton.addEventListener("click", function () {
+  registerButton.addEventListener("click", function (e) {
+    e.preventDefault();
     showRegisterModal();
   });
 
@@ -385,7 +390,25 @@ function showLoginModal() {
   const registerSpan = document.createElement("span");
   registerSpan.textContent = "Create an Account";
   registerButton.appendChild(registerSpan);
+
   modalButtons.appendChild(registerButton);
+
+  // Slack square button (below the long button)
+  const slackLoginButton = document.createElement("button");
+  slackLoginButton.className = "square-button slack-btn";
+  slackLoginButton.title = "Sign in with Slack";
+
+  const slackLoginImg = document.createElement("img");
+  slackLoginImg.src = "/static/images/SlackBtn.png";
+  slackLoginImg.alt = "Slack Sign In";
+  slackLoginButton.appendChild(slackLoginImg);
+
+  slackLoginButton.addEventListener("click", () => {
+    window.location.href = "/api/auth/slack";
+  });
+
+  // append Slack below the Create Account button
+  modalButtons.appendChild(slackLoginButton);
 
   function updateNextButton() {
     const emailValid = emailInput.checkValidity();
@@ -404,7 +427,8 @@ function showLoginModal() {
 
   updateNextButton();
 
-  nextButton.addEventListener("click", () => {
+  nextButton.addEventListener("click", (e) => {
+    e.preventDefault();
     const email = document.getElementById("email").value;
     if (!email || !emailInput.checkValidity()) {
       emailInput.classList.add("error");
@@ -491,10 +515,66 @@ function showRegisterModal() {
 
   let usernameValid = false;
 
+  // Next button (top)
+  const nextButton = document.createElement("button");
+  nextButton.className = "long-button";
+
+  const nextImg = document.createElement("img");
+  nextImg.src = "/static/images/LongButton.png";
+  nextImg.alt = "Next Button";
+  nextButton.appendChild(nextImg);
+
+  const nextSpan = document.createElement("span");
+  nextSpan.textContent = "Next";
+  nextButton.appendChild(nextSpan);
+  nextButton.disabled = true;
+
+  // Login long button (middle)
+  const loginButton = document.createElement("button");
+  loginButton.className = "long-button";
+  loginButton.addEventListener("click", function (e) {
+    e.preventDefault();
+    showLoginModal();
+  });
+
+  const loginImg = document.createElement("img");
+  loginImg.src = "/static/images/LongButtonTwo.png";
+  loginImg.alt = "Login Button";
+  loginButton.appendChild(loginImg);
+
+  const loginSpan = document.createElement("span");
+  loginSpan.textContent = "Login";
+  loginButton.appendChild(loginSpan);
+
+  // Slack square button (below the Login button) - disabled until agree checked
+  const slackRegisterButton = document.createElement("button");
+  slackRegisterButton.className = "square-button slack-btn";
+  slackRegisterButton.title = "Create an account with Slack";
+  slackRegisterButton.disabled = !agreeCheckbox.checked;
+  slackRegisterButton.setAttribute(
+    "aria-disabled",
+    slackRegisterButton.disabled ? "true" : "false"
+  );
+
+  const slackRegisterImg = document.createElement("img");
+  slackRegisterImg.src = "/static/images/SlackBtn.png";
+  slackRegisterImg.alt = "Slack Sign Up";
+  slackRegisterButton.appendChild(slackRegisterImg);
+
+  slackRegisterButton.addEventListener("click", () => {
+    if (slackRegisterButton.disabled) return;
+    window.location.href = "/api/auth/slack";
+  });
+
   function updateNextButton() {
     const emailValid = emailInput.checkValidity();
     const agreed = agreeCheckbox.checked;
     nextButton.disabled = !(emailValid && usernameValid && agreed);
+    slackRegisterButton.disabled = !agreed;
+    slackRegisterButton.setAttribute(
+      "aria-disabled",
+      slackRegisterButton.disabled ? "true" : "false"
+    );
   }
 
   emailInput.addEventListener("input", function () {
@@ -527,11 +607,24 @@ function showRegisterModal() {
 
   agreeCheckbox.addEventListener("change", updateNextButton);
 
+  // Build modal buttons area
   modalButtons.innerHTML = "";
+  modalButtons.appendChild(nextButton);
 
-  const nextButton = document.createElement("button");
-  nextButton.className = "long-button";
-  nextButton.addEventListener("click", () => {
+  const seperator = document.createElement("div");
+  seperator.className = "modal-seperator";
+  seperator.innerHTML = `
+  <span class="modal-seperator-text">OR</span>
+  `;
+  modalButtons.appendChild(seperator);
+
+  modalButtons.appendChild(loginButton);
+  // append Slack below the Login button
+  modalButtons.appendChild(slackRegisterButton);
+
+  // Hook up next button behavior (send code)
+  nextButton.addEventListener("click", (e) => {
+    e.preventDefault();
     const email = document.getElementById("email").value;
     const username = document.getElementById("username").value;
     const agreed = document.getElementById("agree-tos").checked;
@@ -602,40 +695,9 @@ function showRegisterModal() {
         console.error(err);
       });
   });
-  nextButton.disabled = true;
 
-  const nextImg = document.createElement("img");
-  nextImg.src = "/static/images/LongButton.png";
-  nextImg.alt = "Next Button";
-  nextButton.appendChild(nextImg);
-
-  const nextSpan = document.createElement("span");
-  nextSpan.textContent = "Next";
-  nextButton.appendChild(nextSpan);
-  modalButtons.appendChild(nextButton);
-
-  const seperator = document.createElement("div");
-  seperator.className = "modal-seperator";
-  seperator.innerHTML = `
-  <span class="modal-seperator-text">OR</span>
-  `;
-  modalButtons.appendChild(seperator);
-
-  const loginButton = document.createElement("button");
-  loginButton.className = "long-button";
-  loginButton.addEventListener("click", function () {
-    showLoginModal();
-  });
-
-  const loginImg = document.createElement("img");
-  loginImg.src = "/static/images/LongButtonTwo.png";
-  loginImg.alt = "Login Button";
-  loginButton.appendChild(loginImg);
-
-  const loginSpan = document.createElement("span");
-  loginSpan.textContent = "Login";
-  loginButton.appendChild(loginSpan);
-  modalButtons.appendChild(loginButton);
+  // initial sync
+  updateNextButton();
 }
 
 closeBtn.addEventListener("click", hideModal);

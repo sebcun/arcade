@@ -301,15 +301,29 @@ def verifyCode(email, code, mode="register"):
         return {"error": "Failed to verify code."}, 500
 
 
-def getUserProfile(userid):
-    if not userid:
+def getUserProfile(userid_or_email):
+    if not userid_or_email:
         return None
 
     conn = getDbConnection()
-    profile_row = conn.execute(
-        "SELECT p.*, u.username, u.email FROM profiles p JOIN users u ON p.user_id = u.id WHERE p.user_id = ?",
-        (userid,),
-    ).fetchone()
+
+    if isinstance(userid_or_email, str) and "@" in userid_or_email:
+        profile_row = conn.execute(
+            "SELECT p.*, u.username, u.email FROM profiles p JOIN users u ON p.user_id = u.id WHERE u.email = ?",
+            (userid_or_email,),
+        ).fetchone()
+    else:
+        try:
+            uid = int(userid_or_email)
+        except Exception:
+            conn.close()
+            return None
+
+        profile_row = conn.execute(
+            "SELECT p.*, u.username, u.email FROM profiles p JOIN users u ON p.user_id = u.id WHERE p.user_id = ?",
+            (uid,),
+        ).fetchone()
+
     conn.close()
 
     if not profile_row:
@@ -321,6 +335,7 @@ def getUserProfile(userid):
         badges = []
 
     return {
+        "id": profile_row["user_id"],
         "user_id": profile_row["user_id"],
         "username": profile_row["username"],
         "email": profile_row["email"],
@@ -495,14 +510,12 @@ def getAllGames():
     ], 200
 
 
-def getGame(game_id, user_id):
-    if not game_id or not user_id:
-        return {"error": "Game ID and User ID are requred"}, 400
+def getGame(game_id):
+    if not game_id:
+        return {"error": "Game ID is requred"}, 400
 
     conn = getDbConnection()
-    game = conn.execute(
-        "SELECT * FROM games WHERE id = ? AND user_id = ?", (game_id, user_id)
-    ).fetchone()
+    game = conn.execute("SELECT * FROM games WHERE id = ?", (game_id,)).fetchone()
     conn.close()
 
     if not game:
@@ -583,3 +596,47 @@ def saveGame(game_id, user_id, code="", sprites_data=None):
             conn.close()
         except Exception:
             pass
+
+
+def createUser(email):
+    if not email:
+        return {"error": "Email required."}, 400
+
+    cleanedEmail = cleanEmail(email)
+    if cleanedEmail is False:
+        return {"error": "Invalid email."}, 400
+
+    conn = getDbConnection()
+    try:
+        final_username = _generate_fallback_username(conn)
+        cursor = conn.execute(
+            "INSERT INTO users (email, username) VALUES (?, ?)",
+            (cleanedEmail, final_username),
+        )
+        user_id = cursor.lastrowid
+
+        conn.execute(
+            "INSERT INTO profiles (user_id, avatar, level, bio, badges) VALUES (?, ?, ?, ?, ?)",
+            (user_id, None, 1, None, json.dumps([])),
+        )
+        conn.commit()
+        conn.close()
+
+        return {
+            "message": "Account created.",
+            "userid": user_id,
+            "username": final_username,
+        }, 201
+
+    except sqlite3.IntegrityError:
+        try:
+            conn.close()
+        except Exception:
+            pass
+        return {"error": "Failed to create user; username or email may be taken."}, 500
+    except Exception:
+        try:
+            conn.close()
+        except Exception:
+            pass
+        return {"error": "Failed to create user."}, 500

@@ -22,14 +22,22 @@ from db import (
     getAllGames,
     getGame,
     saveGame,
+    createUser,
 )
 from utils import *
 import os
+import requests
 
 
 _env = dotenv_values(".env") or {}
 
-for key in ("SECRET_KEY", "WEBSITE"):
+for key in (
+    "SECRET_KEY",
+    "WEBSITE",
+    "SLACK_CLIENT_ID",
+    "SLACK_CLIENT_SECRET",
+    "SLACK_REDIRECT_URI",
+):
     if key in _env and os.getenv(key) is None:
         os.environ[key] = _env[key]
 
@@ -37,6 +45,10 @@ app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY", "YourSecretKey")
 
 initDb()
+
+SLACK_CLIENT_ID = os.getenv("SLACK_CLIENT_ID")
+SLACK_CLIENT_SECRET = os.getenv("SLACK_CLIENT_SECRET")
+SLACK_REDIRECT_URI = os.getenv("SLACK_REDIRECT_URI")
 
 
 @app.route("/")
@@ -67,6 +79,72 @@ def create():
 
 
 # Api Routes
+
+
+@app.route("/api/auth/slack")
+def slack_create_url():
+    slackAuthURL = (
+        "https://slack.com/openid/connect/authorize"
+        f"?response_type=code&client_id={SLACK_CLIENT_ID}"
+        f"&scope=openid%20profile%20email"
+        f"&redirect_uri={SLACK_REDIRECT_URI}"
+    )
+    return redirect(slackAuthURL)
+
+
+@app.route("/api/auth/slack/callback")
+def slack_callback():
+    code = request.args.get("code")
+    if not code:
+        return jsonify({"error": "No Slack code provided."}), 400
+
+    tokenResponse = requests.post(
+        "https://slack.com/api/openid.connect.token",
+        data={
+            "client_id": SLACK_CLIENT_ID,
+            "client_secret": SLACK_CLIENT_SECRET,
+            "code": code,
+            "redirect_uri": SLACK_REDIRECT_URI,
+        },
+    ).json()
+
+    if not tokenResponse.get("ok"):
+        return jsonify({"error": "Invalid login code provided from Slack."}), 400
+
+    # Get the user info
+    userInfo = requests.get(
+        "https://slack.com/api/openid.connect.userInfo",
+        headers={"Authorization": f"Bearer {tokenResponse['access_token']}"},
+    ).json()
+
+    email = userInfo.get("email")
+    if not email:
+        return jsonify({"error": "No email provided from Slack."}), 400
+
+    profile = getUserProfile(email)
+    if profile:
+        session["email"] = email
+        session["userid"] = profile["id"]
+    else:
+        result, status = createUser(email)
+        if status in (200, 201) and isinstance(result, dict) and result.get("userid"):
+            session["email"] = email
+            session["userid"] = result["userid"]
+            try:
+                giveBadge(
+                    session["userid"],
+                    "siege",
+                    "Siege",
+                    "Signed up during the Siege weeks!",
+                )
+            except Exception:
+                pass
+        else:
+            return jsonify({"error": "Failed to create account via Slack."}), 500
+
+    return redirect(url_for("index"))
+
+
 @app.route("/api/send_code", methods=["POST"])
 def api_send_code():
     data = request.get_json() or {}
@@ -221,10 +299,8 @@ def create_new_game():
 
 @app.route("/api/games/<int:game_id>", methods=["GET"])
 def get_game_data(game_id):
-    if "userid" not in session:
-        return jsonify({"error": "Not logged in"}), 401
 
-    result, status = getGame(game_id, session["userid"])
+    result, status = getGame(game_id)
     return jsonify(result), status
 
 
