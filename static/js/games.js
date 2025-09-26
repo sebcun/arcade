@@ -27,6 +27,7 @@ function startGame(gameidOrData, sprites = null, title = "Game") {
             return new ImageData(imgData, 320, 320);
           });
         }
+        setParameter("game", gameidOrData, false);
         runGameInModal(data.code || "", processedSprites, data.title || title);
       })
       .catch((err) => {
@@ -38,7 +39,6 @@ function startGame(gameidOrData, sprites = null, title = "Game") {
   }
 }
 function runGameInModal(code, sprites, title) {
-  console.log(title);
   gameModalTitle.textContent = title;
   gameModalContents.innerHTML = `<canvas id="gameCanvas" width="600" height="380"></canvas>`;
   const canvas = document.getElementById("gameCanvas");

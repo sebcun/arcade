@@ -19,66 +19,100 @@
           "type": "text",
           "content": "Pauses code for the specified amount of seconds."
         },
-        {
-          "type": "sub",
-          "content": "Syntax"
-        },
-        {
-          "type": "code",
-          "content": "WAIT (seconds)"
-        },
-        {
-          "type": "sub",
-          "content": "Example Usage"
-        },
+        { "type": "sub", "content": "Syntax" },
+        { "type": "code", "content": "WAIT (seconds)" },
+        { "type": "sub", "content": "Example 1 — Delay between logs" },
         {
           "type": "code",
-          "content": "WAIT 2"
+          "content": "LOG \"Start\"\nWAIT 1\nLOG \"One second later\""
         },
         {
-          "type": "br",
-          "content": ""
+          "type": "text",
+          "content": "This logs \"Start\", waits one second, then logs \"One second later\"."
         },
-        {
-          "type": "br",
-          "content": ""
-        },
+        { "type": "br", "content": "" },
+        { "type": "sub", "content": "Example 2 — Ticking loop" },
         {
           "type": "code",
-          "content": "WAIT 0.5"
+          "content": "LOOP\n  LOG \"tick\"\n  WAIT 0.5\nEND LOOP"
+        },
+        {
+          "type": "text",
+          "content": "This produces a repeating tick message every 0.5 seconds using a LOOP."
         }
       ]
     },
     "SPAWN": {
       "title": "SPAWN Command",
       "content": [
-        { "type": "text", "content": "Spawns a sprite at the given position." },
+        {
+          "type": "text",
+          "content": "Spawns a sprite at the given position. Coordinates and expressions are supported."
+        },
         { "type": "sub", "content": "Syntax" },
         { "type": "code", "content": "SPAWN (sprite) AT (x),(y)" },
-        { "type": "sub", "content": "Example Usage" },
-        { "type": "code", "content": "SPAWN sprite1 AT 10,10" },
-        { "type": "br", "content": "" },
-        { "type": "br", "content": "" },
+        { "type": "sub", "content": "Example 1 — Basic spawn" },
         {
           "type": "code",
-          "content": "SPAWN sprite2 AT sprite1.x+3,sprite1.y+10"
+          "content": "SPAWN sprite1 AT 10,10\nLOG \"spawned sprite1 at 10,10\""
+        },
+        {
+          "type": "text",
+          "content": "Spawns sprite1 at coordinates (10,10) and logs a confirmation."
         },
         { "type": "br", "content": "" },
+        {
+          "type": "sub",
+          "content": "Example 2 — Spawn using variables and expressions"
+        },
+        {
+          "type": "code",
+          "content": "STORE 20 AS posX\nSPAWN sprite2 AT posX,sprite1.y+5"
+        },
+        {
+          "type": "text",
+          "content": "Stores 20 in posX then spawns sprite2 at (posX, sprite1.y + 5), showing expression usage."
+        },
         { "type": "br", "content": "" },
-        { "type": "code", "content": "SPAWN sprite2 AT 10+5,posY" }
+        { "type": "sub", "content": "Example 3 — Spawn from an event" },
+        {
+          "type": "code",
+          "content": "ON KEY 's'\n  SPAWN sprite3 AT sprite1.x+30,sprite1.y\nEND KEY"
+        },
+        {
+          "type": "text",
+          "content": "Spawns sprite3 next to sprite1 when the 's' key is pressed."
+        }
       ]
     },
     "DESPAWN": {
       "title": "DESPAWN Command",
       "content": [
-        { "type": "text", "content": "Removes a spawned sprite." },
+        {
+          "type": "text",
+          "content": "Removes a spawned sprite so it is no longer drawn or touched."
+        },
         { "type": "sub", "content": "Syntax" },
         { "type": "code", "content": "DESPAWN (sprite)" },
-        { "type": "sub", "content": "Example Usage" },
-        { "type": "code", "content": "DESPAWN sprite1" },
+        { "type": "sub", "content": "Example 1 — Manual despawn" },
+        {
+          "type": "code",
+          "content": "DESPAWN sprite1\nLOG \"sprite1 removed\""
+        },
+        {
+          "type": "text",
+          "content": "Removes sprite1 and logs that it was removed."
+        },
         { "type": "br", "content": "" },
-        { "type": "br", "content": "" },
-        { "type": "code", "content": "DESPAWN sprite2" }
+        { "type": "sub", "content": "Example 2 — Despawn on touch" },
+        {
+          "type": "code",
+          "content": "ON TOUCH spriteA WITH spriteB\n  DESPAWN spriteB\n  LOG \"Removed the second sprite on touch\"\nEND TOUCH"
+        },
+        {
+          "type": "text",
+          "content": "When spriteA touches spriteB, spriteB is removed and a message is logged."
+        }
       ]
     },
     "MOVE": {
@@ -86,18 +120,39 @@
       "content": [
         {
           "type": "text",
-          "content": "Moves a sprite to the specified position."
+          "content": "Moves a sprite to the specified position. Expressions and variables are supported for coordinates."
         },
         { "type": "sub", "content": "Syntax" },
         { "type": "code", "content": "MOVE (sprite) TO (x),(y)" },
-        { "type": "sub", "content": "Example Usage" },
-        { "type": "code", "content": "MOVE sprite1 TO 100,100" },
+        { "type": "sub", "content": "Example 1 — Absolute move" },
+        {
+          "type": "code",
+          "content": "MOVE sprite1 TO 100,100\nLOG \"moved sprite1 to 100,100\""
+        },
+        {
+          "type": "text",
+          "content": "Moves sprite1 directly to (100,100) and logs the action."
+        },
         { "type": "br", "content": "" },
+        { "type": "sub", "content": "Example 2 — Move continuously in a loop" },
+        {
+          "type": "code",
+          "content": "LOOP\n  MOVE sprite1 TO sprite1.x+2,sprite1.y\n  WAIT 0.05\nEND LOOP"
+        },
+        {
+          "type": "text",
+          "content": "Moves sprite1 2 units to the right every 0.05 seconds creating smooth motion."
+        },
         { "type": "br", "content": "" },
-        { "type": "code", "content": "MOVE sprite1 TO sprite1.x+5,sprite1.y" },
-        { "type": "br", "content": "" },
-        { "type": "br", "content": "" },
-        { "type": "code", "content": "MOVE sprite1 TO posX,15" }
+        { "type": "sub", "content": "Example 3 — Using stored position" },
+        {
+          "type": "code",
+          "content": "STORE 50 AS targetX\nMOVE sprite2 TO targetX,10"
+        },
+        {
+          "type": "text",
+          "content": "Stores a target x coordinate and moves sprite2 to (targetX, 10)."
+        }
       ]
     },
     "SCALE": {
@@ -105,18 +160,39 @@
       "content": [
         {
           "type": "text",
-          "content": "Scales a sprite by the specified multipler."
+          "content": "Scales a sprite by the specified multiplier (positive number)."
         },
         { "type": "sub", "content": "Syntax" },
         { "type": "code", "content": "SCALE (sprite) TO (multiplier)" },
-        { "type": "sub", "content": "Example Usage" },
-        { "type": "code", "content": "SCALE sprite1 TO 0.5" },
+        { "type": "sub", "content": "Example 1 — Reduce size" },
+        {
+          "type": "code",
+          "content": "SCALE sprite1 TO 0.5\nLOG \"sprite1 half size\""
+        },
+        {
+          "type": "text",
+          "content": "Scales sprite1 to half its original size and logs the change."
+        },
         { "type": "br", "content": "" },
+        { "type": "sub", "content": "Example 2 — Scale on key press" },
+        {
+          "type": "code",
+          "content": "ON KEY 'z'\n  SCALE sprite1 TO 2\nEND KEY"
+        },
+        {
+          "type": "text",
+          "content": "When 'z' is pressed, sprite1 is scaled to twice its size."
+        },
         { "type": "br", "content": "" },
-        { "type": "code", "content": "SCALE sprite1 TO 2" },
-        { "type": "br", "content": "" },
-        { "type": "br", "content": "" },
-        { "type": "code", "content": "SCALE sprite1 TO 1" }
+        { "type": "sub", "content": "Example 3 — Alternating scale in a loop" },
+        {
+          "type": "code",
+          "content": "LOOP\n  SCALE sprite2 TO 1\n  WAIT 2\n  SCALE sprite2 TO 1.5\n  WAIT 2\nEND LOOP"
+        },
+        {
+          "type": "text",
+          "content": "Alternates sprite2 size between 1 and 1.5 every 2 seconds."
+        }
       ]
     },
     "TINT": {
@@ -124,18 +200,36 @@
       "content": [
         {
           "type": "text",
-          "content": "Applies a color tint to a sprite."
+          "content": "Applies a color tint to a sprite using a hex color (#rrggbb or #rgb)."
         },
         { "type": "sub", "content": "Syntax" },
         { "type": "code", "content": "TINT (sprite) TO (hex)" },
-        { "type": "sub", "content": "Example Usage" },
-        { "type": "code", "content": "TINT sprite1 TO ff0000" },
+        { "type": "sub", "content": "Example 1 — Make red" },
+        {
+          "type": "code",
+          "content": "TINT sprite1 TO ff0000\nLOG \"sprite1 is red\""
+        },
+        { "type": "text", "content": "Tints sprite1 red and logs the action." },
         { "type": "br", "content": "" },
+        { "type": "sub", "content": "Example 2 — Change tint over time" },
+        {
+          "type": "code",
+          "content": "TINT sprite2 TO #00ff00\nWAIT 1\nTINT sprite2 TO #0000ff"
+        },
+        {
+          "type": "text",
+          "content": "Tints sprite2 green, waits 1 second, then tints it blue."
+        },
         { "type": "br", "content": "" },
-        { "type": "code", "content": "TINT sprite1 TO #ff0000" },
-        { "type": "br", "content": "" },
-        { "type": "br", "content": "" },
-        { "type": "code", "content": "TINT sprite1 TO #000000" }
+        { "type": "sub", "content": "Example 3 — Tint on touch" },
+        {
+          "type": "code",
+          "content": "ON TOUCH sprite1 WITH sprite2\n  TINT sprite1 TO #ffff00\nEND TOUCH"
+        },
+        {
+          "type": "text",
+          "content": "When sprite1 touches sprite2, sprite1 is tinted yellow."
+        }
       ]
     },
     "ROTATE": {
@@ -143,18 +237,29 @@
       "content": [
         {
           "type": "text",
-          "content": "Rotates a sprite to the specified degree."
+          "content": "Rotates a sprite to the specified degrees (can be negative)."
         },
         { "type": "sub", "content": "Syntax" },
         { "type": "code", "content": "ROTATE (sprite) TO (degrees)" },
-        { "type": "sub", "content": "Example Usage" },
-        { "type": "code", "content": "ROTATE sprite1 TO 90" },
+        { "type": "sub", "content": "Example 1 — Rotate to 90" },
+        {
+          "type": "code",
+          "content": "ROTATE sprite1 TO 90\nLOG \"sprite1 rotated to 90deg\""
+        },
+        {
+          "type": "text",
+          "content": "Rotates sprite1 to 90 degrees and logs the change."
+        },
         { "type": "br", "content": "" },
-        { "type": "br", "content": "" },
-        { "type": "code", "content": "ROTATE sprite1 TO 180" },
-        { "type": "br", "content": "" },
-        { "type": "br", "content": "" },
-        { "type": "code", "content": "ROTATE sprite1 TO 5" }
+        { "type": "sub", "content": "Example 2 — Rotate continuously" },
+        {
+          "type": "code",
+          "content": "LOOP\n  ROTATE sprite1 TO sprite1.rotation+45\n  WAIT 0.2\nEND LOOP"
+        },
+        {
+          "type": "text",
+          "content": "Adds 45 degrees to sprite1 rotation every 0.2 seconds to spin it."
+        }
       ]
     },
     "HIDE": {
@@ -162,15 +267,23 @@
       "content": [
         {
           "type": "text",
-          "content": "Hides a sprite without despawning it. Commands such as MOVE can still be used on them."
+          "content": "Hides a sprite visually but keeps it in the scene (you can still move or touch it)."
         },
         { "type": "sub", "content": "Syntax" },
         { "type": "code", "content": "HIDE (sprite)" },
-        { "type": "sub", "content": "Example Usage" },
-        { "type": "code", "content": "HIDE sprite1" },
+        { "type": "sub", "content": "Example 1 — Hide then show" },
+        { "type": "code", "content": "HIDE sprite1\nWAIT 1\nSHOW sprite1" },
+        {
+          "type": "text",
+          "content": "Hides sprite1 for one second, then shows it again."
+        },
         { "type": "br", "content": "" },
-        { "type": "br", "content": "" },
-        { "type": "code", "content": "HIDE sprite2" }
+        { "type": "sub", "content": "Example 2 — Hide on key press" },
+        { "type": "code", "content": "ON KEY 'h'\n  HIDE sprite2\nEND KEY" },
+        {
+          "type": "text",
+          "content": "Hides sprite2 when the 'h' key is pressed."
+        }
       ]
     },
     "SHOW": {
@@ -178,15 +291,19 @@
       "content": [
         {
           "type": "text",
-          "content": "Shows a hidden sprite hidden using the HIDE command."
+          "content": "Shows a sprite that was previously hidden."
         },
         { "type": "sub", "content": "Syntax" },
         { "type": "code", "content": "SHOW (sprite)" },
-        { "type": "sub", "content": "Example Usage" },
-        { "type": "code", "content": "SHOW sprite1" },
-        { "type": "br", "content": "" },
-        { "type": "br", "content": "" },
-        { "type": "code", "content": "SHOW sprite2" }
+        { "type": "sub", "content": "Example 1 — Show after delay" },
+        {
+          "type": "code",
+          "content": "HIDE sprite1\nWAIT 2\nSHOW sprite1\nLOG \"sprite1 visible again\""
+        },
+        {
+          "type": "text",
+          "content": "Hides sprite1, waits two seconds, then shows sprite1 and logs the event."
+        }
       ]
     },
     "STORE": {
@@ -194,18 +311,39 @@
       "content": [
         {
           "type": "text",
-          "content": "Stores a command in a variable."
+          "content": "Stores a computed value in a variable for later use. Variable names must be a single word and cannot be 'sprite<number>'."
         },
         { "type": "sub", "content": "Syntax" },
         { "type": "code", "content": "STORE (value) AS (varname)" },
-        { "type": "sub", "content": "Example Usage" },
-        { "type": "code", "content": "STORE 0 AS score" },
+        { "type": "sub", "content": "Example 1 — Score counter" },
+        {
+          "type": "code",
+          "content": "STORE 0 AS score\nSTORE score+1 AS score\nLOG score"
+        },
+        {
+          "type": "text",
+          "content": "Initializes score to 0, increments it and logs the new value."
+        },
         { "type": "br", "content": "" },
+        { "type": "sub", "content": "Example 2 — Save spawn position" },
+        {
+          "type": "code",
+          "content": "SPAWN sprite1 AT 10,10\nSTORE sprite1.x AS posX\nMOVE sprite2 TO posX,50"
+        },
+        {
+          "type": "text",
+          "content": "Stores sprite1.x in posX and moves sprite2 to use that stored coordinate."
+        },
         { "type": "br", "content": "" },
-        { "type": "code", "content": "STORE score+1 AS score" },
-        { "type": "br", "content": "" },
-        { "type": "br", "content": "" },
-        { "type": "code", "content": "STORE sprite1.x AS posX" }
+        { "type": "sub", "content": "Example 3 — Store in an event" },
+        {
+          "type": "code",
+          "content": "ON KEY 'r'\n  STORE 100 AS lives\nEND KEY"
+        },
+        {
+          "type": "text",
+          "content": "When 'r' is pressed, sets lives to 100 for later use."
+        }
       ]
     },
     "LOG": {
@@ -213,21 +351,140 @@
       "content": [
         {
           "type": "text",
-          "content": "Logs a message or value to the console."
+          "content": "Logs a string or expression to the console. Strings support ${...} interpolation using current variables and sprite properties."
         },
         { "type": "sub", "content": "Syntax" },
         { "type": "code", "content": "LOG (string or expression)" },
-        { "type": "sub", "content": "Example Usage" },
-        { "type": "code", "content": "LOG 10" },
+        { "type": "sub", "content": "Example 1 — Log values" },
+        { "type": "code", "content": "LOG 10\nLOG score\nLOG sprite1.x" },
+        {
+          "type": "text",
+          "content": "Logs a number, a variable and a sprite property."
+        },
         { "type": "br", "content": "" },
+        { "type": "sub", "content": "Example 2 — Interpolated message" },
+        {
+          "type": "code",
+          "content": "STORE 5 AS score\nLOG \"CURRENT SCORE: ${score}\""
+        },
+        {
+          "type": "text",
+          "content": "Stores score then logs a human-friendly message using interpolation."
+        },
         { "type": "br", "content": "" },
-        { "type": "code", "content": "LOG score" },
+        { "type": "sub", "content": "Example 3 — Log from a touch event" },
+        {
+          "type": "code",
+          "content": "ON TOUCH sprite1 WITH sprite2\n  LOG \"Touched: ${sprite1.x}, ${sprite2.x}\"\nEND TOUCH"
+        },
+        {
+          "type": "text",
+          "content": "Logs the x positions of two sprites when they touch."
+        }
+      ]
+    },
+    "LOOP": {
+      "title": "LOOP Logic",
+      "content": [
+        {
+          "type": "text",
+          "content": "Repeats the commands inside the block until the loop is stopped or the program ends. Loops can be nested. Use WAIT inside loops to control timing. STOP LOOP stops the nearest running loop."
+        },
+        { "type": "sub", "content": "Syntax" },
+        {
+          "type": "code",
+          "content": "LOOP\n   ...commands...\nEND LOOP\n\nUse 'STOP LOOP' inside a nested block to break the loop when a condition is met."
+        },
+        { "type": "sub", "content": "Example 1 — Continuous movement" },
+        {
+          "type": "code",
+          "content": "LOOP\n  MOVE sprite1 TO sprite1.x+1,sprite1.y\n  WAIT 0.05\nEND LOOP"
+        },
+        {
+          "type": "text",
+          "content": "Moves sprite1 continuously to the right in small steps creating smooth motion."
+        },
         { "type": "br", "content": "" },
+        { "type": "sub", "content": "Example 2 — Loop with stop condition" },
+        {
+          "type": "code",
+          "content": "ON KEY 's'\n  STORE 0 AS score\n  LOOP\n    STORE score+1 AS score\n    LOG \"Score: ${score}\"\n    IF score IS 10\n      STOP LOOP\n    END IF\n    WAIT 0.2\n  END LOOP\n  LOG \"LOOP DONE\"\nEND KEY"
+        },
+        {
+          "type": "text",
+          "content": "Starts a loop when 's' is pressed, increments score until it reaches 10 then stops and logs 'LOOP DONE'."
+        }
+      ]
+    },
+    "IF": {
+      "title": "IF Logic",
+      "content": [
+        {
+          "type": "text",
+          "content": "Runs the commands inside the block only when a condition is true. Both left and right sides are full expressions (numbers, strings, sprite properties, variables). Condition uses strict equality."
+        },
+        { "type": "sub", "content": "Syntax" },
+        {
+          "type": "code",
+          "content": "IF (left expression) IS (right expression)\n  ...commands...\nEND IF"
+        },
+        { "type": "sub", "content": "Notes" },
+        {
+          "type": "text",
+          "content": "IF blocks are awaited when executed, so WAIT inside an IF will pause that IF's block. IF supports nesting and works well with STORE, LOOP and events."
+        },
+        { "type": "sub", "content": "Example 1 — Simple numeric check" },
+        {
+          "type": "code",
+          "content": "STORE 5 AS score\nIF score IS 5\n  LOG \"SCORE IS FIVE\"\nEND IF"
+        },
+        {
+          "type": "text",
+          "content": "Checks if score equals 5 and logs a message if true."
+        },
         { "type": "br", "content": "" },
-        { "type": "code", "content": "LOG sprite1.x" },
+        { "type": "sub", "content": "Example 2 — React to a sprite property" },
+        {
+          "type": "code",
+          "content": "SPAWN sprite1 AT 10,20\nIF sprite1.x IS 10\n  LOG \"sprite1 is at x=10\"\n  MOVE sprite1 TO 20,20\nEND IF"
+        },
+        {
+          "type": "text",
+          "content": "If sprite1.x equals 10, logs a message and moves sprite1 to (20,20)."
+        },
         { "type": "br", "content": "" },
+        { "type": "sub", "content": "Example 3 — Expression comparison" },
+        {
+          "type": "code",
+          "content": "STORE 3 AS lives\nIF lives+2 IS 5\n  LOG \"You have 5 lives total (including bonus)\"\nEND IF"
+        },
+        {
+          "type": "text",
+          "content": "Evaluates an expression on the left and compares it to the right — useful for computed conditions."
+        },
         { "type": "br", "content": "" },
-        { "type": "code", "content": "LOG \"CURRENT SCORE: ${score}\"" }
+        {
+          "type": "sub",
+          "content": "Example 4 — String comparison & interpolation"
+        },
+        {
+          "type": "code",
+          "content": "STORE \"player\" AS who\nIF who IS \"player\"\n  LOG \"Hello, ${who}!\"\nEND IF"
+        },
+        {
+          "type": "text",
+          "content": "Checks a string variable and uses interpolation inside the logged message."
+        },
+        { "type": "br", "content": "" },
+        { "type": "sub", "content": "Example 5 — Nested IF" },
+        {
+          "type": "code",
+          "content": "STORE 10 AS score\nIF score IS 10\n  LOG \"Score is 10\"\n  IF score IS 10\n    LOG \"Nested: still 10\"\n  END IF\nEND IF"
+        },
+        {
+          "type": "text",
+          "content": "Demonstrates nested IF blocks — inner IF will run because the outer condition is true."
+        }
       ]
     }
   },
@@ -237,20 +494,84 @@
       "content": [
         {
           "type": "text",
-          "content": "Runs the code inside the block when a key on the keyboard is pressed."
+          "content": "Runs the code inside the block when a key on the keyboard is pressed. Use single-character keys wrapped in quotes (e.g. 'w'). You can start loops, store variables, and spawn/move sprites in the handler."
         },
         { "type": "sub", "content": "Syntax" },
-        { "type": "code", "content": "ON KEY '(key)'\n\nEND ON" },
-        { "type": "sub", "content": "Example Usage" },
         {
           "type": "code",
-          "content": "ON KEY 'w'\n  MOVE sprite1 TO sprite1.x,sprite1.y-5\nEND ON"
+          "content": "ON KEY '(key)'\n  ...commands...\nEND KEY"
+        },
+        { "type": "sub", "content": "Example 1 — Move on key" },
+        {
+          "type": "code",
+          "content": "ON KEY 'w'\n  MOVE sprite1 TO sprite1.x,sprite1.y-5\nEND KEY"
+        },
+        {
+          "type": "text",
+          "content": "Moves sprite1 up when the 'w' key is pressed."
         },
         { "type": "br", "content": "" },
-        { "type": "br", "content": "" },
+        { "type": "sub", "content": "Example 2 — Start a scoring loop" },
         {
           "type": "code",
-          "content": "ON KEY 's'\n  MOVE sprite1 TO sprite1.x,sprite1.y+5\nEND ON"
+          "content": "ON KEY 's'\n  STORE 0 AS score\n  LOOP\n    STORE score+1 AS score\n    LOG \"Score: ${score}\"\n    IF score IS 10\n      STOP LOOP\n    END IF\n    WAIT 0.2\n  END LOOP\n  LOG \"LOOP DONE\"\nEND KEY"
+        },
+        {
+          "type": "text",
+          "content": "Begins a loop when 's' is pressed that increments score until it reaches 10."
+        },
+        { "type": "br", "content": "" },
+        { "type": "sub", "content": "Example 3 — Spawn & tint on key" },
+        {
+          "type": "code",
+          "content": "ON KEY 'p'\n  SPAWN sprite2 AT sprite1.x+30,sprite1.y\n  TINT sprite2 TO #00ff00\nEND KEY"
+        },
+        {
+          "type": "text",
+          "content": "Spawns sprite2 next to sprite1 and tints it green when 'p' is pressed."
+        }
+      ]
+    },
+    "ON TOUCH": {
+      "title": "ON TOUCH Event",
+      "content": [
+        {
+          "type": "text",
+          "content": "Runs the code inside the block when one sprite's rectangle intersects another. Use this to react to collisions: update score, despawn, change tint, etc."
+        },
+        { "type": "sub", "content": "Syntax" },
+        {
+          "type": "code",
+          "content": "ON TOUCH (spritename) WITH (spritename)\n  ...commands...\nEND TOUCH"
+        },
+        { "type": "sub", "content": "Example 1 — Simple touch log" },
+        {
+          "type": "code",
+          "content": "ON TOUCH sprite1 WITH sprite2\n  LOG \"Sprites touched!\"\nEND TOUCH"
+        },
+        {
+          "type": "text",
+          "content": "Logs a message when sprite1 and sprite2 touch."
+        },
+        { "type": "br", "content": "" },
+        { "type": "sub", "content": "Example 2 — Score on touch" },
+        {
+          "type": "code",
+          "content": "ON TOUCH sprite1 WITH sprite2\n  STORE score+1 AS score\n  LOG \"Score is now ${score}\"\n  DESPAWN sprite2\nEND TOUCH"
+        },
+        {
+          "type": "text",
+          "content": "Increments the score, logs it, and removes sprite2 when the two sprites collide."
+        },
+        { "type": "br", "content": "" },
+        { "type": "sub", "content": "Example 3 — Conditional touch reaction" },
+        {
+          "type": "code",
+          "content": "ON TOUCH spriteA WITH spriteB\n  TINT spriteA TO #ffff00\n  IF spriteB.x IS 50\n    LOG \"Touched spriteB at x=50\"\n  END IF\nEND TOUCH"
+        },
+        {
+          "type": "text",
+          "content": "Tints spriteA on touch and logs an extra message if spriteB was at x=50 when touched."
         }
       ]
     }

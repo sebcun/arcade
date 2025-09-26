@@ -1,9 +1,17 @@
 const activeSprites = [];
+
 let keyHandlers = {};
 window.keyListenerAdded = false;
 let keyListener = null;
+
+let touchHandlers = [];
+let touchPairsActive = new Set();
+let touchMonitorAdded = false;
+let touchMonitorRAF = null;
+
 let variables = {};
 let abortController = null;
+let activeLoopStack = [];
 
 function buildContext() {
   const context = {};
@@ -20,6 +28,19 @@ function buildContext() {
     context[key] = value;
   }
   return context;
+}
+
+function stripName(token) {
+  if (!token) return token;
+  token = token.trim();
+  if (
+    (token.startsWith("'") && token.endsWith("'")) ||
+    (token.startsWith('"') && token.endsWith('"'))
+  ) {
+    token = token.slice(1, -1);
+  }
+  token = token.replace(/[:;]+$/g, "");
+  return token.toLowerCase();
 }
 
 function evaluateExpression(expr, context) {
@@ -55,15 +76,30 @@ function sleep(ms, signal) {
   });
 }
 
-async function executeCode(code, sprites, ctx, signal = null) {
+async function executeCode(
+  code,
+  sprites,
+  ctx,
+  signal = null,
+  loopController = null,
+  isEvent = false
+) {
   if (!signal) {
     abortController = new AbortController();
     signal = abortController.signal;
     keyHandlers = {};
     window.keyListenerAdded = false;
+
+    touchHandlers = [];
+    touchPairsActive.clear();
     if (keyListener) {
       document.removeEventListener("keydown", keyListener);
       keyListener = null;
+    }
+    if (touchMonitorRAF) {
+      cancelAnimationFrame(touchMonitorRAF);
+      touchMonitorRAF = null;
+      touchMonitorAdded = false;
     }
   }
 
@@ -94,20 +130,129 @@ async function executeCode(code, sprites, ctx, signal = null) {
         keyName = keyName.toLowerCase();
         i++;
         const blockLines = [];
-        while (i < lines.length) {
-          const blockLine = lines[i].trim();
-          if (blockLine.toUpperCase() === "END ON") {
-            break;
+        const stack = ["KEY"];
+        while (i < lines.length && stack.length > 0) {
+          const cur = lines[i];
+          const curTrim = cur.trim();
+          const up = curTrim.toUpperCase();
+          if (up.startsWith("ON ")) {
+            const p = curTrim.split(/\s+/);
+            const newSub = p[1]?.toUpperCase() || "";
+            stack.push(newSub);
+            blockLines.push(lines[i]);
+            i++;
+            continue;
+          }
+          if (up.startsWith("END ")) {
+            const p = curTrim.split(/\s+/);
+            const endSub = p[1]?.toUpperCase() || "";
+            if (endSub === stack[stack.length - 1]) {
+              stack.pop();
+              if (stack.length === 0) {
+                i++;
+                break;
+              } else {
+                blockLines.push(lines[i]);
+                i++;
+                continue;
+              }
+            } else {
+              blockLines.push(lines[i]);
+              i++;
+              continue;
+            }
           }
           blockLines.push(lines[i]);
           i++;
         }
-        if (i >= lines.length || lines[i].trim().toUpperCase() !== "END ON") {
-          console.log(`ON KEY: Missing 'END ON' for key '${keyName}'`);
+        if (stack.length > 0) {
+          console.log(`ON KEY: Missing 'END KEY' for key '${keyName}'`);
           continue;
         }
-        keyHandlers[keyName] = blockLines;
+        keyHandlers[keyName] = keyHandlers[keyName] || [];
+        const handlerObj = { lines: blockLines, loopController, _active: true };
+        keyHandlers[keyName].push(handlerObj);
+        if (loopController) {
+          loopController._keys = loopController._keys || [];
+          loopController._keys.push({ key: keyName, handlerObj });
+        }
+      } else if (subCmd === "TOUCH") {
+        const withIndex = parts.findIndex((p) => p.toUpperCase() === "WITH");
+        if (
+          withIndex === -1 ||
+          withIndex < 3 ||
+          withIndex === parts.length - 1
+        ) {
+          console.log(
+            `${
+              i + 1
+            } ON TOUCH: invalid syntax. Expected 'ON TOUCH <nameA> WITH <nameB>'`
+          );
+          i++;
+          continue;
+        }
+
+        const nameAParts = parts.slice(2, withIndex);
+        const nameBParts = parts.slice(withIndex + 1, withIndex + 2);
+        const nameA = stripName(nameAParts.join(" "));
+        const nameB = stripName(nameBParts.join(" "));
         i++;
+
+        const blockLines = [];
+        const stack = ["TOUCH"];
+        while (i < lines.length && stack.length > 0) {
+          const cur = lines[i];
+          const curTrim = cur.trim();
+          const up = curTrim.toUpperCase();
+          if (up.startsWith("ON ")) {
+            const p = curTrim.split(/\s+/);
+            const newSub = p[1]?.toUpperCase() || "";
+            stack.push(newSub);
+            blockLines.push(lines[i]);
+            i++;
+            continue;
+          }
+          if (up.startsWith("END ")) {
+            const p = curTrim.split(/\s+/);
+            const endSub = p[1]?.toUpperCase() || "";
+            if (endSub === stack[stack.length - 1]) {
+              stack.pop();
+              if (stack.length === 0) {
+                i++;
+                break;
+              } else {
+                blockLines.push(lines[i]);
+                i++;
+                continue;
+              }
+            } else {
+              blockLines.push(lines[i]);
+              i++;
+              continue;
+            }
+          }
+          blockLines.push(lines[i]);
+          i++;
+        }
+        if (stack.length > 0) {
+          console.log(
+            `ON TOUCH: Missing 'END TOUCH' for touch handler '${nameA} WITH ${nameB}'`
+          );
+          continue;
+        }
+
+        const handlerObj = {
+          a: nameA,
+          b: nameB,
+          lines: blockLines,
+          loopController: loopController || null,
+          _active: true,
+        };
+        touchHandlers.push(handlerObj);
+        if (loopController) {
+          loopController._touches = loopController._touches || [];
+          loopController._touches.push(handlerObj);
+        }
       } else {
         console.log(`${i + 1} UNKNOWN: '${cmd}' in line '${line}'`);
         i++;
@@ -122,19 +267,106 @@ async function executeCode(code, sprites, ctx, signal = null) {
   if (!window.keyListenerAdded) {
     keyListener = (e) => {
       const key = e.key.toLowerCase();
-      if (keyHandlers[key]) {
-        executeCode(keyHandlers[key].join("\n"), sprites, ctx, signal);
+      const handlers = (keyHandlers[key] || []).slice();
+      for (const h of handlers) {
+        if (h._active === false) continue;
+        executeCode(
+          h.lines.join("\n"),
+          sprites,
+          ctx,
+          abortController ? abortController.signal : null,
+          h.loopController || null,
+          true
+        );
       }
     };
     document.addEventListener("keydown", keyListener);
     window.keyListenerAdded = true;
   }
 
+  if (!touchMonitorAdded && touchHandlers.length > 0) {
+    touchMonitorAdded = true;
+    function checkTouches() {
+      try {
+        if (signal && signal.aborted) {
+          touchMonitorAdded = false;
+          touchMonitorRAF = null;
+          return;
+        }
+
+        const baseScale = 1 / 5;
+        const spriteRawSize = 320;
+
+        for (const handler of touchHandlers.slice()) {
+          if (handler._active === false) continue;
+          const idxA = activeSprites.findIndex(
+            (s) => s.name.toLowerCase() === handler.a
+          );
+          const idxB = activeSprites.findIndex(
+            (s) => s.name.toLowerCase() === handler.b
+          );
+          if (idxA === -1 || idxB === -1) continue;
+
+          const sa = activeSprites[idxA];
+          const sb = activeSprites[idxB];
+
+          const ma = sa.scale ?? 1;
+          const mb = sb.scale ?? 1;
+
+          const wA = spriteRawSize * baseScale * ma;
+          const hA = spriteRawSize * baseScale * ma;
+          const wB = spriteRawSize * baseScale * mb;
+          const hB = spriteRawSize * baseScale * mb;
+
+          const rectA = { x: sa.x, y: sa.y, w: wA, h: hA };
+          const rectB = { x: sb.x, y: sb.y, w: wB, h: hB };
+
+          const intersects =
+            rectA.x < rectB.x + rectB.w &&
+            rectA.x + rectA.w > rectB.x &&
+            rectA.y < rectB.y + rectB.h &&
+            rectA.y + rectA.h > rectB.y;
+
+          const pairKey = [handler.a, handler.b].sort().join("::");
+
+          if (intersects) {
+            if (!touchPairsActive.has(pairKey)) {
+              touchPairsActive.add(pairKey);
+              executeCode(
+                handler.lines.join("\n"),
+                sprites,
+                ctx,
+                signal,
+                handler.loopController || null,
+                true
+              );
+            }
+          } else {
+            if (touchPairsActive.has(pairKey)) {
+              touchPairsActive.delete(pairKey);
+            }
+          }
+        }
+      } catch (err) {
+        console.error("Touch monitor error:", err);
+      }
+
+      if (!(signal && signal.aborted)) {
+        touchMonitorRAF = requestAnimationFrame(checkTouches);
+      } else {
+        touchMonitorAdded = false;
+        touchMonitorRAF = null;
+      }
+    }
+
+    checkTouches();
+  }
+
   if (nonEventLines.length > 0) {
     const lines = nonEventLines;
     let i = 0;
     while (i < lines.length) {
-      if (signal.aborted) return;
+      if (signal && signal.aborted) return;
 
       const rawLine = lines[i];
       const line = rawLine.trim();
@@ -145,6 +377,110 @@ async function executeCode(code, sprites, ctx, signal = null) {
 
       const parts = line.split(/\s+/);
       const cmd = parts[0].toUpperCase();
+
+      // STOP LOOP stops a running loop (no longer accept END LOOP as a stop command)
+      if (cmd === "STOP" && parts[1]?.toUpperCase() === "LOOP") {
+        if (loopController) {
+          loopController.stopped = true;
+          return;
+        } else if (activeLoopStack.length > 0) {
+          const top = activeLoopStack[activeLoopStack.length - 1];
+          top.stopped = true;
+          return;
+        } else {
+          console.log(`${i + 1} STOP LOOP: no active loop to stop here`);
+          i++;
+          continue;
+        }
+      }
+
+      if (
+        cmd === "LOOP" ||
+        (cmd === "START" && parts[1]?.toUpperCase() === "LOOP")
+      ) {
+        let depth = 1;
+        const blockLines = [];
+        let j = i + 1;
+        while (j < lines.length && depth > 0) {
+          const lTrim = lines[j].trim();
+          const up = lTrim.toUpperCase();
+          if (up.startsWith("LOOP") || up.startsWith("START LOOP")) {
+            depth++;
+            blockLines.push(lines[j]);
+          } else if (up.startsWith("END LOOP")) {
+            depth--;
+            if (depth > 0) {
+              blockLines.push(lines[j]);
+            }
+          } else {
+            blockLines.push(lines[j]);
+          }
+          j++;
+        }
+        if (depth > 0) {
+          console.log(`${i + 1} LOOP: Missing 'END LOOP'`);
+          i = j;
+          continue;
+        }
+
+        const myLoopController = { stopped: false, _keys: [], _touches: [] };
+        const runner = async () => {
+          activeLoopStack.push(myLoopController);
+          try {
+            while (!myLoopController.stopped && !(signal && signal.aborted)) {
+              try {
+                await executeCode(
+                  blockLines.join("\n"),
+                  sprites,
+                  ctx,
+                  signal,
+                  myLoopController,
+                  true
+                );
+              } catch (e) {
+                if (e && e.message === "Aborted") return;
+                console.error("Loop body error:", e);
+                return;
+              }
+            }
+          } finally {
+            const idx = activeLoopStack.lastIndexOf(myLoopController);
+            if (idx !== -1) activeLoopStack.splice(idx, 1);
+
+            if (myLoopController._keys) {
+              for (const entry of myLoopController._keys) {
+                const arr = keyHandlers[entry.key];
+                if (!arr) continue;
+                entry.handlerObj._active = false;
+                const index = arr.indexOf(entry.handlerObj);
+                if (index !== -1) {
+                  arr.splice(index, 1);
+                }
+                if (arr.length === 0) {
+                  delete keyHandlers[entry.key];
+                }
+              }
+            }
+
+            if (myLoopController._touches) {
+              for (const th of myLoopController._touches) {
+                th._active = false;
+                const index = touchHandlers.indexOf(th);
+                if (index !== -1) touchHandlers.splice(index, 1);
+              }
+            }
+          }
+        };
+
+        if (isEvent) {
+          await runner();
+        } else {
+          runner();
+        }
+
+        i = j;
+        continue;
+      }
 
       if (cmd === "WAIT") {
         if (parts.length >= 2) {
@@ -227,7 +563,7 @@ async function executeCode(code, sprites, ctx, signal = null) {
       }
 
       if (cmd === "MOVE") {
-        if (parts.length >= 4 && parts[2] === "TO") {
+        if (parts.length >= 4 && parts[2].toUpperCase() === "TO") {
           const spriteName = parts[1];
           const posParts = parts[3];
           const pos = posParts.split(",");
@@ -283,7 +619,7 @@ async function executeCode(code, sprites, ctx, signal = null) {
       }
 
       if (cmd === "SCALE") {
-        if (parts.length >= 4 && parts[2] === "TO") {
+        if (parts.length >= 4 && parts[2].toUpperCase() === "TO") {
           const spriteName = parts[1];
           const multiplierStr = parts[3];
           const multiplier = parseFloat(multiplierStr);
@@ -318,7 +654,7 @@ async function executeCode(code, sprites, ctx, signal = null) {
       }
 
       if (cmd === "TINT") {
-        if (parts.length >= 4 && parts[2] === "TO") {
+        if (parts.length >= 4 && parts[2].toUpperCase() === "TO") {
           const spriteName = parts[1];
           let hexString = parts[3];
 
@@ -359,7 +695,7 @@ async function executeCode(code, sprites, ctx, signal = null) {
       }
 
       if (cmd === "ROTATE") {
-        if (parts.length >= 4 && parts[2] === "TO") {
+        if (parts.length >= 4 && parts[2].toUpperCase() === "TO") {
           const spriteName = parts[1];
           const degreesStr = parts[3];
           const degrees = parseFloat(degreesStr);
@@ -485,6 +821,89 @@ async function executeCode(code, sprites, ctx, signal = null) {
           }
         }
         i++;
+        continue;
+      }
+
+      // IF <left> IS <right> ... END IF
+      if (cmd === "IF") {
+        // keep original (trimmed) line for parsing expressions so quoted strings are preserved
+        const rest = line.slice(2).trim(); // content after IF
+        const upperRest = rest.toUpperCase();
+        const isIdx = upperRest.indexOf(" IS ");
+        if (isIdx === -1) {
+          console.log(
+            `${i + 1} IF: invalid syntax. Expected 'IF <left> IS <right>'`
+          );
+          i++;
+          continue;
+        }
+        const leftExpr = rest.slice(0, isIdx).trim();
+        const rightExpr = rest.slice(isIdx + 4).trim();
+
+        // collect block until matching END IF, support nested IFs
+        let depth = 1;
+        const blockLines = [];
+        let j = i + 1;
+        while (j < lines.length && depth > 0) {
+          const lTrim = lines[j].trim();
+          const up = lTrim.toUpperCase();
+          if (up.startsWith("IF ")) {
+            depth++;
+            blockLines.push(lines[j]);
+          } else if (up.startsWith("END IF")) {
+            depth--;
+            if (depth > 0) {
+              blockLines.push(lines[j]);
+            }
+          } else {
+            blockLines.push(lines[j]);
+          }
+          j++;
+        }
+
+        if (depth > 0) {
+          console.log(`${i + 1} IF: Missing 'END IF'`);
+          i = j;
+          continue;
+        }
+
+        let leftVal, rightVal;
+        const context = buildContext();
+        try {
+          leftVal = evaluateExpression(leftExpr, context);
+        } catch (e) {
+          console.log(`${i + 1} IF: left expression error: ${e.message}`);
+          i = j;
+          continue;
+        }
+        try {
+          rightVal = evaluateExpression(rightExpr, context);
+        } catch (e) {
+          console.log(`${i + 1} IF: right expression error: ${e.message}`);
+          i = j;
+          continue;
+        }
+
+        const condition = leftVal === rightVal;
+        if (condition) {
+          // run the block (await so WAIT inside IF works)
+          try {
+            await executeCode(
+              blockLines.join("\n"),
+              sprites,
+              ctx,
+              signal,
+              loopController || null,
+              true
+            );
+          } catch (e) {
+            if (e && e.message === "Aborted") return;
+            console.error("IF block error:", e);
+            return;
+          }
+        }
+
+        i = j;
         continue;
       }
 
@@ -630,9 +1049,18 @@ function stopExecution() {
     document.removeEventListener("keydown", keyListener);
     keyListener = null;
   }
+  if (touchMonitorRAF) {
+    cancelAnimationFrame(touchMonitorRAF);
+    touchMonitorRAF = null;
+  }
+  touchHandlers = [];
+  touchPairsActive.clear();
+  touchMonitorAdded = false;
+
   window.keyListenerAdded = false;
   keyHandlers = {};
   variables = {};
+  activeLoopStack = [];
 }
 
 window.stopExecution = stopExecution;

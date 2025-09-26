@@ -1,0 +1,12 @@
+ ON KEY 's'
+        STORE 0 AS score
+        LOOP
+                STORE score+1 AS score
+                LOG score
+                IF score IS 10
+                        STOP LOOP
+                END IF
+              
+        END LOOP
+        LOG "LOOP DONE"
+END KEY
