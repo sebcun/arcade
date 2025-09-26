@@ -1,8 +1,20 @@
-from flask import Flask, render_template, request, jsonify, session, redirect, url_for
+from dotenv import dotenv_values
+from flask import (
+    Flask,
+    render_template,
+    request,
+    jsonify,
+    session,
+    redirect,
+    url_for,
+    abort,
+    send_from_directory,
+)
+
 from db import (
     initDb,
-    registerUser,
-    loginUser,
+    sendVerificationCode,
+    verifyCode,
     getUserProfile,
     updateUserProfile,
     giveBadge,
@@ -13,6 +25,13 @@ from db import (
 )
 from utils import *
 import os
+
+
+_env = dotenv_values(".env") or {}
+
+for key in ("SECRET_KEY", "WEBSITE"):
+    if key in _env and os.getenv(key) is None:
+        os.environ[key] = _env[key]
 
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY", "YourSecretKey")
@@ -48,31 +67,50 @@ def create():
 
 
 # Api Routes
-@app.route("/api/register", methods=["POST"])
-def register():
-    data = request.get_json()
+@app.route("/api/send_code", methods=["POST"])
+def api_send_code():
+    data = request.get_json() or {}
     email = data.get("email")
+    mode = data.get("mode", "register")
     username = data.get("username")
-    password = data.get("password")
-    result, status = registerUser(email, username, password)
-    if status == 201:
-        session["email"] = email
-        session["userid"] = result["userid"]
-        giveBadge(
-            session["userid"], "siege", "Siege", "Signed up during the Siege weeks!"
-        )
+
+    result, status = sendVerificationCode(email, username=username, mode=mode)
     return jsonify(result), status
 
 
-@app.route("/api/login", methods=["POST"])
-def login():
-    data = request.get_json()
+@app.route("/api/verify_code", methods=["POST"])
+def api_verify_code():
+    data = request.get_json() or {}
     email = data.get("email")
-    password = data.get("password")
-    result, status = loginUser(email, password)
-    if status == 200:
+    code = data.get("code")
+    mode = data.get("mode", "register")
+
+    result, status = verifyCode(email, code, mode=mode)
+
+    if (
+        status == 201
+        and mode == "register"
+        and isinstance(result, dict)
+        and result.get("userid")
+    ):
         session["email"] = email
         session["userid"] = result["userid"]
+        try:
+            giveBadge(
+                session["userid"], "siege", "Siege", "Signed up during the Siege weeks!"
+            )
+        except Exception:
+            pass
+
+    if (
+        status == 200
+        and mode == "login"
+        and isinstance(result, dict)
+        and result.get("userid")
+    ):
+        session["email"] = email
+        session["userid"] = result["userid"]
+
     return jsonify(result), status
 
 
@@ -201,6 +239,17 @@ def save_game_data(game_id):
 
     result, status = saveGame(game_id, session["userid"], code, sprites_data)
     return jsonify(result), status
+
+
+@app.route("/static/<path:filename>")
+def static_files(filename):
+    static_dir = os.path.join(app.root_path, "static")
+    full_path = os.path.normpath(os.path.join(static_dir, filename))
+    if not full_path.startswith(os.path.abspath(static_dir)):
+        return abort(404)
+    if not os.path.exists(full_path):
+        return abort(404)
+    return send_from_directory(static_dir, filename)
 
 
 if __name__ == "__main__":
