@@ -254,14 +254,10 @@ def createGame(user_id, title, description=""):
     finally:
         conn.close()
         
-def getUserGames(user_id):
-    if not user_id:
-        return {"error": "User ID is requred"}, 400
-    
+def getAllGames():
     conn = getDbConnection()
     games = conn.execute(
-        'SELECT id, title, description, created_at, updated_at FROM games WHERE user_id = ? ORDER BY updated_at DESC',
-        (user_id,)
+        'SELECT id, title, user_id, description, created_at, updated_at FROM games ORDER BY updated_at DESC'
     ).fetchall()
     conn.close()
     
@@ -269,6 +265,7 @@ def getUserGames(user_id):
     return [{
         "id": game['id'],
         "title": game['title'],
+        "author": game['user_id'],
         "description": game['description'],
         "created_at": game['created_at'],
         "updated_at": game['updated_at']

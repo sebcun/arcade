@@ -156,6 +156,15 @@
       </div>
     </div>
 
+    <!-- Modal -->
+    <div id="game-modal" class="modal">
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2 id="game-modal-title">Placeholder title.</h2>
+        <div id="game-modal-contents"></div>
+      </div>
+    </div>
+
     <div id="toast-container"></div>
 
     <!-- Scripts -->
@@ -172,8 +181,10 @@
     <script src="{{ url_for('static', filename='js/toasts.js')}}"></script>
     <script src="{{ url_for('static', filename='js/profile.js')}}"></script>
     <script src="{{ url_for('static', filename='js/settings.js')}}"></script>
-    <script src="{{ url_for('static', filename='js/parameters.js')}}"></script>
     <script src="{{ url_for('static', filename='js/loading.js')}}"></script>
+    <script src="{{ url_for('static', filename='js/games.js')}}"></script>
+    <script src="{{ url_for('static', filename='js/codeParser.js')}}"></script>
+    <script src="{{ url_for('static', filename='js/parameters.js')}}"></script>
 
     {% block scripts %}{% endblock %}
   </body>

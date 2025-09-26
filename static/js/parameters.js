@@ -5,6 +5,7 @@ function clearParameters() {
   window.history.replaceState({}, "", `${window.location.pathname}`);
   window.name = "Arcade";
 }
+
 if (params.has("login")) {
   // Show login page if URL has ?login
   showLoginModal();
@@ -21,7 +22,6 @@ if (params.has("login")) {
   // Show settings page if URL has ?settings
   if (LOGGEDIN === "True") {
     showSettings();
-    clearParameters();
   } else {
     showModal(
       "You are not logged in!",
@@ -49,9 +49,6 @@ if (params.has("login")) {
   // If a profile value is given load other profile (?profile=<id>)
   if (profileValue) {
     showProfile(profileValue);
-
-    // Get rid of parameters in URL
-    clearParameters();
   } else {
     // Otherwise show own profile
     if (LOGGEDIN === "True") {
@@ -73,7 +70,16 @@ if (params.has("login")) {
         ]
       );
     }
-    // Get rid of parameters in URL
-    clearParameters();
   }
+
+  // Get rid of parameters in URL
+  clearParameters();
+} else if (params.has("game")) {
+  const gameValue = params.get("game");
+  if (gameValue) {
+    startGame(Number(gameValue));
+  }
+
+  // Get rid of parameters in URL
+  clearParameters();
 }

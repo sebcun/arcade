@@ -285,3 +285,34 @@ body {
 .form-group textarea.error {
   border: 2px solid red !important;
 }
+
+.square-button {
+  background: none;
+  color: inherit;
+  border: none;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
+  outline: inherit;
+}
+
+.square-button.disabled {
+  cursor: none;
+  opacity: 0.65;
+}
+
+.square-button img {
+  height: 3.125rem;
+  transition: opacity 0.2s;
+  cursor: pointer;
+}
+
+.square-button:hover img {
+  opacity: 0.65;
+}
+
+#gameCanvas {
+  background-color: #111d35;
+  border: 2px solid #2b2c6d;
+  border-radius: 4px;
+}

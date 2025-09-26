@@ -7,7 +7,7 @@ from db import (
     updateUserProfile,
     giveBadge,
     createGame,
-    getUserGames,
+    getAllGames,
     getGame,
     saveGame
 )
@@ -127,12 +127,41 @@ def get_images():
     return images
 
 @app.route('/api/games', methods=['GET'])
-def get_user_games():
-    if "userid" not in session:
-        return jsonify({"error": "Not logged in"}), 401
+def get_games():
     
-    games, status = getUserGames(session['userid'])
-    return jsonify(games), status
+    author = request.args.get('author')
+    
+    games, status = getAllGames()
+    
+    if not isinstance(games, list):
+        return jsonify({"error": "Failed to fetch games"}), status if isinstance(status, int) else 500
+    
+    if author:
+        try:
+            author_id = int(author)
+        except (TypeError, ValueError):
+            if author == "me":
+                if "userid" in session:
+                    author_id = session["userid"]
+                else:
+                    return jsonify({"error": "Not logged in"}), 401
+            else:
+                return jsonify({"error": "Invalid author id"}), 400
+
+        games = [g for g in games if str(g.get("author")) == str(author_id)]
+        
+    normalized = [
+        {
+            "id": g.get("id"),
+            "title": g.get("title"),
+            "description": g.get("description"),
+            "created_at": g.get("created_at"),
+            "updated_at": g.get("updated_at"),
+        }
+        for g in games
+    ]
+
+    return jsonify(normalized), status
 
 @app.route("/api/games", methods=["POST"])
 def create_new_game():

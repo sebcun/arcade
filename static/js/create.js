@@ -1,8 +1,9 @@
-// Global Vars
 let sprites = [];
 let previewCtx;
 let currentGameId = null;
 let currentGameTitle = "No Game Selected";
+let editingSpriteIndex = -1;
+let drawnPixels;
 
 document.addEventListener("DOMContentLoaded", () => {
   initSpriteCanvas();
@@ -11,14 +12,16 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 function showProjectModal() {
-  fetch("/api/games")
+  fetch("/api/games?author=me")
     .then((response) => response.json())
     .then((games) => {
-      let content = '<div class="project-list">';
+      let content =
+        '<div class="project-list" style="margin-bottom: 10px; margin-top: 10px;">';
       games.forEach((game) => {
-        content += `<div class="project-item" data-id="${game.id}" data-title="${game.title}">
-        <h3>${game.title}</h3>
-        </div>`;
+        content += `<button class="long-button project-item" data-id="${game.id}" data-title="${game.title}" style="opacity: 0.8;">
+        <img src="/static/images/LongButtonTwo.png" alt="${game.title}">
+        <span>${game.title}</span>
+        </button>`;
       });
 
       content += "</div>";
@@ -103,9 +106,9 @@ function loadGame(id, title) {
   document.getElementById("projectTitle").textContent = title;
 
   document.getElementById("selectProjectButton").style.display = "none";
-  document.getElementById("resetButton").style.display = "block";
   document.getElementById("runButton").style.display = "block";
   document.getElementById("saveButton").style.display = "block";
+  document.getElementById("shareButton").style.display = "block";
 
   fetch(`/api/games/${id}`)
     .then((response) => response.json())
@@ -125,7 +128,7 @@ function loadGame(id, title) {
         updateSpritesList();
       }
 
-      document.getElementById("editorContainer").style.display = "block";
+      document.getElementById("editorContainer").style.display = "flex";
     });
 }
 
@@ -138,20 +141,17 @@ function updateSpritesList() {
     div.style.alignItems = "center";
     div.style.margin = "5px 0";
 
-    // Create small preview canvas (32x32 scaled down)
     const previewCanvas = document.createElement("canvas");
     previewCanvas.width = 32;
     previewCanvas.height = 32;
     const pctx = previewCanvas.getContext("2d");
 
-    // Temporary canvas for full-size sprite
     const tempCanvas = document.createElement("canvas");
     tempCanvas.width = 320;
     tempCanvas.height = 320;
     const tctx = tempCanvas.getContext("2d");
     tctx.putImageData(sprite, 0, 0);
 
-    // Draw the full sprite scaled down to 32x32 over the white background
     pctx.drawImage(tempCanvas, 0, 0, 320, 320, 0, 0, 32, 32);
 
     div.appendChild(previewCanvas);
@@ -161,16 +161,82 @@ function updateSpritesList() {
     text.style.marginLeft = "10px";
     div.appendChild(text);
 
+    const editBtn = document.createElement("button");
+    editBtn.style.marginLeft = "10px";
+    editBtn.style.border = "none";
+    editBtn.style.background = "none";
+    editBtn.innerHTML =
+      '<img src="/static/images/Pencil.png" alt="edit" style="width: 16px; height: 16px">';
+    editBtn.addEventListener("click", () => editSprite(i));
+    div.appendChild(editBtn);
+
     list.appendChild(div);
   });
 }
 
-function initSpriteCanvas() {
-  // Get canvas
+function editSprite(index) {
+  editingSpriteIndex = index;
+  const sprite = sprites[index];
   const canvas = document.getElementById("pixelCanvas");
   const ctx = canvas.getContext("2d");
 
-  //   Draw checkboard (transparent background)
+  ctx.clearRect(0, 0, 320, 320);
+  const size = 10;
+  for (let x = 0; x < 32; x++) {
+    for (let y = 0; y < 32; y++) {
+      ctx.fillStyle = (x + y) % 2 === 0 ? "#cccccc" : "#ffffff";
+      ctx.fillRect(x * size, y * size, size, size);
+    }
+  }
+
+  console.log(sprite);
+
+  drawnPixels = Array(32)
+    .fill()
+    .map(() => Array(32).fill(false));
+
+  const pixelColors = Array(32)
+    .fill()
+    .map(() => Array(32).fill(null));
+
+  for (let i = 0; i < 32; i++) {
+    for (let j = 0; j < 32; j++) {
+      let hasPixel = false;
+      let r, g, b;
+      for (let subx = 0; subx < 10; subx++) {
+        for (let suby = 0; suby < 10; suby++) {
+          const pixelIndex = ((j * 10 + suby) * 320 + (i * 10 + subx)) * 4;
+          if (sprite.data[pixelIndex + 3] > 0) {
+            r = sprite.data[pixelIndex];
+            g = sprite.data[pixelIndex + 1];
+            b = sprite.data[pixelIndex + 2];
+            hasPixel = true;
+            break;
+          }
+        }
+        if (hasPixel) break;
+      }
+      if (hasPixel) {
+        drawnPixels[i][j] = true;
+        pixelColors[i][j] = `rgb(${r}, ${g}, ${b})`;
+      }
+    }
+  }
+
+  for (let i = 0; i < 32; i++) {
+    for (let j = 0; j < 32; j++) {
+      if (drawnPixels[i][j]) {
+        ctx.fillStyle = pixelColors[i][j];
+        ctx.fillRect(i * 10, j * 10, 10, 10);
+      }
+    }
+  }
+}
+
+function initSpriteCanvas() {
+  const canvas = document.getElementById("pixelCanvas");
+  const ctx = canvas.getContext("2d");
+
   function drawCheckboard() {
     const size = 10;
     for (let x = 0; x < 32; x++) {
@@ -182,16 +248,14 @@ function initSpriteCanvas() {
   }
   drawCheckboard();
 
-  //   Setup basic variables
   let drawing = false;
-  let drawnPixels = Array(32)
+  drawnPixels = Array(32)
     .fill()
     .map(() => Array(32).fill(false));
   canvas.addEventListener("mousedown", () => (drawing = true));
   canvas.addEventListener("mouseup", () => (drawing = false));
   canvas.addEventListener("mousemove", draw);
 
-  //   Draw pixels
   function draw(e) {
     if (!drawing) return;
     const rect = canvas.getBoundingClientRect();
@@ -203,15 +267,14 @@ function initSpriteCanvas() {
     drawnPixels[x][y] = true;
   }
 
-  //   Clear pixels
   document.getElementById("clearButton").addEventListener("click", () => {
     drawnPixels = Array(32)
       .fill()
       .map(() => Array(32).fill(false));
     drawCheckboard();
+    editingSpriteIndex = -1;
   });
 
-  // Sprite Handling
   document.getElementById("saveSpriteButton").addEventListener("click", () => {
     const currentImgData = ctx.getImageData(0, 0, 320, 320);
     const data = currentImgData.data;
@@ -242,8 +305,19 @@ function initSpriteCanvas() {
     }
 
     const transparentImgData = new ImageData(transparentData, 320, 320);
-    sprites.push(transparentImgData);
+    if (editingSpriteIndex !== -1) {
+      sprites[editingSpriteIndex] = transparentImgData;
+      editingSpriteIndex = -1;
+    } else {
+      sprites.push(transparentImgData);
+    }
     updateSpritesList();
+
+    drawnPixels = Array(32)
+      .fill()
+      .map(() => Array(32).fill(false));
+    drawCheckboard();
+    editingSpriteIndex = -1;
   });
 }
 
@@ -251,6 +325,7 @@ function initPreviewCanvas() {
   const canvas = document.getElementById("previewCanvas");
   previewCtx = canvas.getContext("2d");
   const cursorPosSpan = document.getElementById("cursorPosition");
+  let isRunning = false;
 
   canvas.addEventListener("mousemove", (e) => {
     const rect = canvas.getBoundingClientRect();
@@ -263,29 +338,22 @@ function initPreviewCanvas() {
     cursorPosSpan.textContent = "Cursor: Not on canvas";
   });
 
-  //   Reset
-  const resetButton = document.getElementById("resetButton");
-  resetButton.addEventListener("click", () => {
-    previewCtx.clearRect(0, 0, canvas.width, canvas.height);
-    resetSprites();
-  });
-
-  //   Run
   const runButton = document.getElementById("runButton");
   runButton.addEventListener("click", async () => {
-    if (runButton.disabled) return;
     const code = document.getElementById("codeBox").value;
-    try {
-      runButton.disabled = true;
-      await executeCode(code, sprites, previewCtx);
-    } catch (err) {
-      console.error("Error running script:", err);
-    } finally {
-      runButton.disabled = false;
-    }
+    const runImg = runButton.querySelector("img");
+
+    window.isGameRunning = true;
+    startGame(code, sprites, currentGameTitle || "Untitled Game");
   });
 
-  // Save
+  window.addEventListener("gameModalClosed", () => {
+    isRunning = false;
+    window.isGameRunning = false;
+    const runImg = runButton.querySelector("img");
+    if (runImg) runImg.src = "/static/images/PlayBtn.png";
+  });
+
   const saveButton = document.getElementById("saveButton");
   saveButton.addEventListener("click", () => {
     const code = document.getElementById("codeBox").value;
@@ -306,6 +374,22 @@ function initPreviewCanvas() {
         } else {
           showToast(data.error || "Save failed", { color: "error" });
         }
+      });
+  });
+
+  const shareButton = document.getElementById("shareButton");
+  shareButton.addEventListener("click", async () => {
+    navigator.clipboard
+      .writeText(`${WEBSITE_URL}/?game=${currentGameId}`)
+      .then(() => {
+        showToast("Link copied to clipboard.");
+      })
+      .catch((err) => {
+        // Error while sharing
+        showToast("There was an issue while creating a link for the game.", {
+          color: "error",
+        });
+        console.log(`Game sharing error: ${err}`);
       });
   });
 }
