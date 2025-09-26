@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify, session, redirect
+from flask import Flask, render_template, request, jsonify, session, redirect, url_for
 from db import (
     initDb,
     registerUser,
@@ -9,11 +9,10 @@ from db import (
     createGame,
     getAllGames,
     getGame,
-    saveGame
+    saveGame,
 )
 from utils import *
 import os
-import json
 
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY", "YourSecretKey")
@@ -25,15 +24,16 @@ initDb()
 def index():
     websiteURL = os.getenv("WEBSITE", "https://arcade.sebcun.com")
 
-    if "email" in session:
+    if "userid" in session:
         return render_template("index.html", LOGGEDIN=True, WEBSITE=websiteURL)
     return render_template("index.html", LOGGEDIN=False, WEBSITE=websiteURL)
+
 
 @app.route("/docs")
 def docs():
     websiteURL = os.getenv("WEBSITE", "https://arcade.sebcun.com")
 
-    if "email" in session:
+    if "userid" in session:
         return render_template("docs.html", LOGGEDIN=True, WEBSITE=websiteURL)
     return render_template("docs.html", LOGGEDIN=False, WEBSITE=websiteURL)
 
@@ -42,9 +42,9 @@ def docs():
 def create():
     websiteURL = os.getenv("WEBSITE", "https://arcade.sebcun.com")
 
-    if "email" in session:
+    if "userid" in session:
         return render_template("create.html", LOGGEDIN=True, WEBSITE=websiteURL)
-    return render_template("create.html", LOGGEDIN=False, WEBSITE=websiteURL)
+    return redirect(url_for("index") + "?login")
 
 
 # Api Routes
@@ -126,16 +126,19 @@ def get_images():
                 images.append(rel_path.replace("\\", "/"))
     return images
 
-@app.route('/api/games', methods=['GET'])
+
+@app.route("/api/games", methods=["GET"])
 def get_games():
-    
-    author = request.args.get('author')
-    
+
+    author = request.args.get("author")
+
     games, status = getAllGames()
-    
+
     if not isinstance(games, list):
-        return jsonify({"error": "Failed to fetch games"}), status if isinstance(status, int) else 500
-    
+        return jsonify({"error": "Failed to fetch games"}), (
+            status if isinstance(status, int) else 500
+        )
+
     if author:
         try:
             author_id = int(author)
@@ -149,7 +152,7 @@ def get_games():
                 return jsonify({"error": "Invalid author id"}), 400
 
         games = [g for g in games if str(g.get("author")) == str(author_id)]
-        
+
     normalized = [
         {
             "id": g.get("id"),
@@ -163,37 +166,41 @@ def get_games():
 
     return jsonify(normalized), status
 
+
 @app.route("/api/games", methods=["POST"])
 def create_new_game():
     if "userid" not in session:
         return jsonify({"error": "Not logged in"}), 401
-    
+
     data = request.get_json()
     title = data.get("title")
     description = data.get("description", "")
-    
+
     result, status = createGame(session["userid"], title, description)
     return jsonify(result), status
+
 
 @app.route("/api/games/<int:game_id>", methods=["GET"])
 def get_game_data(game_id):
     if "userid" not in session:
         return jsonify({"error": "Not logged in"}), 401
-    
-    result, status = getGame(game_id, session['userid'])
+
+    result, status = getGame(game_id, session["userid"])
     return jsonify(result), status
+
 
 @app.route("/api/games/<int:game_id>/save", methods=["POST"])
 def save_game_data(game_id):
     if "userid" not in session:
         return jsonify({"error": "Not logged in"}), 401
-    
+
     data = request.get_json()
     code = data.get("code", "")
     sprites_data = data.get("sprites", [])
-    
+
     result, status = saveGame(game_id, session["userid"], code, sprites_data)
     return jsonify(result), status
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", debug=True)
