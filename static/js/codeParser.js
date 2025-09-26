@@ -378,7 +378,6 @@ async function executeCode(
       const parts = line.split(/\s+/);
       const cmd = parts[0].toUpperCase();
 
-      // STOP LOOP stops a running loop (no longer accept END LOOP as a stop command)
       if (cmd === "STOP" && parts[1]?.toUpperCase() === "LOOP") {
         if (loopController) {
           loopController.stopped = true;
@@ -824,10 +823,8 @@ async function executeCode(
         continue;
       }
 
-      // IF <left> IS <right> ... END IF
       if (cmd === "IF") {
-        // keep original (trimmed) line for parsing expressions so quoted strings are preserved
-        const rest = line.slice(2).trim(); // content after IF
+        const rest = line.slice(2).trim();
         const upperRest = rest.toUpperCase();
         const isIdx = upperRest.indexOf(" IS ");
         if (isIdx === -1) {
@@ -840,7 +837,6 @@ async function executeCode(
         const leftExpr = rest.slice(0, isIdx).trim();
         const rightExpr = rest.slice(isIdx + 4).trim();
 
-        // collect block until matching END IF, support nested IFs
         let depth = 1;
         const blockLines = [];
         let j = i + 1;
@@ -886,7 +882,6 @@ async function executeCode(
 
         const condition = leftVal === rightVal;
         if (condition) {
-          // run the block (await so WAIT inside IF works)
           try {
             await executeCode(
               blockLines.join("\n"),
