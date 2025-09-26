@@ -483,7 +483,19 @@ async function executeCode(
 
       if (cmd === "WAIT") {
         if (parts.length >= 2) {
-          const sec = parseFloat(parts[1]);
+          const expr = parts.slice(1).join(" ");
+          const context = buildContext();
+          let sec;
+
+          try {
+            sec = evaluateExpression(expr, context);
+          } catch (e) {
+            console.log(`${i + 1} WAIT: ${e.message}`);
+            i++;
+            continue;
+          }
+
+          sec = Number(sec);
           if (!isNaN(sec) && sec >= 0) {
             try {
               await sleep(sec * 1000, signal);
@@ -775,23 +787,93 @@ async function executeCode(
           i++;
           continue;
         }
+
         const valueParts = parts.slice(1, asIndex);
         const valueExpr = valueParts.join(" ");
         const varname = parts[asIndex + 1];
+
         if (parts.length > asIndex + 2) {
           console.log(`${i + 1} STORE: variable name must be one word`);
           i++;
           continue;
         }
+
         if (/^sprite\d+$/i.test(varname)) {
           console.log(`${i + 1} STORE: variable name cannot be sprite[number]`);
           i++;
           continue;
         }
+
         const context = buildContext();
+
         try {
-          const value = evaluateExpression(valueExpr, context);
-          variables[varname] = value;
+          if (valueExpr.includes("#")) {
+            const idxHash = valueExpr.indexOf("#");
+            const leftExpr = valueExpr.slice(0, idxHash).trim();
+            const rightExpr = valueExpr.slice(idxHash + 1).trim();
+
+            if (!leftExpr || !rightExpr) {
+              console.log(
+                `${
+                  i + 1
+                } STORE: invalid random range '${valueExpr}'. Expected '<expr>#<expr>'`
+              );
+              i++;
+              continue;
+            }
+
+            let leftVal, rightVal;
+            try {
+              leftVal = evaluateExpression(leftExpr, context);
+            } catch (e) {
+              console.log(
+                `${i + 1} STORE: left expression error: ${e.message}`
+              );
+              i++;
+              continue;
+            }
+
+            try {
+              rightVal = evaluateExpression(rightExpr, context);
+            } catch (e) {
+              console.log(
+                `${i + 1} STORE: right expression error: ${e.message}`
+              );
+              i++;
+              continue;
+            }
+
+            const a = Number(leftVal);
+            const b = Number(rightVal);
+            if (isNaN(a) || isNaN(b)) {
+              console.log(
+                `${
+                  i + 1
+                } STORE: invalid random bounds '${leftVal}' and '${rightVal}'. Expected numbers.`
+              );
+              i++;
+              continue;
+            }
+
+            const min = Math.ceil(Math.min(a, b));
+            const max = Math.floor(Math.max(a, b));
+
+            if (max < min) {
+              console.log(
+                `${
+                  i + 1
+                } STORE: invalid random bounds after rounding: min=${min}, max=${max}`
+              );
+              i++;
+              continue;
+            }
+
+            const rand = Math.floor(Math.random() * (max - min + 1)) + min;
+            variables[varname] = rand;
+          } else {
+            const value = evaluateExpression(valueExpr, context);
+            variables[varname] = value;
+          }
         } catch (e) {
           console.log(`${i + 1} STORE: ${e.message}`);
         }

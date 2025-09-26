@@ -311,7 +311,7 @@
       "content": [
         {
           "type": "text",
-          "content": "Stores a computed value in a variable for later use. Variable names must be a single word and cannot be 'sprite<number>'."
+          "content": "Stores a computed value in a variable for later use. Variable names must be a single word and cannot be 'sprite<number>'.\n\nYou can also generate random values with this by using `value#value`."
         },
         { "type": "sub", "content": "Syntax" },
         { "type": "code", "content": "STORE (value) AS (varname)" },
@@ -343,6 +343,15 @@
         {
           "type": "text",
           "content": "When 'r' is pressed, sets lives to 100 for later use."
+        },
+        { "type": "sub", "content": "Example 4 — Random Position" },
+        {
+          "type": "code",
+          "content": "SPAWN sprite1 AT 0,0\nON KEY 'r'\n  STORE 0#100 AS randomX\n  STORE 0#100 AS randomY\n  MOVE sprite1 TO randomX,randomY\nEND KEY"
+        },
+        {
+          "type": "text",
+          "content": "When 'r' is pressed, the sprite moves to a random position between 0-100 x and y."
         }
       ]
     },
