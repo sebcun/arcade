@@ -7,7 +7,7 @@ const closeGameBtn = document.querySelector("#game-modal .close");
 window.isGameRunning = false;
 
 function startGame(gameidOrData, sprites = null, title = "Game") {
-  if (typeof gameidOrData === "number") {
+  if (sprites === null) {
     fetch(`/api/games/${gameidOrData}`)
       .then((response) => {
         if (!response.ok) {
@@ -38,6 +38,7 @@ function startGame(gameidOrData, sprites = null, title = "Game") {
   }
 }
 function runGameInModal(code, sprites, title) {
+  console.log(title);
   gameModalTitle.textContent = title;
   gameModalContents.innerHTML = `<canvas id="gameCanvas" width="600" height="380"></canvas>`;
   const canvas = document.getElementById("gameCanvas");
@@ -58,6 +59,7 @@ function hideGame() {
   gameModal.classList.remove("show");
   stopExecution();
   window.isGameRunning = false;
+  clearParameters();
 
   setTimeout(() => {
     gameModal.style.display = "none";

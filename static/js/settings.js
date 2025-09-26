@@ -15,6 +15,7 @@ function showSettings() {
         showToast("You are not logged in!", { color: "error" });
         console.log(`Profile loading error: ${data.error}`);
       } else {
+        setParameter("settings", undefined, true);
         // Profile Found
         const settingsHTML = `
           <div class="settings-form-group settings-form-group-row" style="margin-bottom: 10px;">

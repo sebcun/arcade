@@ -160,6 +160,7 @@ function showProfile(userid = null) {
           showToast("You are not logged in!", { color: "error" });
           console.log(`Profile loading error: ${data.error}`);
         } else {
+          setParameter("profile", undefined, true);
           // Profile Found
 
           // Level Image

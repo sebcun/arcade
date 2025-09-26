@@ -157,6 +157,7 @@ def get_games():
         {
             "id": g.get("id"),
             "title": g.get("title"),
+            "author": g.get("author"),
             "description": g.get("description"),
             "created_at": g.get("created_at"),
             "updated_at": g.get("updated_at"),

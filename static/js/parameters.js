@@ -5,19 +5,44 @@ function clearParameters() {
   window.history.replaceState({}, "", `${window.location.pathname}`);
   window.name = "Arcade";
 }
+function setParameter(key, value, noValue = false) {
+  clearParameters();
+  const params = new URLSearchParams(window.location.search);
+  if (noValue) {
+    let query = params.toString();
+    if (query) query += "&";
+    query += key;
+    window.history.replaceState({}, "", `${window.location.pathname}?${query}`);
+  } else {
+    if (value !== undefined) {
+      params.set(key, value);
+    } else {
+      params.set(key, "");
+    }
+    window.history.replaceState(
+      {},
+      "",
+      `${window.location.pathname}?${params.toString()}`
+    );
+  }
+}
 
 if (params.has("login")) {
-  // Show login page if URL has ?login
-  showLoginModal();
+  if (LOGGEDIN === "True") {
+    clearParameters();
+  } else {
+    showLoginModal();
+  }
 
   // Get rid of parameters in URL
-  clearParameters();
 } else if (params.has("register")) {
   // Show register page if URL has ?register
-  showRegisterModal();
-
+  if (LOGGEDIN === "True") {
+    clearParameters();
+  } else {
+    showRegisterModal();
+  }
   // Get rid of parameters in URL
-  clearParameters();
 } else if (params.has("settings")) {
   // Show settings page if URL has ?settings
   if (LOGGEDIN === "True") {
@@ -39,9 +64,6 @@ if (params.has("login")) {
       ]
     );
   }
-
-  // Get rid of parameters in URL
-  clearParameters();
 } else if (params.has("profile")) {
   // Show profile page if URL has ?profile
   const profileValue = params.get("profile");
@@ -71,15 +93,9 @@ if (params.has("login")) {
       );
     }
   }
-
-  // Get rid of parameters in URL
-  clearParameters();
 } else if (params.has("game")) {
   const gameValue = params.get("game");
   if (gameValue) {
     startGame(Number(gameValue));
   }
-
-  // Get rid of parameters in URL
-  clearParameters();
 }
