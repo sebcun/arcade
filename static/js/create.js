@@ -189,8 +189,6 @@ function editSprite(index) {
     }
   }
 
-  console.log(sprite);
-
   drawnPixels = Array(32)
     .fill()
     .map(() => Array(32).fill(false));
@@ -358,9 +356,13 @@ function initPreviewCanvas() {
   saveButton.addEventListener("click", () => {
     const code = document.getElementById("codeBox").value;
 
-    const spritesData = sprites.map((sprite) =>
-      btoa(String.fromCharCode(...sprite.data))
-    );
+    const spritesData = sprites.map((sprite) => {
+      let binary = "";
+      for (let i = 0; i < sprite.data.length; i++) {
+        binary += String.fromCharCode(sprite.data[i]);
+      }
+      return btoa(binary);
+    });
 
     fetch(`/api/games/${currentGameId}/save`, {
       method: "POST",
