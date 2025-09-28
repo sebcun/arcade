@@ -100,20 +100,3 @@ if (settingsBtnMobile) {
     }
   });
 }
-
-// Notificaitons
-const notificationsBtn = document.getElementById("notifications-btn");
-if (notificationsBtn) {
-  notificationsBtn.addEventListener("click", function () {
-    showToast("Coming soon.");
-  });
-}
-
-const notificationsBtnMobile = document.getElementById(
-  "notifications-btn-mobile"
-);
-if (notificationsBtnMobile) {
-  notificationsBtnMobile.addEventListener("click", function () {
-    showToast("Coming soon.");
-  });
-}

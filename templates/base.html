@@ -89,10 +89,10 @@
           />
         </a>
         {% if LOGGEDIN %}
-        <a id="notifications-btn">
+        <a id="create-btn" href="/create">
           <img
-            src="{{ url_for('static', filename='images/NotificationBtn.png') }}"
-            alt="Notification"
+            src="{{ url_for('static', filename='images/AddBtn.png') }}"
+            alt="Create"
           />
         </a>
         <a id="settings-btn">
@@ -127,10 +127,10 @@
           </div>
           {% if LOGGEDIN %}
           <div class="mobile-button">
-            <a id="notifications-btn-mobile">
+            <a id="create-btn-mobile" href="/create">
               <img
-                src="{{ url_for('static', filename='images/NotificationBtn.png') }}"
-                alt="Notification"
+                src="{{ url_for('static', filename='images/AddBtn.png') }}"
+                alt="Create"
               />
             </a>
             <span>Notification</span>

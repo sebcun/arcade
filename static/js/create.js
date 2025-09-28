@@ -395,3 +395,7 @@ function initPreviewCanvas() {
       });
   });
 }
+
+document.getElementById("docsButton").addEventListener("click", () => {
+  window.open("/docs", "_blank");
+});
