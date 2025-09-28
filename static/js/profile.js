@@ -15,6 +15,7 @@ function showProfile(userid = null) {
           showToast("Profile not found!", { color: "error" });
           console.log(`Profile loading error: ${data.error}`);
         } else {
+          setParameter("profile", userid, false);
           // Profile Found
 
           // Level Image
@@ -27,8 +28,13 @@ function showProfile(userid = null) {
           // Badges HTML
           let badgesHTML = "";
           try {
+            let badges = data.badges;
+
+            if (typeof badges === "string") {
+              badges = badges ? JSON.parse(badges) : [];
+            }
+
             // Parse badges to proper array
-            const badges = JSON.parse(data.badges);
             if (Array.isArray(badges)) {
               // For each badge
               badges.forEach((badgeArray) => {

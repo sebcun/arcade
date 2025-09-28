@@ -43,7 +43,8 @@ function startGame(gameidOrData, sprites = null, title = "Game") {
           data.likes || 0,
           data.liked || false,
           gameidOrData,
-          data.plays || 0
+          data.plays || 0,
+          data.author || null
         );
       })
       .catch((err) => {
@@ -62,7 +63,8 @@ function runGameInModal(
   likes = 0,
   liked = false,
   gameId = null,
-  plays = 0
+  plays = 0,
+  authorId = null
 ) {
   gameModalTitle.textContent = title;
   gameModalContents.innerHTML = `
@@ -77,6 +79,9 @@ function runGameInModal(
       <span id="play-icon" style="margin-left:12px; display:flex; align-items:center; gap:6px;">
         <i class="bi bi-eye-fill" style="font-size:1.2rem;"></i>
         <span id="play-count">${plays}</span>
+      </span>
+      <span id="author-wrap" style="margin-left:auto; display:flex; align-items:center; gap:6px;">
+        <a id="author-link" href="#" role="button" tabindex="0" aria-label="View author profile" style="text-decoration:none; color:inherit;"></a>
       </span>
     </div>
   `;
@@ -94,6 +99,34 @@ function runGameInModal(
 
   window.isGameRunning = true;
   resetSprites();
+
+  const authorLink = document.getElementById("author-link");
+  if (authorLink) {
+    if (authorId !== null && authorId !== undefined) {
+      authorLink.textContent = "@loading";
+      authorLink.style.cursor = "pointer";
+
+      fetch(`/api/profile/${authorId}`)
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error(`Profile fetch failed: ${response.status}`);
+          }
+          return response.json();
+        })
+        .then((pdata) => {
+          authorLink.textContent = `@${pdata.username}`;
+        })
+        .catch((err) => {
+          console.warn("Could not fetch author profile:", err);
+          authorLink.textContent = `@${String(authorId)}`;
+        });
+
+      authorLink.addEventListener("click", (e) => {
+        e.preventDefault();
+        showProfile(authorId);
+      });
+    }
+  }
 
   const likeIcon = document.getElementById("like-icon");
   const likeCount = document.getElementById("like-count");

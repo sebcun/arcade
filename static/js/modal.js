@@ -10,6 +10,7 @@ function showModal(
   content = "Place",
   buttons = []
 ) {
+  hideGame();
   modalTitle.textContent = title;
   modalContents.innerHTML = content;
 

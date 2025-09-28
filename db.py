@@ -597,6 +597,7 @@ def getGame(game_id):
     return {
         "id": game["id"],
         "title": game["title"],
+        "author": game["user_id"],
         "description": game["description"],
         "created_at": game["created_at"],
         "updated_at": game["updated_at"],
