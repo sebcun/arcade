@@ -1,10 +1,10 @@
 from flask import Blueprint, session, request, jsonify
 from db import updateUserProfile
 
-edit_profile_bp = Blueprint("editprofile", __name__)
+edit_profile_bp = Blueprint("edit_profile", __name__)
 
 
-@edit_profile_bp.route("/editprofile", methods=["POST"])
+@edit_profile_bp.route("/edit_profile", methods=["POST"])
 def edit_profile():
     if "userid" in session:
         data = request.get_json()

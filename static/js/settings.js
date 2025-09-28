@@ -127,7 +127,7 @@ function showEditUsername(username) {
         }, 300);
         const newUsername = usernameInput.value.slice(1);
         try {
-          const response = await fetch("/api/editprofile", {
+          const response = await fetch("/api/edit_profile", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -356,7 +356,7 @@ function showEditAvatar() {
                 ? selectedBackground.dataset.value
                 : avatar_background ?? "GREY";
               const newAvatar = JSON.stringify({ face, eyes, hair });
-              const response = await fetch("/api/editprofile", {
+              const response = await fetch("/api/edit_profile", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 credentials: "include",

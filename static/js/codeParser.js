@@ -984,6 +984,55 @@ async function executeCode(
         continue;
       }
 
+      if (cmd === "GIVE") {
+        if (parts.length >= 3 && parts[1].toUpperCase() === "XP") {
+          const size = parts[2].toUpperCase();
+          if (!["SMALL", "MEDIUM", "LARGE"].includes(size)) {
+            console.log(
+              `${i + 1} GIVE XP: invalid size '${
+                parts[2]
+              }'. Expected SMALL, MEDIUM, or LARGE.`
+            );
+            i++;
+            continue;
+          }
+
+          fetch("/api/give_xp", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+            body: JSON.stringify({ size }),
+          })
+            .then((response) => {
+              if (!response.ok) {
+                throw new Error(
+                  `HTTP ${response.status}: ${response.statusText}`
+                );
+              }
+              return response.json();
+            })
+            .then((data) => {
+              if (data.level_up) {
+                showModal("Level Up!", "Congratulations! You've leveled up!");
+              }
+            })
+            .catch((error) => {
+              console.error("GIVE XP request failed:", error);
+              showToast("Failed to give XP. Please try again.", {
+                color: "error",
+              });
+            });
+        } else {
+          console.log(
+            `${
+              i + 1
+            } GIVE: invalid syntax. Expected 'GIVE XP SMALL/MEDIUM/LARGE', got '${line}'`
+          );
+        }
+        i++;
+        continue;
+      }
+
       console.log(`${i + 1} UNKNOWN: '${cmd}' in line '${line}'`);
       i++;
     }

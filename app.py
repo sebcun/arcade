@@ -35,6 +35,7 @@ from routes.api.games.play import play_bp
 # Others
 from routes.api.images import images_bp
 from routes.static import static_bp
+from routes.api.giveXp import give_xp_bp
 
 
 # Public blueprints
@@ -64,7 +65,7 @@ app.register_blueprint(play_bp, url_prefix="/api")
 # Other Blueprints
 app.register_blueprint(static_bp)
 app.register_blueprint(images_bp, url_prefix="/api")
-
+app.register_blueprint(give_xp_bp, url_prefix="/api")
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", debug=True)

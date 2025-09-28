@@ -65,6 +65,7 @@ def initDb():
                         avatar_background TEXT DEFAULT "GREY",
                         avatar_border TEXT DEFAULT "NONE",
                         level INTEGER DEFAULT 1,
+                        xp INTEGER DEFAULT 0,
                         bio TEXT,
                         badges TEXT DEFAULT "[]",
                         created_at INTEGER DEFAULT (CAST(strftime('%s', 'now') AS INTEGER)),
@@ -373,6 +374,7 @@ def getUserProfile(userid_or_email):
         "avatar_background": profile_row["avatar_background"],
         "avatar_border": profile_row["avatar_border"],
         "level": profile_row["level"],
+        "xp": profile_row["xp"],
         "bio": profile_row["bio"],
         "badges": badges,
         "created_at": profile_row["created_at"],
@@ -385,6 +387,7 @@ def updateUserProfile(
     avatar_background=None,
     avatar_border=None,
     level=None,
+    xp=None,
     bio=None,
     badges=None,
     username=None,
@@ -439,6 +442,10 @@ def updateUserProfile(
             if level is not None:
                 conn.execute(
                     "UPDATE profiles SET level = ? WHERE user_id = ?", (level, userid)
+                )
+            if xp is not None:
+                conn.execute(
+                    "UPDATE profiles SET xp = ? WHERE user_id = ?", (xp, userid)
                 )
             if bio is not None:
                 conn.execute(
