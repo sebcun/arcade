@@ -8,6 +8,7 @@ load_dotenv()
 
 
 def send(recipientEmail, otp, expiry_minutes=5):
+    print('1')
     host = os.environ.get("EMAIL_HOST")
     port_raw = os.environ.get("EMAIL_PORT", "587")
     try:
@@ -95,6 +96,7 @@ def send(recipientEmail, otp, expiry_minutes=5):
                 server.login(user, password)
                 server.send_message(msg)
         else:
+            print('2')
             with smtplib.SMTP(host, port, timeout=30) as server:
                 server.set_debuglevel(1)
                 server.ehlo()

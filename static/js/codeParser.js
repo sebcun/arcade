@@ -1013,7 +1013,12 @@ async function executeCode(
             })
             .then((data) => {
               if (data.level_up) {
-                showModal("Level Up!", "Congratulations! You've leveled up!");
+                showModal(
+                  "Level Up!",
+                  "Congratulations! You've leveled up!",
+                  [],
+                  false
+                );
               }
             })
             .catch((error) => {

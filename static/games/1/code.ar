@@ -1,0 +1,3 @@
+ON KEY 'f'
+  GIVE XP MEDIUM
+END KEY

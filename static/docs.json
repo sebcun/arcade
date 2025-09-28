@@ -209,7 +209,10 @@
           "type": "code",
           "content": "TINT sprite1 TO ff0000\nLOG \"sprite1 is red\""
         },
-        { "type": "text", "content": "Tints sprite1 red and logs the action." },
+        {
+          "type": "text",
+          "content": "Tints sprite1 red and logs the action."
+        },
         { "type": "br", "content": "" },
         { "type": "sub", "content": "Example 2 — Change tint over time" },
         {
@@ -493,6 +496,46 @@
         {
           "type": "text",
           "content": "Demonstrates nested IF blocks — inner IF will run because the outer condition is true."
+        }
+      ]
+    },
+    "GIVE": {
+      "title": "GIVE XP Command",
+      "content": [
+        {
+          "type": "text",
+          "content": "Awards experience points (XP) to the user in the specified size. This can trigger a level-up if enough XP is accumulated. XP sizes are SMALL, MEDIUM, or LARGE."
+        },
+        { "type": "sub", "content": "Syntax" },
+        { "type": "code", "content": "GIVE XP (size)" },
+        { "type": "sub", "content": "Example 1 — Award small XP" },
+        {
+          "type": "code",
+          "content": "GIVE XP SMALL\nLOG \"Awarded small XP\""
+        },
+        {
+          "type": "text",
+          "content": "Awards a small amount of XP and logs a confirmation."
+        },
+        { "type": "br", "content": "" },
+        { "type": "sub", "content": "Example 2 — XP on touch event" },
+        {
+          "type": "code",
+          "content": "ON TOUCH sprite1 WITH sprite2\n  GIVE XP MEDIUM\n  LOG \"Collected medium XP!\"\nEND TOUCH"
+        },
+        {
+          "type": "text",
+          "content": "Awards medium XP when sprite1 touches sprite2 and logs the event."
+        },
+        { "type": "br", "content": "" },
+        { "type": "sub", "content": "Example 3 — XP in a scoring loop" },
+        {
+          "type": "code",
+          "content": "LOOP\n  STORE score+1 AS score\n  IF score IS 10\n    GIVE XP LARGE\n    LOG \"Level up bonus!\"\n    STOP LOOP\n  END IF\n  WAIT 0.5\nEND LOOP"
+        },
+        {
+          "type": "text",
+          "content": "Increments score in a loop, awards large XP and stops when score reaches 10."
         }
       ]
     }

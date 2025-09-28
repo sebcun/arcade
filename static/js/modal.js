@@ -3,14 +3,18 @@ const modal = document.getElementById("modal");
 const modalTitle = document.getElementById("modal-title");
 const modalContents = document.getElementById("modal-contents");
 const modalButtons = document.getElementById("modal-buttons");
-const closeBtn = document.querySelector(".close");
+const closeBtn = document.querySelector("#modal .close");
 
 function showModal(
   title = "Placeholder Title",
   content = "Place",
-  buttons = []
+  buttons = [],
+  hideGameTF = true
 ) {
-  hideGame();
+  if (hideGameTF) {
+    hideGame();
+  }
+
   modalTitle.textContent = title;
   modalContents.innerHTML = content;
 
