@@ -28,13 +28,22 @@ function startGame(gameidOrData, sprites = null, title = "Game") {
           });
         }
         setParameter("game", gameidOrData, false);
+
+        fetch(`/api/games/${gameidOrData}/play`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+        }).catch((err) => {
+          console.warn("Failed to increment play count:", err);
+        });
+
         runGameInModal(
           data.code || "",
           processedSprites,
           data.title || title,
           data.likes || 0,
           data.liked || false,
-          gameidOrData
+          gameidOrData,
+          data.plays || 0
         );
       })
       .catch((err) => {
@@ -52,7 +61,8 @@ function runGameInModal(
   title,
   likes = 0,
   liked = false,
-  gameId = null
+  gameId = null,
+  plays = 0
 ) {
   gameModalTitle.textContent = title;
   gameModalContents.innerHTML = `
@@ -63,7 +73,11 @@ function runGameInModal(
       }" style="cursor:pointer;font-size:1.2rem;" role="button" aria-pressed="${
     liked ? "true" : "false"
   }" tabindex="0" aria-label="Like"></i>
-      <span id="like-count" style="margin-left:6px;">${likes}</span>
+      <span id="like-count">${likes}</span>
+      <span id="play-icon" style="margin-left:12px; display:flex; align-items:center; gap:6px;">
+        <i class="bi bi-eye-fill" style="font-size:1.2rem;"></i>
+        <span id="play-count">${plays}</span>
+      </span>
     </div>
   `;
   const canvas = document.getElementById("gameCanvas");

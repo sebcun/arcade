@@ -25,6 +25,7 @@ from db import (
     getLikesForGame,
     userLikedGame,
     toggleLike,
+    incrementPlay,
 )
 from utils import *
 import os
@@ -352,6 +353,12 @@ def toggle_like(game_id):
         return jsonify({"error": "Not logged in"}), 401
 
     result, status = toggleLike(game_id, session["userid"])
+    return jsonify(result), status
+
+
+@app.route("/api/games/<int:game_id>/play", methods=["POST"])
+def increment_play(game_id):
+    result, status = incrementPlay(game_id)
     return jsonify(result), status
 
 

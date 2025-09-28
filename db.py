@@ -84,6 +84,7 @@ def initDb():
                         user_id INTEGER NOT NULL,
                         title TEXT NOT NULL,
                         description TEXT,
+                        plays INTEGER DEFAULT 0,
                         created_at INTEGER DEFAULT (CAST(strftime('%s', 'now') AS INTEGER)),
                         updated_at INTEGER DEFAULT (CAST(strftime('%s', 'now') AS INTEGER)),
                         FOREIGN KEY (user_id) REFERENCES users(id)
@@ -546,7 +547,7 @@ def createGame(user_id, title, description=""):
 def getAllGames():
     conn = getDbConnection()
     games = conn.execute(
-        "SELECT id, title, user_id, description, created_at, updated_at FROM games ORDER BY updated_at DESC"
+        "SELECT id, title, user_id, description, plays, created_at, updated_at FROM games ORDER BY updated_at DESC"
     ).fetchall()
     conn.close()
 
@@ -556,6 +557,7 @@ def getAllGames():
             "title": game["title"],
             "author": game["user_id"],
             "description": game["description"],
+            "plays": game["plays"],
             "created_at": game["created_at"],
             "updated_at": game["updated_at"],
         }
@@ -600,7 +602,36 @@ def getGame(game_id):
         "updated_at": game["updated_at"],
         "code": code_content,
         "sprites": sprites,
+        "plays": game["plays"],
     }, 200
+
+
+def incrementPlay(game_id):
+    if not game_id:
+        return {"error": "Game ID is required."}, 400
+
+    conn = getDbConnection()
+    try:
+        game = conn.execute("SELECT id FROM games WHERE id = ?", (game_id,)).fetchone()
+        if not game:
+            conn.close()
+            return {"error": "Game not found."}, 404
+
+        conn.execute("UPDATE games SET plays = plays + 1 WHERE id = ?", (game_id,))
+        conn.commit()
+
+        row = conn.execute(
+            "SELECT plays FROM games WHERE id = ?", (game_id,)
+        ).fetchone()
+        conn.close()
+
+        return {"plays": row["plays"]}, 200
+    except Exception:
+        try:
+            conn.close()
+        except Exception:
+            pass
+        return {"error": "Failed to increment play count."}, 500
 
 
 def saveGame(game_id, user_id, code="", sprites_data=None):
