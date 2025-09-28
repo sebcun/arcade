@@ -1,365 +1,69 @@
-from dotenv import dotenv_values
-from flask import (
-    Flask,
-    render_template,
-    request,
-    jsonify,
-    session,
-    redirect,
-    url_for,
-    abort,
-    send_from_directory,
-)
-from db import (
-    initDb,
-    sendVerificationCode,
-    verifyCode,
-    getUserProfile,
-    updateUserProfile,
-    giveBadge,
-    createGame,
-    getAllGames,
-    getGame,
-    saveGame,
-    createUser,
-    getLikesForGame,
-    userLikedGame,
-    toggleLike,
-    incrementPlay,
-)
-from utils import *
+from config import *
+from flask import Flask
+from db import initDb
 import os
-import requests
-
-
-_env = dotenv_values(".env") or {}
-
-for key in (
-    "SECRET_KEY",
-    "WEBSITE",
-    "SLACK_CLIENT_ID",
-    "SLACK_CLIENT_SECRET",
-    "SLACK_REDIRECT_URI",
-):
-    if key in _env and os.getenv(key) is None:
-        os.environ[key] = _env[key]
 
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY", "YourSecretKey")
 
 initDb()
 
-SLACK_CLIENT_ID = os.getenv("SLACK_CLIENT_ID")
-SLACK_CLIENT_SECRET = os.getenv("SLACK_CLIENT_SECRET")
-SLACK_REDIRECT_URI = os.getenv("SLACK_REDIRECT_URI")
-
-
-@app.route("/")
-def index():
-    websiteURL = os.getenv("WEBSITE", "https://arcade.sebcun.com")
-
-    if "userid" in session:
-        return render_template("index.html", LOGGEDIN=True, WEBSITE=websiteURL)
-    return render_template("index.html", LOGGEDIN=False, WEBSITE=websiteURL)
-
-
-@app.route("/docs")
-def docs():
-    websiteURL = os.getenv("WEBSITE", "https://arcade.sebcun.com")
-
-    if "userid" in session:
-        return render_template("docs.html", LOGGEDIN=True, WEBSITE=websiteURL)
-    return render_template("docs.html", LOGGEDIN=False, WEBSITE=websiteURL)
-
-
-@app.route("/create")
-def create():
-    websiteURL = os.getenv("WEBSITE", "https://arcade.sebcun.com")
-
-    if "userid" in session:
-        return render_template("create.html", LOGGEDIN=True, WEBSITE=websiteURL)
-    return redirect(url_for("index") + "?login")
-
-
-# Api Routes
-
-
-@app.route("/api/auth/slack")
-def slack_create_url():
-    slackAuthURL = (
-        "https://slack.com/openid/connect/authorize"
-        f"?response_type=code&client_id={SLACK_CLIENT_ID}"
-        f"&scope=openid%20profile%20email"
-        f"&redirect_uri={SLACK_REDIRECT_URI}"
-    )
-    return redirect(slackAuthURL)
-
-
-@app.route("/api/auth/slack/callback")
-def slack_callback():
-    code = request.args.get("code")
-    if not code:
-        return jsonify({"error": "No Slack code provided."}), 400
-
-    tokenResponse = requests.post(
-        "https://slack.com/api/openid.connect.token",
-        data={
-            "client_id": SLACK_CLIENT_ID,
-            "client_secret": SLACK_CLIENT_SECRET,
-            "code": code,
-            "redirect_uri": SLACK_REDIRECT_URI,
-        },
-    ).json()
-
-    if not tokenResponse.get("ok"):
-        return jsonify({"error": "Invalid login code provided from Slack."}), 400
-
-    # Get the user info
-    userInfo = requests.get(
-        "https://slack.com/api/openid.connect.userInfo",
-        headers={"Authorization": f"Bearer {tokenResponse['access_token']}"},
-    ).json()
-
-    email = userInfo.get("email")
-    if not email:
-        return jsonify({"error": "No email provided from Slack."}), 400
-
-    profile = getUserProfile(email)
-    if profile:
-        session["email"] = email
-        session["userid"] = profile["id"]
-    else:
-        result, status = createUser(email)
-        if status in (200, 201) and isinstance(result, dict) and result.get("userid"):
-            session["email"] = email
-            session["userid"] = result["userid"]
-            try:
-                giveBadge(
-                    session["userid"],
-                    "siege",
-                    "Siege",
-                    "Signed up during the Siege weeks!",
-                )
-            except Exception:
-                pass
-        else:
-            return jsonify({"error": "Failed to create account via Slack."}), 500
-
-    return redirect(url_for("index"))
-
-
-@app.route("/api/send_code", methods=["POST"])
-def api_send_code():
-    data = request.get_json() or {}
-    email = data.get("email")
-    mode = data.get("mode", "register")
-    username = data.get("username")
-
-    result, status = sendVerificationCode(email, username=username, mode=mode)
-    return jsonify(result), status
-
-
-@app.route("/api/verify_code", methods=["POST"])
-def api_verify_code():
-    data = request.get_json() or {}
-    email = data.get("email")
-    code = data.get("code")
-    mode = data.get("mode", "register")
-
-    result, status = verifyCode(email, code, mode=mode)
-
-    if (
-        status == 201
-        and mode == "register"
-        and isinstance(result, dict)
-        and result.get("userid")
-    ):
-        session["email"] = email
-        session["userid"] = result["userid"]
-        try:
-            giveBadge(
-                session["userid"], "siege", "Siege", "Signed up during the Siege weeks!"
-            )
-        except Exception:
-            pass
-
-    if (
-        status == 200
-        and mode == "login"
-        and isinstance(result, dict)
-        and result.get("userid")
-    ):
-        session["email"] = email
-        session["userid"] = result["userid"]
-
-    return jsonify(result), status
-
-
-@app.route("/api/logout", methods=["POST"])
-def logout():
-    session.pop("email", None)
-    session.pop("userid", None)
-    return jsonify({"message": "Logged out successfully"}), 200
-
-
-@app.route("/api/me", methods=["GET"])
-def me():
-    if "userid" in session:
-        profile = getUserProfile(session["userid"])
-        if profile:
-            return jsonify(profile), 200
-        return jsonify({"error": "Profile not found"}), 404
-    return jsonify({"error": "Not logged in"}), 401
-
-
-@app.route("/api/profile/<userid>", methods=["GET"])
-def profile(userid):
-    profile = getUserProfile(userid)
-    if profile:
-        profile = {k: v for k, v in profile.items() if k != "email"}
-        return jsonify(profile), 200
-    return jsonify({"error": "Profile not found"}), 404
-
-
-@app.route("/api/editprofile", methods=["POST"])
-def editprofile():
-    if "userid" in session:
-        data = request.get_json()
-        username = data.get("username")
-        avatar = data.get("avatar")
-        avatar_background = data.get("avatar_background")
-        result, status = updateUserProfile(
-            session["userid"],
-            username=username,
-            avatar=avatar,
-            avatar_background=avatar_background,
-        )
-        return jsonify(result), status
-
-    return jsonify({"error": "Not logged in"}), 401
-
-
-@app.route("/api/images")
-def get_images():
-    images = []
-    for root, dirs, files in os.walk("static/images"):
-        for file in files:
-            if file.endswith(".png"):
-                rel_path = os.path.relpath(os.path.join(root, file), "static")
-                images.append(rel_path.replace("\\", "/"))
-    return images
-
-
-@app.route("/api/games", methods=["GET"])
-def get_games():
-
-    author = request.args.get("author")
-
-    games, status = getAllGames()
-
-    if not isinstance(games, list):
-        return jsonify({"error": "Failed to fetch games"}), (
-            status if isinstance(status, int) else 500
-        )
-
-    if author:
-        try:
-            author_id = int(author)
-        except (TypeError, ValueError):
-            if author == "me":
-                if "userid" in session:
-                    author_id = session["userid"]
-                else:
-                    return jsonify({"error": "Not logged in"}), 401
-            else:
-                return jsonify({"error": "Invalid author id"}), 400
-
-        games = [g for g in games if str(g.get("author")) == str(author_id)]
-
-    normalized = [
-        {
-            "id": g.get("id"),
-            "title": g.get("title"),
-            "author": g.get("author"),
-            "description": g.get("description"),
-            "created_at": g.get("created_at"),
-            "updated_at": g.get("updated_at"),
-        }
-        for g in games
-    ]
-
-    return jsonify(normalized), status
-
-
-@app.route("/api/games", methods=["POST"])
-def create_new_game():
-    if "userid" not in session:
-        return jsonify({"error": "Not logged in"}), 401
-
-    data = request.get_json()
-    title = data.get("title")
-    description = data.get("description", "")
-
-    result, status = createGame(session["userid"], title, description)
-    return jsonify(result), status
-
-
-@app.route("/api/games/<int:game_id>", methods=["GET"])
-def get_game_data(game_id):
-
-    result, status = getGame(game_id)
-
-    if isinstance(result, dict) and status == 200:
-        try:
-            likes = getLikesForGame(game_id)
-            user_liked = False
-            if "userid" in session:
-                user_liked = userLikedGame(game_id, session["userid"])
-            result["likes"] = likes
-            result["liked"] = bool(user_liked)
-        except Exception:
-            result["likes"] = 0
-            result["liked"] = False
-    return jsonify(result), status
-
-
-@app.route("/api/games/<int:game_id>/save", methods=["POST"])
-def save_game_data(game_id):
-    if "userid" not in session:
-        return jsonify({"error": "Not logged in"}), 401
-
-    data = request.get_json()
-    code = data.get("code", "")
-    sprites_data = data.get("sprites", [])
-
-    result, status = saveGame(game_id, session["userid"], code, sprites_data)
-    return jsonify(result), status
-
-
-@app.route("/static/<path:filename>")
-def static_files(filename):
-    static_dir = os.path.join(app.root_path, "static")
-    full_path = os.path.normpath(os.path.join(static_dir, filename))
-    if not full_path.startswith(os.path.abspath(static_dir)):
-        return abort(404)
-    if not os.path.exists(full_path):
-        return abort(404)
-    return send_from_directory(static_dir, filename)
-
-
-@app.route("/api/games/<int:game_id>/like", methods=["POST"])
-def toggle_like(game_id):
-    if "userid" not in session:
-        return jsonify({"error": "Not logged in"}), 401
-
-    result, status = toggleLike(game_id, session["userid"])
-    return jsonify(result), status
-
-
-@app.route("/api/games/<int:game_id>/play", methods=["POST"])
-def increment_play(game_id):
-    result, status = incrementPlay(game_id)
-    return jsonify(result), status
+# Import blueprints
+from routes.public.index import index_bp
+from routes.public.docs import docs_bp
+from routes.public.create import create_bp
+
+# Auth
+from routes.api.auth.slack import slack_bp
+from routes.api.auth.slackCallback import slack_callback_bp
+from routes.api.auth.sendCode import send_code_bp
+from routes.api.auth.verifyCode import verify_code_bp
+from routes.api.auth.logout import logout_bp
+
+# Profiles
+from routes.api.profile.me import me_bp
+from routes.api.profile.profile import profile_bp
+from routes.api.profile.editProfile import edit_profile_bp
+
+# Games
+from routes.api.games.games import games_bp
+from routes.api.games.game import game_bp
+from routes.api.games.saveGame import save_game_bp
+from routes.api.games.like import like_bp
+from routes.api.games.play import play_bp
+
+# Others
+from routes.api.images import images_bp
+from routes.static import static_bp
+
+
+# Public blueprints
+app.register_blueprint(index_bp)
+app.register_blueprint(docs_bp)
+app.register_blueprint(create_bp)
+
+# Auth Blueprints
+app.register_blueprint(slack_bp, url_prefix="/api/auth")
+app.register_blueprint(slack_callback_bp, url_prefix="/api/auth")
+app.register_blueprint(send_code_bp, url_prefix="/api/auth")
+app.register_blueprint(verify_code_bp, url_prefix="/api/auth")
+app.register_blueprint(logout_bp, url_prefix="/api/auth")
+
+# Profile Blueprints
+app.register_blueprint(me_bp, url_prefix="/api")
+app.register_blueprint(profile_bp, url_prefix="/api")
+app.register_blueprint(edit_profile_bp, url_prefix="/api")
+
+# Games Blueprints
+app.register_blueprint(games_bp, url_prefix="/api")
+app.register_blueprint(game_bp, url_prefix="/api")
+app.register_blueprint(save_game_bp, url_prefix="/api")
+app.register_blueprint(like_bp, url_prefix="/api")
+app.register_blueprint(play_bp, url_prefix="/api")
+
+# Other Blueprints
+app.register_blueprint(static_bp)
+app.register_blueprint(images_bp, url_prefix="/api")
 
 
 if __name__ == "__main__":

@@ -1,15 +1,10 @@
 import sqlite3
 import json
 import os
-import base64
 import random
 from datetime import datetime, timedelta
-from werkzeug.security import generate_password_hash, check_password_hash
 from utils import cleanEmail, cleanUsername
-from PIL import Image
-from io import BytesIO
 import emailUtils
-import time
 
 AZURE_DATA_PATH = "/home/data"
 IS_AZURE = os.path.exists(AZURE_DATA_PATH)

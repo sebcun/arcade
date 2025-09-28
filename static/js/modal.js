@@ -105,7 +105,7 @@ function showCodeModal(email, mode = "login") {
           verifySpan.textContent = "Verifying" + ".".repeat(dots);
         }, 300);
 
-        fetch("/api/verify_code", {
+        fetch("/api/auth/verify_code", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           credentials: "include",
@@ -206,7 +206,7 @@ function showCodeModal(email, mode = "login") {
         resendSpan.textContent = "Sending" + ".".repeat(dots);
       }, 300);
 
-      fetch("/api/send_code", {
+      fetch("/api/auth/send_code", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -445,7 +445,7 @@ function showLoginModal() {
       nextSpan.textContent = "Sending Code" + ".".repeat(dots);
     }, 300);
 
-    fetch("/api/send_code", {
+    fetch("/api/auth/send_code", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
@@ -657,7 +657,7 @@ function showRegisterModal() {
       nextSpan.textContent = "Sending Code" + ".".repeat(dots);
     }, 300);
 
-    fetch("/api/send_code", {
+    fetch("/api/auth/send_code", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: "include",

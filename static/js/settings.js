@@ -57,7 +57,7 @@ function showSettings() {
                     text: "Logout",
                     onClick: async () => {
                       try {
-                        const response = await fetch("/api/logout", {
+                        const response = await fetch("/api/auth/logout", {
                           method: "POST",
                           headers: { "Content-Type": "application/json" },
                         });
