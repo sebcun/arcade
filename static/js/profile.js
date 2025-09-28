@@ -160,6 +160,7 @@ function showProfile(userid = null) {
           showToast("You are not logged in!", { color: "error" });
           console.log(`Profile loading error: ${data.error}`);
         } else {
+          console.log(data);
           setParameter("profile", undefined, true);
           // Profile Found
 
@@ -173,8 +174,13 @@ function showProfile(userid = null) {
           // Badges HTML
           let badgesHTML = "";
           try {
+            let badges = data.badges;
+
+            if (typeof badges === "string") {
+              badges = badges ? JSON.parse(badges) : [];
+            }
+
             // Parse badges to proper array
-            const badges = JSON.parse(data.badges);
             if (Array.isArray(badges)) {
               // For each badge
               badges.forEach((badgeArray) => {
