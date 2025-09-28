@@ -7,7 +7,51 @@ document.addEventListener("DOMContentLoaded", () => {
     .then((data) => {
       docsData = data;
       populateSidebar();
-      loadSection("introduction");
+
+      const urlParams = new URLSearchParams(window.location.search);
+      let initialSection = "introduction";
+      let initialPage = null;
+
+      if (urlParams.has("command")) {
+        const cmd = urlParams.get("command");
+        if (docsData.commands && docsData.commands[cmd]) {
+          initialSection = "commands";
+          initialPage = cmd;
+        }
+      } else if (urlParams.has("event")) {
+        let evt = urlParams.get("event");
+        if (evt === "ONTOUCH") evt = "ON TOUCH";
+        else if (evt === "ONKEY") evt = "ON KEY";
+        if (docsData.events && docsData.events[evt]) {
+          initialSection = "events";
+          initialPage = evt;
+        }
+      }
+
+      loadSection(initialSection, initialPage);
+
+      document
+        .querySelectorAll(".sidebar-nav a")
+        .forEach((a) => a.classList.remove("active"));
+
+      const activeLink = document.querySelector(
+        `a[data-section="${initialSection}"][data-page="${initialPage || ""}"]`
+      );
+      if (activeLink) {
+        activeLink.classList.add("active");
+        if (initialPage) {
+          const submenu = activeLink.closest(".submenu");
+          if (submenu) {
+            submenu.classList.add("show");
+            const toggle = document.querySelector(
+              `.toggle-submenu[data-submenu="${initialSection}"]`
+            );
+            if (toggle) toggle.classList.add("open");
+          }
+        }
+      }
+
+      history.replaceState(null, "", window.location.pathname);
 
       document.querySelectorAll(".sidebar-nav a").forEach((link) => {
         link.addEventListener("click", (e) => {
@@ -60,7 +104,17 @@ document.addEventListener("DOMContentLoaded", () => {
       data = docsData[section];
     }
 
-    let html = `<h1>${data.title}</h1>`;
+    let param = "";
+    if (section === "commands" && page) {
+      param = `?command=${page}`;
+    } else if (section === "events" && page) {
+      const urlEvent = page.replace(/\s+/g, "");
+      param = `?event=${urlEvent}`;
+    }
+
+    const fullUrl = window.location.origin + "/docs" + param;
+
+    let html = `<h1>${data.title} <i class="bi bi-copy copy-icon" style="cursor: pointer; margin-left: 10px; font-size: 1.2rem;" title="Copy URL"></i></h1>`;
     data.content.forEach((content) => {
       if (content.type === "text") {
         html += content.content.replace(/\n/g, "<br>");
@@ -77,6 +131,21 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
     contentDiv.innerHTML = html;
+
+    const copyIcon = contentDiv.querySelector(".copy-icon");
+    if (copyIcon) {
+      copyIcon.addEventListener("click", () => {
+        navigator.clipboard
+          .writeText(fullUrl)
+          .then(() => {
+            showToast("URL copied to clipboard!", { color: "success" });
+          })
+          .catch((err) => {
+            console.error("Failed to copy: ", err);
+            showToast("Failed to copy URL", { color: "error" });
+          });
+      });
+    }
   }
 
   // Toggle submenus
