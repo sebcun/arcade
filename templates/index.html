@@ -7,5 +7,18 @@
 <script src="{{ url_for('static', filename='js/home.js') }}"></script>
 {% endblock %} {% block content %}
 
-<div id="game-list"></div>
+<div id="home-sections">
+  <div class="section" id="most-liked-section">
+    <h2>Most Liked Games</h2>
+    <div class="carousel" id="most-liked-carousel"></div>
+  </div>
+  <div class="section" id="most-played-section">
+    <h2>Most Played Games</h2>
+    <div class="carousel" id="most-played-carousel"></div>
+  </div>
+  <div class="section" id="most-recent-section">
+    <h2>Most Recently Updated Games</h2>
+    <div class="carousel" id="most-recent-carousel"></div>
+  </div>
+</div>
 {% endblock %}

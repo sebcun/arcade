@@ -77,3 +77,31 @@
   color: #fff;
   opacity: 0.95;
 }
+
+#home-sections {
+  padding: 16px;
+}
+
+.section {
+  margin-bottom: 40px;
+}
+
+.section h2 {
+  margin: 0 0 16px 0;
+  font-size: 24px;
+  color: #fff;
+}
+
+.carousel {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding-bottom: 8px;
+}
+
+.game-card {
+  flex-shrink: 0;
+  scroll-snap-align: start;
+  width: 160px;
+}

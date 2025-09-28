@@ -1,5 +1,5 @@
 from flask import Blueprint, request, session, jsonify
-from db import getAllGames, createGame
+from db import getAllGames, createGame, getGamesSorted
 
 games_bp = Blueprint("games", __name__)
 
@@ -7,6 +7,16 @@ games_bp = Blueprint("games", __name__)
 @games_bp.route("/games", methods=["GET"])
 def get_games():
     author = request.args.get("author")
+    sort = request.args.get("sort")
+    limit_str = request.args.get("limit")
+    limit = int(limit_str) if limit_str and limit_str.isdigit() else None
+    
+    if sort in ['liked', 'played', 'recent']:
+        games, status = getGamesSorted(sort, limit or 30)
+    else:
+        games, status = getAllGames()
+        if limit:
+            games = games[:limit]
 
     games, status = getAllGames()
 

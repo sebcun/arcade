@@ -807,3 +807,48 @@ def toggleLike(game_id, user_id):
         except Exception:
             pass
         return {"error": "Failed to toggle like."}, 500
+
+def getGamesSorted(sort_type, limit=30):
+    conn=getDbConnection()
+    
+    if sort_type == 'liked':
+        games = conn.execute("""
+            SELECT g.id, g.title, g.user_id as author, g.description, g.plays, g.created_at, g.updated_at, COUNT(l.id) as likes
+            FROM games g LEFT JOIN likes l ON g.id = l.game_id
+            GROUP BY g.id
+            ORDER BY likes DESC
+            LIMIT ?
+        """, (limit,)).fetchall()
+        
+    elif sort_type == 'played':
+        games = conn.execute(
+            "SELECT id, title, user_id as author, description, plays, created_at, updated_at FROM games ORDER BY plays DESC LIMIT ?",
+            (limit,)
+        ).fetchall()
+        
+    elif sort_type == 'recent':
+        games = conn.execute(
+            "SELECT id, title, user_id as author, description, plays, created_at, updated_at FROM games ORDER BY created_at DESC LIMIT ?",
+            (limit,)
+        ).fetchall()
+        
+    else:
+        games = conn.execute(
+            "SELECT id, title, user_id as author, description, plays, created_at, updated_at FROM games ORDER BY updated_at DESC LIMIT ?",
+            (limit,)
+        ).fetchall()
+        
+        
+    conn.close()
+    return [
+        {
+            "id": game["id"],
+            "title": game["title"],
+            "author": game["author"],
+            "description": game["description"],
+            "plays": game["plays"],
+            "created_at": game["created_at"],
+            "updated_at": game["updated_at"],
+        }
+        for game in games
+    ], 200
