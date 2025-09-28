@@ -9,6 +9,7 @@ from utils import cleanEmail, cleanUsername
 from PIL import Image
 from io import BytesIO
 import emailUtils
+import time
 
 AZURE_DATA_PATH = "/home/data"
 IS_AZURE = os.path.exists(AZURE_DATA_PATH)
@@ -69,7 +70,7 @@ def initDb():
                         level INTEGER DEFAULT 1,
                         bio TEXT,
                         badges TEXT DEFAULT "[]",
-                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        created_at INTEGER DEFAULT (CAST(strftime('%s', 'now') AS INTEGER)),
                         FOREIGN KEY (user_id) REFERENCES users(id)
                     )"""
     )
@@ -81,8 +82,8 @@ def initDb():
                         user_id INTEGER NOT NULL,
                         title TEXT NOT NULL,
                         description TEXT,
-                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        created_at INTEGER DEFAULT (CAST(strftime('%s', 'now') AS INTEGER)),
+                        updated_at INTEGER DEFAULT (CAST(strftime('%s', 'now') AS INTEGER)),
                         FOREIGN KEY (user_id) REFERENCES users(id)
                  )"""
     )
@@ -95,7 +96,7 @@ def initDb():
                 username TEXT,
                 code TEXT NOT NULL,
                 mode TEXT NOT NULL, -- 'register' or 'login'
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                created_at INTEGER DEFAULT (CAST(strftime('%s', 'now') AS INTEGER)),
                 expires_at TIMESTAMP NOT NULL
             )"""
     )
@@ -117,6 +118,25 @@ def _generate_fallback_username(conn):
         ).fetchone():
             return candidate
     return f"user{random.getrandbits(64)}"
+
+
+def _now_unix():
+    return int(datetime.utcnow().timestamp())
+
+
+def _parse_timestamp(value):
+    if value is None:
+        return None
+    try:
+        return int(value)
+    except Exception:
+        pass
+    try:
+        dt = datetime.fromisoformat(value)
+        return int(dt.timestamp())
+    except Exception:
+        pass
+    return None
 
 
 def sendVerificationCode(email, username=None, mode="register"):
@@ -173,7 +193,7 @@ def sendVerificationCode(email, username=None, mode="register"):
         )
 
         code = _generate_code()
-        expires_at = (datetime.utcnow() + timedelta(minutes=5)).isoformat()
+        expires_at = int((datetime.utcnow() + timedelta(minutes=5)).timestamp())
 
         conn.execute(
             "INSERT INTO verifications (email, username, code, mode, expires_at) VALUES (?, ?, ?, ?, ?)",
@@ -213,15 +233,14 @@ def verifyCode(email, code, mode="register"):
             conn.close()
             return {"error": "Invalid verification code."}, 400
 
-        try:
-            expires_at = datetime.fromisoformat(row["expires_at"])
-        except Exception:
+        expires_at = _parse_timestamp(row["expires_at"])
+        if expires_at is None:
             conn.execute("DELETE FROM verifications WHERE id = ?", (row["id"],))
             conn.commit()
             conn.close()
             return {"error": "Verification code invalid or expired."}, 400
 
-        if datetime.utcnow() > expires_at:
+        if _now_unix() > expires_at:
             conn.execute("DELETE FROM verifications WHERE id = ?", (row["id"],))
             conn.commit()
             conn.close()
@@ -417,7 +436,7 @@ def giveBadge(userid, badgeid, badgeName, badgeDescription, createdAt=None):
         return {"error": "User ID, badge ID, name, and description are required."}, 400
 
     if createdAt is None:
-        createdAt = datetime.now().isoformat()
+        createdAt = _now_unix()
 
     conn = getDbConnection()
     profile = conn.execute(
@@ -565,7 +584,8 @@ def saveGame(game_id, user_id, code="", sprites_data=None):
 
     try:
         conn.execute(
-            "UPDATE games SET updated_at = CURRENT_TIMESTAMP where id = ?", (game_id,)
+            "UPDATE games SET updated_at = CAST(strftime('%s', 'now') AS INTEGER) where id = ?",
+            (game_id,),
         )
         conn.commit()
 

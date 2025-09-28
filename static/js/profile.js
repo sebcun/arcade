@@ -40,7 +40,20 @@ function showProfile(userid = null) {
                 const imageName = badgeid + ".png";
 
                 // Given Date
-                const date = new Date(badgeCreationDate);
+                let badgeCreatedAt = badgeCreationDate;
+                if (
+                  typeof badgeCreatedAt === "string" &&
+                  /^\d+$/.test(badgeCreatedAt)
+                ) {
+                  badgeCreatedAt = Number(badgeCreatedAt);
+                }
+                if (
+                  typeof badgeCreatedAt === "number" &&
+                  badgeCreatedAt < 1e12
+                ) {
+                  badgeCreatedAt = badgeCreatedAt * 1000;
+                }
+                const date = new Date(badgeCreatedAt);
                 const day = date.getDate();
                 const month = date.toLocaleString("en-US", { month: "short" });
                 const year = date.getFullYear();
@@ -73,7 +86,14 @@ function showProfile(userid = null) {
 
           // Creation date of user
           let creationDate = "";
-          const date = new Date(data.created_at);
+          let createdAt = data.created_at;
+          if (typeof createdAt === "string" && /^\d+$/.test(createdAt)) {
+            createdAt = Number(createdAt);
+          }
+          if (typeof createdAt === "number" && createdAt < 1e12) {
+            createdAt = createdAt * 1000;
+          }
+          const date = new Date(createdAt);
           const month = date.toLocaleString("en-US", { month: "long" });
           const year = date.getFullYear();
           creationDate = `${month} ${year}`;
@@ -160,7 +180,6 @@ function showProfile(userid = null) {
           showToast("You are not logged in!", { color: "error" });
           console.log(`Profile loading error: ${data.error}`);
         } else {
-          console.log(data);
           setParameter("profile", undefined, true);
           // Profile Found
 
@@ -192,7 +211,20 @@ function showProfile(userid = null) {
                 const imageName = badgeid + ".png";
 
                 // Given Date
-                const date = new Date(badgeCreationDate);
+                let badgeCreatedAt = badgeCreationDate;
+                if (
+                  typeof badgeCreatedAt === "string" &&
+                  /^\d+$/.test(badgeCreatedAt)
+                ) {
+                  badgeCreatedAt = Number(badgeCreatedAt);
+                }
+                if (
+                  typeof badgeCreatedAt === "number" &&
+                  badgeCreatedAt < 1e12
+                ) {
+                  badgeCreatedAt = badgeCreatedAt * 1000;
+                }
+                const date = new Date(badgeCreatedAt);
                 const day = date.getDate();
                 const month = date.toLocaleString("en-US", { month: "short" });
                 const year = date.getFullYear();
@@ -225,7 +257,14 @@ function showProfile(userid = null) {
 
           // Creation Date of user
           let creationDate = "";
-          const date = new Date(data.created_at);
+          let createdAt = data.created_at;
+          if (typeof createdAt === "string" && /^\d+$/.test(createdAt)) {
+            createdAt = Number(createdAt);
+          }
+          if (typeof createdAt === "number" && createdAt < 1e12) {
+            createdAt = createdAt * 1000;
+          }
+          const date = new Date(createdAt);
           const month = date.toLocaleString("en-US", { month: "long" });
           const year = date.getFullYear();
           creationDate = `${month} ${year}`;

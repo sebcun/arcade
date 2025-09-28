@@ -55,7 +55,7 @@ function showCodeModal(email, mode = "login") {
   const message =
     mode === "register"
       ? `A verification code was sent to <strong>${email}</strong>. Enter it below to finish creating your account.`
-      : `A one time code was sent to <strong>${email}</strong>. Enter it below to sign in`;
+      : `If an account with that email exists, a one time code was sent to <strong>${email}</strong>. Enter it below to sign in`;
 
   const codeFormHTML = `
     <form id ="code-form" class="code-form">
