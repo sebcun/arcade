@@ -255,6 +255,9 @@ function showProfile(userid = null) {
             }
           }
 
+          let avatar_background = data.avatar_background ?? "GREY";
+          let avatar_border = data.avatar_border ?? "NONE";
+
           // Creation Date of user
           let creationDate = "";
           let createdAt = data.created_at;
@@ -295,7 +298,7 @@ function showProfile(userid = null) {
             `
             <div class="profile-modal-content">
                 <div class="profile-scrollable">
-                  <div class="profile-avatar"> 
+                  <div class="profile-avatar ${avatar_background.toLowerCase()}"> 
                       <img src="/static/images/avatars/face/${avatar.face}.png">
                       <img src="/static/images/avatars/eyes/${avatar.eyes}.png">
                       <img src="/static/images/avatars/hair/${avatar.hair}.png">

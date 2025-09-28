@@ -224,8 +224,12 @@ def editprofile():
         data = request.get_json()
         username = data.get("username")
         avatar = data.get("avatar")
+        avatar_background = data.get("avatar_background")
         result, status = updateUserProfile(
-            session["userid"], username=username, avatar=avatar
+            session["userid"],
+            username=username,
+            avatar=avatar,
+            avatar_background=avatar_background,
         )
         return jsonify(result), status
 

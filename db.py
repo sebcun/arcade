@@ -67,6 +67,8 @@ def initDb():
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
                         user_id INTEGER NOT NULL,
                         avatar TEXT,
+                        avatar_background TEXT DEFAULT "GREY",
+                        avatar_border TEXT DEFAULT "NONE",
                         level INTEGER DEFAULT 1,
                         bio TEXT,
                         badges TEXT DEFAULT "[]",
@@ -359,6 +361,8 @@ def getUserProfile(userid_or_email):
         "username": profile_row["username"],
         "email": profile_row["email"],
         "avatar": profile_row["avatar"],
+        "avatar_background": profile_row["avatar_background"],
+        "avatar_border": profile_row["avatar_border"],
         "level": profile_row["level"],
         "bio": profile_row["bio"],
         "badges": badges,
@@ -367,7 +371,14 @@ def getUserProfile(userid_or_email):
 
 
 def updateUserProfile(
-    userid, avatar=None, level=None, bio=None, badges=None, username=None
+    userid,
+    avatar=None,
+    avatar_background=None,
+    avatar_border=None,
+    level=None,
+    bio=None,
+    badges=None,
+    username=None,
 ):
     if not userid:
         return {"error": "User ID is required."}, 400
@@ -405,6 +416,16 @@ def updateUserProfile(
             if avatar is not None:
                 conn.execute(
                     "UPDATE profiles SET avatar = ? WHERE user_id = ?", (avatar, userid)
+                )
+            if avatar_background is not None:
+                conn.execute(
+                    "UPDATE profiles SET avatar_background = ? WHERE user_id = ?",
+                    (avatar_background, userid),
+                )
+            if avatar_border is not None:
+                conn.execute(
+                    "UPDATE profiles SET avatar_border = ? WHERE user_id = ?",
+                    (avatar_border, userid),
                 )
             if level is not None:
                 conn.execute(

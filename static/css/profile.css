@@ -7,12 +7,11 @@
   margin: 0;
   overflow: hidden;
 }
-
 .profile-scrollable {
   display: flex;
   align-items: flex-start;
-  max-height: 400px;
-  overflow-y: auto;
+  max-height: none;
+  overflow: visible;
   flex: 1;
   -ms-overflow-style: none;
   scrollbar-width: none;
@@ -20,7 +19,6 @@
 .profile-scrollable::-webkit-scrollbar {
   display: none;
 }
-
 .profile-avatar {
   position: relative;
   width: 100px;
@@ -29,9 +27,34 @@
   margin-right: 20px;
   flex-shrink: 0;
   padding: 5px;
-  background-color: blue;
 }
-
+.profile-avatar.grey {
+  background-color: rgb(92, 92, 92);
+}
+.profile-avatar.red {
+  background-color: rgb(255, 78, 78);
+}
+.profile-avatar.orange {
+  background-color: rgb(255, 172, 77);
+}
+.profile-avatar.yellow {
+  background-color: rgb(255, 252, 87);
+}
+.profile-avatar.green {
+  background-color: rgb(65, 255, 122);
+}
+.profile-avatar.blue {
+  background-color: rgb(54, 125, 255);
+}
+.profile-avatar.purple {
+  background-color: rgb(190, 49, 255);
+}
+.profile-avatar.white {
+  background-color: rgb(255, 255, 255);
+}
+.profile-avatar.black {
+  background-color: rgb(0, 0, 0);
+}
 .profile-avatar img {
   position: absolute;
   top: 50%;
@@ -40,7 +63,6 @@
   width: 85%;
   height: auto;
 }
-
 .profile-avatar .level-image {
   position: absolute;
   width: 28px;
@@ -51,7 +73,6 @@
   left: auto;
   transform: none;
 }
-
 .profile-avatar .edit-avatar-btn {
   position: absolute;
   width: 25px;
@@ -64,44 +85,41 @@
   cursor: pointer;
   transition: opacity 0.2s;
 }
-
 .profile-avatar .edit-avatar-btn:hover {
   opacity: 0.65;
 }
-
 .profile-details {
   text-align: left;
   flex: 1;
   word-wrap: break-word;
+  max-height: 400px;
+  overflow-y: auto;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  padding-right: 6px;
 }
-
 .profile-badges {
   margin-left: 2px;
   display: inline-flex;
   gap: 5px;
   align-items: center;
 }
-
 .profile-badges .badge-image {
   width: 25px;
   height: 25px;
   cursor: pointer;
   transition: transform 0.2s ease;
 }
-
 .profile-badges .badge-image:hover {
   transform: scale(1.1);
 }
-
 .profile-details h2 {
   margin: 0 0 10px 0;
 }
-
 .profile-details p {
   margin: 5px 0;
   line-height: 1.5;
 }
-
 .profile-buttons {
   position: absolute;
   bottom: 10px;
@@ -112,22 +130,68 @@
   border-radius: 4px;
   z-index: 1;
 }
-
 .profile-buttons img {
   width: 50px;
   height: 50px;
   transition: opacity 0.2s;
   cursor: default;
 }
-
 .profile-buttons img:hover {
   opacity: 0.65;
   cursor: pointer;
 }
-
 .profile-details::after {
   content: "";
   display: block;
   height: 1px;
   margin: 15px 0;
+}
+.color-box.grey {
+  background-color: rgb(92, 92, 92);
+}
+.color-box.red {
+  background-color: rgb(255, 78, 78);
+}
+.color-box.orange {
+  background-color: rgb(255, 172, 77);
+}
+.color-box.yellow {
+  background-color: rgb(255, 252, 87);
+}
+.color-box.green {
+  background-color: rgb(65, 255, 122);
+}
+.color-box.blue {
+  background-color: rgb(54, 125, 255);
+}
+.color-box.purple {
+  background-color: rgb(190, 49, 255);
+}
+.color-box.white {
+  background-color: rgb(255, 255, 255);
+}
+.color-box.black {
+  background-color: rgb(0, 0, 0);
+}
+.avatar-options {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.avatar-option img {
+  width: 36px;
+  height: auto;
+  display: block;
+  border-radius: 6px;
+}
+.color-box {
+  width: 36px;
+  height: 36px;
+  border-radius: 6px;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.08) inset;
+}
+.avatar-option.selected {
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
 }
