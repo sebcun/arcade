@@ -316,3 +316,13 @@ body {
   border: 2px solid #2b2c6d;
   border-radius: 4px;
 }
+
+.like-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.liked {
+  color: #e25555;
+}

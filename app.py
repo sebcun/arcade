@@ -10,7 +10,6 @@ from flask import (
     abort,
     send_from_directory,
 )
-
 from db import (
     initDb,
     sendVerificationCode,
@@ -23,6 +22,9 @@ from db import (
     getGame,
     saveGame,
     createUser,
+    getLikesForGame,
+    userLikedGame,
+    toggleLike,
 )
 from utils import *
 import os
@@ -305,6 +307,18 @@ def create_new_game():
 def get_game_data(game_id):
 
     result, status = getGame(game_id)
+
+    if isinstance(result, dict) and status == 200:
+        try:
+            likes = getLikesForGame(game_id)
+            user_liked = False
+            if "userid" in session:
+                user_liked = userLikedGame(game_id, session["userid"])
+            result["likes"] = likes
+            result["liked"] = bool(user_liked)
+        except Exception:
+            result["likes"] = 0
+            result["liked"] = False
     return jsonify(result), status
 
 
@@ -330,6 +344,15 @@ def static_files(filename):
     if not os.path.exists(full_path):
         return abort(404)
     return send_from_directory(static_dir, filename)
+
+
+@app.route("/api/games/<int:game_id>/like", methods=["POST"])
+def toggle_like(game_id):
+    if "userid" not in session:
+        return jsonify({"error": "Not logged in"}), 401
+
+    result, status = toggleLike(game_id, session["userid"])
+    return jsonify(result), status
 
 
 if __name__ == "__main__":

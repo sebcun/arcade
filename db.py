@@ -103,6 +103,19 @@ def initDb():
             )"""
     )
 
+    # Likes table
+    conn.execute(
+        """CREATE TABLE IF NOT EXISTS likes (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                game_id INTEGER NOT NULL,
+                user_id INTEGER NOT NULL,
+                created_at INTEGER DEFAULT (CAST(strftime('%s', 'now') AS INTEGER)),
+                UNIQUE(game_id, user_id),
+                FOREIGN KEY (game_id) REFERENCES games(id),
+                FOREIGN KEY (user_id) REFERENCES users(id)
+            )"""
+    )
+
     conn.commit()
     conn.close()
 
@@ -681,3 +694,82 @@ def createUser(email):
         except Exception:
             pass
         return {"error": "Failed to create user."}, 500
+
+
+def getLikesForGame(game_id):
+    try:
+        conn = getDbConnection()
+        row = conn.execute(
+            "SELECT COUNT(*) AS cnt FROM likes WHERE game_id = ?", (game_id,)
+        ).fetchone()
+        conn.close()
+        return int(row["cnt"]) if row else 0
+    except Exception:
+        try:
+            conn.close()
+        except Exception:
+            pass
+        return 0
+
+
+def userLikedGame(game_id, user_id):
+    if not game_id or not user_id:
+        return False
+    try:
+        conn = getDbConnection()
+        row = conn.execute(
+            "SELECT 1 FROM likes WHERE game_id = ? AND user_id = ?", (game_id, user_id)
+        ).fetchone()
+        conn.close()
+        return bool(row)
+    except Exception:
+        try:
+            conn.close()
+        except Exception:
+            pass
+        return False
+
+
+def toggleLike(game_id, user_id):
+    if not game_id or not user_id:
+        return {"error": "Game ID and User ID are required."}, 400
+
+    conn = getDbConnection()
+
+    try:
+        game = conn.execute("SELECT id FROM games WHERE id = ?", (game_id,)).fetchone()
+        if not game:
+            conn.close()
+            return {"error": "Game not found."}, 404
+
+        existing = conn.execute(
+            "SELECT id FROM likes WHERE game_id = ? AND user_id = ?", (game_id, user_id)
+        ).fetchone()
+
+        if existing:
+            conn.execute("DELETE FROM likes WHERE id = ?", (existing["id"],))
+            conn.commit()
+            liked = False
+
+        else:
+            conn.execute(
+                "INSERT INTO likes (game_id, user_id) VALUES (?, ?)", (game_id, user_id)
+            )
+            conn.commit()
+            liked = True
+
+        row = conn.execute(
+            "SELECT COUNT(*) AS cnt FROM likes WHERE game_id = ?", (game_id,)
+        ).fetchone()
+        count = int(row["cnt"]) if row else 0
+        conn.close()
+        return {"likes": count, "liked": liked}, 200
+
+    except Exception as e:
+        print(e)
+
+        try:
+            conn.close()
+        except Exception:
+            pass
+        return {"error": "Failed to toggle like."}, 500

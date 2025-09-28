@@ -28,7 +28,14 @@ function startGame(gameidOrData, sprites = null, title = "Game") {
           });
         }
         setParameter("game", gameidOrData, false);
-        runGameInModal(data.code || "", processedSprites, data.title || title);
+        runGameInModal(
+          data.code || "",
+          processedSprites,
+          data.title || title,
+          data.likes || 0,
+          data.liked || false,
+          gameidOrData
+        );
       })
       .catch((err) => {
         console.error("Error starting game:", err);
@@ -38,11 +45,34 @@ function startGame(gameidOrData, sprites = null, title = "Game") {
     runGameInModal(code, sprites, title);
   }
 }
-function runGameInModal(code, sprites, title) {
+
+function runGameInModal(
+  code,
+  sprites,
+  title,
+  likes = 0,
+  liked = false,
+  gameId = null
+) {
   gameModalTitle.textContent = title;
-  gameModalContents.innerHTML = `<canvas id="gameCanvas" width="600" height="380"></canvas>`;
+  gameModalContents.innerHTML = `
+    <canvas id="gameCanvas" width="600" height="380"></canvas>
+    <div id="game-controls" class="game-controls" style="margin-top:8px; display:flex; gap:8px; align-items:center;">
+      <i id="like-icon" class="bi ${
+        liked ? "bi-heart-fill liked" : "bi-heart"
+      }" style="cursor:pointer;font-size:1.2rem;" role="button" aria-pressed="${
+    liked ? "true" : "false"
+  }" tabindex="0" aria-label="Like"></i>
+      <span id="like-count" style="margin-left:6px;">${likes}</span>
+    </div>
+  `;
   const canvas = document.getElementById("gameCanvas");
   const ctx = canvas.getContext("2d");
+
+  if (gameId !== null) {
+    gameModalContents.querySelector("#game-controls").dataset.gameId =
+      String(gameId);
+  }
 
   gameModal.style.display = "flex";
   gameModal.offsetHeight;
@@ -50,6 +80,51 @@ function runGameInModal(code, sprites, title) {
 
   window.isGameRunning = true;
   resetSprites();
+
+  const likeIcon = document.getElementById("like-icon");
+  const likeCount = document.getElementById("like-count");
+
+  if (likeIcon && gameId !== null) {
+    const toggleLocalIcon = (isLiked) => {
+      if (isLiked) {
+        likeIcon.classList.remove("bi-heart");
+        likeIcon.classList.add("bi-heart-fill", "liked");
+        likeIcon.setAttribute("aria-pressed", "true");
+      } else {
+        likeIcon.classList.remove("bi-heart-fill", "liked");
+        likeIcon.classList.add("bi-heart");
+        likeIcon.setAttribute("aria-pressed", "false");
+      }
+    };
+
+    const doToggleLike = async () => {
+      try {
+        const resp = await fetch(`/api/games/${gameId}/like`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+        });
+        if (resp.status === 401) {
+          window.location = "/?login";
+          return;
+        }
+        const json = await resp.json();
+        if (resp.ok && json) {
+          likeCount.textContent = json.likes;
+          toggleLocalIcon(!!json.liked);
+        } else {
+          console.error("Failed to toggle like:", json);
+        }
+      } catch (err) {
+        console.error("Error toggling like:", err);
+      }
+    };
+
+    likeIcon.addEventListener("click", (e) => {
+      e.preventDefault();
+      doToggleLike();
+    });
+  }
+
   executeCode(code, sprites, ctx).catch((err) => {
     console.error("Game execution error:", err);
   });
