@@ -1,32 +1,18 @@
 import os
 import smtplib
 import ssl
-import logging
 from email.message import EmailMessage
 from dotenv import load_dotenv
 
 load_dotenv()
 
-logger = logging.getLogger(__name__)
-if not logger.handlers:
-    handler = logging.StreamHandler()
-    formatter = logging.Formatter("%(asctime)s %(levelname)s %(name)s - %(message)s")
-    handler.setFormatter(formatter)
-    logger.addHandler(handler)
-logger.setLevel(os.environ.get("LOG_LEVEL", "INFO"))
-
 
 def send(recipientEmail, otp, expiry_minutes=5):
-    """
-    Send one-time code email.
-    Returns True on success, False otherwise. Logs details for troubleshooting.
-    """
     host = os.environ.get("EMAIL_HOST")
     port_raw = os.environ.get("EMAIL_PORT", "587")
     try:
         port = int(port_raw)
     except (TypeError, ValueError):
-        logger.error("Invalid EMAIL_PORT: %r", port_raw)
         return False
 
     user = os.environ.get("EMAIL_HOST_USER")
@@ -35,13 +21,6 @@ def send(recipientEmail, otp, expiry_minutes=5):
     domain = os.environ.get("WEBSITE", "https://arcade.sebcun.com")
 
     if not all([host, port, user, password]):
-        logger.error(
-            "Missing email configuration: host=%s port=%s user=%s password_set=%s",
-            host,
-            port,
-            user,
-            bool(password),
-        )
         return False
 
     otp_str = str(otp)
@@ -110,14 +89,12 @@ def send(recipientEmail, otp, expiry_minutes=5):
 
     try:
         if port == 465:
-            logger.debug("Using SMTP_SSL on %s:%d", host, port)
             context = ssl.create_default_context()
             with smtplib.SMTP_SSL(host, port, context=context, timeout=30) as server:
                 server.set_debuglevel(1)
                 server.login(user, password)
                 server.send_message(msg)
         else:
-            logger.debug("Using SMTP (STARTTLS=%s) on %s:%d", useTLS, host, port)
             with smtplib.SMTP(host, port, timeout=30) as server:
                 server.set_debuglevel(1)
                 server.ehlo()
@@ -127,10 +104,7 @@ def send(recipientEmail, otp, expiry_minutes=5):
                     server.ehlo()
                 server.login(user, password)
                 server.send_message(msg)
-
-        logger.info("Email sent to %s", recipientEmail)
         return True
 
     except Exception as ex:
-        logger.exception("Failed to send email to %s: %s", recipientEmail, ex)
         return False
