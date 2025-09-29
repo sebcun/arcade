@@ -19,12 +19,16 @@ document.addEventListener("DOMContentLoaded", () => {
           initialPage = cmd;
         }
       } else if (urlParams.has("event")) {
-        let evt = urlParams.get("event");
-        if (evt === "ONTOUCH") evt = "ON TOUCH";
-        else if (evt === "ONKEY") evt = "ON KEY";
+        const evt = urlParams.get("event");
         if (docsData.events && docsData.events[evt]) {
           initialSection = "events";
           initialPage = evt;
+        }
+      } else if (urlParams.has("tutorial")) {
+        const tut = urlParams.get("tutorial");
+        if (docsData.tutorials && docsData.tutorials[tut]) {
+          initialSection = "tutorials";
+          initialPage = tut;
         }
       }
 
@@ -74,6 +78,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const commandsUl = document.getElementById("commands-submenu");
     const eventsUl = document.getElementById("events-submenu");
     const apiUl = document.getElementById("api-submenu");
+    const tutorialsUl = document.getElementById("tutorials-submenu");
 
     Object.keys(docsData.commands || {}).forEach((key) => {
       const li = document.createElement("li");
@@ -92,6 +97,12 @@ document.addEventListener("DOMContentLoaded", () => {
       li.innerHTML = `<a href="#" data-section="api" data-page="${key}">${docsData.api[key].title}</a>`;
       apiUl.appendChild(li);
     });
+
+    Object.keys(docsData.tutorials || {}).forEach((key) => {
+      const li = document.createElement("li");
+      li.innerHTML = `<a href="#" data-section="tutorials" data-page="${key}">${docsData.tutorials[key].title}</a>`;
+      tutorialsUl.appendChild(li);
+    });
   }
 
   // Load section/page
@@ -108,8 +119,9 @@ document.addEventListener("DOMContentLoaded", () => {
     if (section === "commands" && page) {
       param = `?command=${page}`;
     } else if (section === "events" && page) {
-      const urlEvent = page.replace(/\s+/g, "");
-      param = `?event=${urlEvent}`;
+      param = `?event=${page}`;
+    } else if (section === "tutorials" && page) {
+      param = `?tutorial=${page}`;
     }
 
     const fullUrl = window.location.origin + "/docs" + param;
@@ -128,6 +140,10 @@ document.addEventListener("DOMContentLoaded", () => {
         html += `<div class="code-block"><code>${escaped}</code></div>`;
       } else if (content.type === "br") {
         html += `<br>`;
+      } else if (content.type === "img") {
+        html += `<img src="${content.content}" alt="Documentation image" style="max-width: 100%; height: auto;">`;
+      } else if (content.type === "link") {
+        html += `<a href="${content.url}" target="_blank" rel="noopener noreferrer">${content.content}</a>`;
       }
     });
     contentDiv.innerHTML = html;

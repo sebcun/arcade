@@ -395,6 +395,77 @@
         }
       ]
     },
+    "TEXT": {
+      "title": "TEXT Command",
+      "content": [
+        {
+          "type": "text",
+          "content": "This sets the text under the game window. Strings support ${...} interpolation using current variables and sprite properties."
+        },
+        {
+          "type": "img",
+          "content": "https://hc-cdn.hel1.your-objectstorage.com/s/v3/be9d916a48e5918f833b7004ce7a3c184cc0d715_screenshot_from_2025-09-29_10-35-50.png"
+        },
+        { "type": "sub", "content": "Syntax" },
+        { "type": "code", "content": "TEXT (string or expression)" },
+        { "type": "sub", "content": "Example 1 — Log values" },
+        { "type": "code", "content": "TEXT 10\nTEXT score\nTEXT sprite1.x" },
+        {
+          "type": "text",
+          "content": "Sets the text to a number, a variable and a sprite property."
+        },
+        { "type": "br", "content": "" },
+        { "type": "sub", "content": "Example 2 — Interpolated message" },
+        {
+          "type": "code",
+          "content": "STORE 5 AS score\nTEXT \"CURRENT SCORE: ${score}\""
+        },
+        {
+          "type": "text",
+          "content": "Stores score then sets the text to a human-friendly message using interpolation."
+        }
+      ]
+    },
+    "GIVE": {
+      "title": "GIVE XP Command",
+      "content": [
+        {
+          "type": "text",
+          "content": "Awards experience points (XP) to the user in the specified size. This can trigger a level-up if enough XP is accumulated. XP sizes are SMALL, MEDIUM, or LARGE."
+        },
+        { "type": "sub", "content": "Syntax" },
+        { "type": "code", "content": "GIVE XP (size)" },
+        { "type": "sub", "content": "Example 1 — Award small XP" },
+        {
+          "type": "code",
+          "content": "GIVE XP SMALL\nLOG \"Awarded small XP\""
+        },
+        {
+          "type": "text",
+          "content": "Awards a small amount of XP and logs a confirmation."
+        },
+        { "type": "br", "content": "" },
+        { "type": "sub", "content": "Example 2 — XP on touch event" },
+        {
+          "type": "code",
+          "content": "ON TOUCH sprite1 WITH sprite2\n  GIVE XP MEDIUM\n  LOG \"Collected medium XP!\"\nEND TOUCH"
+        },
+        {
+          "type": "text",
+          "content": "Awards medium XP when sprite1 touches sprite2 and logs the event."
+        },
+        { "type": "br", "content": "" },
+        { "type": "sub", "content": "Example 3 — XP in a scoring loop" },
+        {
+          "type": "code",
+          "content": "LOOP\n  STORE score+1 AS score\n  IF score IS 10\n    GIVE XP LARGE\n    LOG \"Level up bonus!\"\n    STOP LOOP\n  END IF\n  WAIT 0.5\nEND LOOP"
+        },
+        {
+          "type": "text",
+          "content": "Increments score in a loop, awards large XP and stops when score reaches 10."
+        }
+      ]
+    },
     "LOOP": {
       "title": "LOOP Logic",
       "content": [
@@ -498,50 +569,10 @@
           "content": "Demonstrates nested IF blocks — inner IF will run because the outer condition is true."
         }
       ]
-    },
-    "GIVE": {
-      "title": "GIVE XP Command",
-      "content": [
-        {
-          "type": "text",
-          "content": "Awards experience points (XP) to the user in the specified size. This can trigger a level-up if enough XP is accumulated. XP sizes are SMALL, MEDIUM, or LARGE."
-        },
-        { "type": "sub", "content": "Syntax" },
-        { "type": "code", "content": "GIVE XP (size)" },
-        { "type": "sub", "content": "Example 1 — Award small XP" },
-        {
-          "type": "code",
-          "content": "GIVE XP SMALL\nLOG \"Awarded small XP\""
-        },
-        {
-          "type": "text",
-          "content": "Awards a small amount of XP and logs a confirmation."
-        },
-        { "type": "br", "content": "" },
-        { "type": "sub", "content": "Example 2 — XP on touch event" },
-        {
-          "type": "code",
-          "content": "ON TOUCH sprite1 WITH sprite2\n  GIVE XP MEDIUM\n  LOG \"Collected medium XP!\"\nEND TOUCH"
-        },
-        {
-          "type": "text",
-          "content": "Awards medium XP when sprite1 touches sprite2 and logs the event."
-        },
-        { "type": "br", "content": "" },
-        { "type": "sub", "content": "Example 3 — XP in a scoring loop" },
-        {
-          "type": "code",
-          "content": "LOOP\n  STORE score+1 AS score\n  IF score IS 10\n    GIVE XP LARGE\n    LOG \"Level up bonus!\"\n    STOP LOOP\n  END IF\n  WAIT 0.5\nEND LOOP"
-        },
-        {
-          "type": "text",
-          "content": "Increments score in a loop, awards large XP and stops when score reaches 10."
-        }
-      ]
     }
   },
   "events": {
-    "ON KEY": {
+    "ONKEY": {
       "title": "ON KEY Event",
       "content": [
         {
@@ -584,7 +615,7 @@
         }
       ]
     },
-    "ON TOUCH": {
+    "ONTOUCH": {
       "title": "ON TOUCH Event",
       "content": [
         {
@@ -628,5 +659,40 @@
       ]
     }
   },
-  "api": {}
+  "api": {},
+  "tutorials": {
+    "CATCHTHEGUY": {
+      "title": "CATCH THE GUY Tutorial",
+      "content": [
+        {
+          "type": "text",
+          "content": "In this tutorial, we will go over how to create a simple 'Catch The Guy' game where you must move around to touch the other person. If you would like to see how this game will look once you have finished the tutorial, you can view it "
+        },
+        {
+          "type": "link",
+          "content": "here.",
+          "url": "https://arcade.sebcun.com/?game=2"
+        },
+        { "type": "sub", "content": "Create a Project" },
+        {
+          "type": "text",
+          "content": "We will start by creating a new project. We can do this by visiting "
+        },
+        {
+          "type": "link",
+          "content": "here.",
+          "url": "https://arcade.sebcun.com/create"
+        },
+        {
+          "type": "text",
+          "content": " On this page, you can create a new project. Give it a memorable nam  e and a description if you want!"
+        },
+        { "type": "sub", "content": "Creating Sprites" },
+        {
+          "type": "text",
+          "content": "For this game, we need 2 sprites. We can create a sprite by drawing in the Sprite editor and then saving it. This will give it a unique name such as 'sprite1' which you can use when coding. For our version of the game, we want 2 stick figure sprites. Be creative! But below is how ours will look in this tutorial."
+        }
+      ]
+    }
+  }
 }

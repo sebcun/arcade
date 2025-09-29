@@ -69,7 +69,8 @@ function runGameInModal(
   gameModalTitle.textContent = title;
   gameModalContents.innerHTML = `
     <canvas id="gameCanvas" width="600" height="380"></canvas>
-    <div id="game-controls" class="game-controls" style="margin-top:8px; display:flex; gap:8px; align-items:center;">
+    <span id="gameText" style="margin-top:8px;"></span>
+    <div id="game-controls" class="game-controls" style="display:flex; gap:8px; align-items:center;">
       <i id="like-icon" class="bi ${
         liked ? "bi-heart-fill liked" : "bi-heart"
       }" style="cursor:pointer;font-size:1.2rem;" role="button" aria-pressed="${

@@ -905,6 +905,37 @@ async function executeCode(
         continue;
       }
 
+      if (cmd === "TEXT") {
+        if (parts.length < 2) {
+          console.log(`${i + 1} TEXT: missing argument`);
+          i++;
+          continue;
+        }
+        const arg = parts.slice(1).join(" ");
+        if (arg.startsWith('"') && arg.endsWith('"')) {
+          const str = arg.slice(1, -1);
+          const interpolated = interpolateString(str, buildContext());
+
+          const textSpan = document.getElementById("gameText");
+
+          if (textSpan) {
+            textSpan.textContent = interpolated;
+          } else {
+            console.log(`${i + 1} TEXT: text span not found`);
+          }
+        } else {
+          const context = buildContext();
+          try {
+            const value = evaluateExpression(arg, context);
+            console.log(value);
+          } catch (e) {
+            console.log(`${i + 1} TEXT: ${e.message}`);
+          }
+        }
+        i++;
+        continue;
+      }
+
       if (cmd === "IF") {
         const rest = line.slice(2).trim();
         const upperRest = rest.toUpperCase();
