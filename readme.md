@@ -6,16 +6,18 @@ Arcade is a site where you can create an account, play games, level up, customiz
 
 ## Features
 
-- Signup and login.
+- Signup and login (Using Slack OAuth | or | one time email codes.)
 - Ability to view peoples profiles.
 - Ability to change usernames.
+- Ability to create games using a Sprite editor and high level programming language, as well as play them
+- Play counters and ability to like games.
+- Documentation for how to create a game
 
 ## Planned Features
 
-- Ability to customize avatars.
-- Ability to play pixel art type games and earn levels.
-- Ability to level up.
 - Ability to buy avatar items.
+- Full JS games.
+- Ability to set custom backgrounds for the game.
 
 ## Installation
 
