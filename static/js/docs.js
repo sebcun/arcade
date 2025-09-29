@@ -144,6 +144,8 @@ document.addEventListener("DOMContentLoaded", () => {
         html += `<img src="${content.content}" alt="Documentation image" style="max-width: 100%; height: auto;">`;
       } else if (content.type === "link") {
         html += `<a href="${content.url}" target="_blank" rel="noopener noreferrer">${content.content}</a>`;
+      } else if (content.type === "vid") {
+        html += `<video src="${content.content}" controls style="max-width: 100%; height: auto;" alt="Documentation video"></video>`;
       }
     });
     contentDiv.innerHTML = html;

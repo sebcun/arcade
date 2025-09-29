@@ -691,7 +691,97 @@
         {
           "type": "text",
           "content": "For this game, we need 2 sprites. We can create a sprite by drawing in the Sprite editor and then saving it. This will give it a unique name such as 'sprite1' which you can use when coding. For our version of the game, we want 2 stick figure sprites. Be creative! But below is how ours will look in this tutorial."
-        }
+        },
+        {
+          "type": "img",
+          "content": "https://i.imgur.com/De0sFqv.png"
+        },
+        {
+          "type": "text",
+          "content": "To make sure we don't lose our valuable art, we will save the game once we have created our Sprites. To do this, click the save button in the top action bar."
+        },
+        { "type": "br", "content": "" },
+        {
+          "type": "img",
+          "content": "https://i.imgur.com/BeBILXD.png"
+        },
+        { "type": "sub", "content": "Coding the Game" },
+        {
+          "type": "text",
+          "content": "We can now start coding the game. We will start by spawning our sprites on other sides of the game canvas by using the SPAWN command. We will also set the text to some basic instructions so the player knows what to do, as well as storing the score."
+        },
+        { "type": "br", "content": "" },
+        {
+          "type": "code",
+          "content": "STORE 0 AS score\nTEXT 'You are the RED person. Use W/A/S/D to move around to touch the BLUE person to score!'\nSPAWN sprite1 AT 0,50\nSPAWN sprite2 AT 400,50"
+        },
+        { "type": "br", "content": "" },
+        { "type": "br", "content": "" },
+        {
+          "type": "text",
+          "content": "Next we are going to move our sprite that we control, using the ON KEY event as well as sprite variables."
+        },
+        { "type": "br", "content": "" },
+        {
+          "type": "code",
+          "content": "STORE 0 AS score\nTEXT 'You are the RED person. Use W/A/S/D to move around to touch the BLUE person to score!'\nSPAWN sprite1 AT 0,50\nSPAWN sprite2 AT 400,50\n\nON KEY 'w'\n  MOVE sprite1 TO sprite1.x,sprite1.y-5\nEND KEY\n\nON KEY 's'\n  MOVE sprite1 TO sprite1.x,sprite1.y+5\nEND KEY\n\nON KEY 'a'\n  MOVE sprite1 TO sprite1.x-5,sprite1.y\nEND KEY\n\nON KEY 'd'\n  MOVE sprite1 TO sprite1.x+5,sprite1.y\nEND KEY"
+        },
+        { "type": "br", "content": "" },
+        { "type": "br", "content": "" },
+        {
+          "type": "text",
+          "content": "You should then save your game again so we don't lose any progress. We can also test our game by playing it by clicking the play button in the game action bar. When you click this, in the popup once you click W/A/S/D you should see that the sprite moves."
+        },
+        { "type": "br", "content": "" },
+        {
+          "type": "img",
+          "content": "https://i.imgur.com/qLgmtda.png"
+        },
+        { "type": "br", "content": "" },
+        { "type": "br", "content": "" },
+        {
+          "type": "text",
+          "content": "We are finally going to finish off our game by adding an ON TOUCH event so we can increase the score of the player when they do catch the blue guy."
+        },
+        { "type": "br", "content": "" },
+        {
+          "type": "code",
+          "content": "STORE 0 AS score\nTEXT 'You are the RED person. Use W/A/S/D to move around to touch the BLUE person to score!'\nSPAWN sprite1 AT 0,50\nSPAWN sprite2 AT 400,50\n\nON KEY 'w'\n  MOVE sprite1 TO sprite1.x,sprite1.y-5\nEND KEY\n\nON KEY 's'\n  MOVE sprite1 TO sprite1.x,sprite1.y+5\nEND KEY\n\nON KEY 'a'\n  MOVE sprite1 TO sprite1.x-5,sprite1.y\nEND KEY\n\nON KEY 'd'\n  MOVE sprite1 TO sprite1.x+5,sprite1.y\nEND KEY\n\nON TOUCH sprite1 WITH sprite2\n  STORE score+1 AS score\n  TEXT \"SCORE: ${score}\"\n  STORE 0#570 AS randomX\n  STORE 0#350 AS randomY\n  MOVE sprite2 TO randomX,randomY\nEND TOUCH"
+        },
+        { "type": "br", "content": "" },
+        { "type": "br", "content": "" },
+        {
+          "type": "text",
+          "content": "You can now save and play your game and you should see that we have a working version!"
+        },
+        { "type": "br", "content": "" },
+        {
+          "type": "vid",
+          "content": "https://hc-cdn.hel1.your-objectstorage.com/s/v3/d71325966314ab5f3d4340c2a44522f6baed880f_chrome_29-september-2025_11-24.04.mp4"
+        },
+        { "type": "sub", "content": "Extension: Rewarding XP" },
+        {
+          "type": "text",
+          "content": "We can also make it so we can reward XP to the system wide level system when they do something. In this case, we will give them a SMALL package of XP whenever they touch someone."
+        },
+        { "type": "br", "content": "" },
+        {
+          "type": "code",
+          "content": "STORE 0 AS score\nTEXT 'You are the RED person. Use W/A/S/D to move around to touch the BLUE person to score!'\nSPAWN sprite1 AT 0,50\nSPAWN sprite2 AT 400,50\n\nON KEY 'w'\n  MOVE sprite1 TO sprite1.x,sprite1.y-5\nEND KEY\n\nON KEY 's'\n  MOVE sprite1 TO sprite1.x,sprite1.y+5\nEND KEY\n\nON KEY 'a'\n  MOVE sprite1 TO sprite1.x-5,sprite1.y\nEND KEY\n\nON KEY 'd'\n  MOVE sprite1 TO sprite1.x+5,sprite1.y\nEND KEY\n\nON TOUCH sprite1 WITH sprite2\n  GIVE XP SMALL\n  STORE score+1 AS score\n  TEXT \"SCORE: ${score}\"\n  STORE 0#570 AS randomX\n  STORE 0#350 AS randomY\n  MOVE sprite2 TO randomX,randomY\nEND TOUCH"
+        },
+        { "type": "br", "content": "" },
+        { "type": "br", "content": "" },
+        {
+          "type": "text",
+          "content": "We can even add one time XP rewards when they hit a certain score. In this case, we will utilise the IF logic to give them a MEDIUM package of XP when they get a score of 5."
+        },
+        { "type": "br", "content": "" },
+        {
+          "type": "code",
+          "content": "STORE 0 AS score\nSTORE 0 AS lastScore\nTEXT 'You are the RED person. Use W/A/S/D to move around to touch the BLUE person to score!'\nSPAWN sprite1 AT 0,50\nSPAWN sprite2 AT 400,50\n\nON KEY 'w'\n  MOVE sprite1 TO sprite1.x,sprite1.y-5\nEND KEY\n\nON KEY 's'\n  MOVE sprite1 TO sprite1.x,sprite1.y+5\nEND KEY\n\nON KEY 'a'\n  MOVE sprite1 TO sprite1.x-5,sprite1.y\nEND KEY\n\nON KEY 'd'\n  MOVE sprite1 TO sprite1.x+5,sprite1.y\nEND KEY\n\nON TOUCH sprite1 WITH sprite2\n  GIVE XP SMALL\n  STORE score+1 AS score\n  STORE lastScore+1 AS lastScore\n  TEXT \"SCORE: ${score}\"\n  STORE 0#570 AS randomX\n  STORE 0#350 AS randomY\n  MOVE sprite2 TO randomX,randomY\n\n  IF lastScore IS 5\n    STORE 0 AS lastScore\n    GIVE XP MEDIUM\n  END IF\n\nEND TOUCH"
+        },
+        { "type": "br", "content": "" },
+        { "type": "br", "content": "" }
       ]
     }
   }

@@ -927,7 +927,13 @@ async function executeCode(
           const context = buildContext();
           try {
             const value = evaluateExpression(arg, context);
-            console.log(value);
+            const textSpan = document.getElementById("gameText");
+
+            if (textSpan) {
+              textSpan.textContent = value;
+            } else {
+              console.log(`${i + 1} TEXT: text span not found`);
+            }
           } catch (e) {
             console.log(`${i + 1} TEXT: ${e.message}`);
           }
