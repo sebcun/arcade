@@ -3,6 +3,10 @@
   rel="stylesheet"
   href="{{ url_for('static', filename='css/index.css') }}"
 />
+<link
+  rel="stylesheet"
+  href="{{ url_for('static', filename='css/settings.css') }}"
+/>
 {% endblock %} {% block content %}
 <div class="index-container">
   <!-- Most Liked Games Section -->
@@ -56,6 +60,7 @@
 
 {% endblock %} {% block scripts %}
 <script src="static/js/index.js"></script>
+<script src="static/js/settings.js"></script>
 
 <!-- Scroll Handler -->
 <script>

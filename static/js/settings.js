@@ -1,9 +1,5 @@
 function showSettings() {
-  showModal(
-    "Loading",
-    "If you see this dm me on slack for an extra free badge :) https://hackclub.slack.com/team/U0971C3C44D"
-  );
-  fetch("/api/me", {
+  fetch("/api/user", {
     method: "GET",
     credentials: "include",
   })
@@ -14,82 +10,55 @@ function showSettings() {
         showToast("You are not logged in!", { color: "error" });
         console.log(`Profile loading error: ${data.error}`);
       } else {
-        setParameter("settings", undefined, true);
         const settingsHTML = `
-          <div class="settings-form-group settings-form-group-row" style="margin-bottom: 10px;">
-            <label for="email" class="settings-label">Email:</label>
+          <div class="form-floating mb-3">
             <input
               type="text"
-              id="email"
-              name="email"
-              value="${data.email}"
-              disabled
-              class="settings-input"
-            />
-            <button class="settings-edit-btn">
-              <img src="/static/images/Pencil.png" alt="Edit Email" title="You cannot edit your email." class="settings-edit-img disabled">
-            </button>
-          </div>
-          <div class="settings-form-group settings-form-group-row" style="margin-bottom: 10px;">
-            <label for="username" class="settings-label">Username:</label>
-            <input
-              type="text"
+              class="form-control"
               id="username"
               name="username"
               value="@${data.username}"
-              class="settings-input"
               disabled
+              placeholder="@username"
             />
-            <button class="settings-edit-btn" onclick="showEditUsername('${data.username}')">
-              <img src="/static/images/Pencil.png" alt="Edit Username" title="Edit Username." class="settings-edit-img">
-            </button>
+            <label for="username">Username</label>
           </div>
-          `;
-        showModal("Settings", settingsHTML, [
-          {
-            text: "Logout",
-            onClick: async () => {
-              showModal(
-                "Logout?",
-                `<p id="modal-text">Are you sure you want to logout?</p>`,
-                [
-                  {
-                    text: "Logout",
-                    onClick: async () => {
-                      try {
-                        const response = await fetch("/api/auth/logout", {
-                          method: "POST",
-                          headers: { "Content-Type": "application/json" },
-                        });
-                        const logoutData = await response.json();
-                        if (response.ok) {
-                          showToast("Logged out successfully!", {
-                            color: "success",
-                          });
-                          hideModal();
-                          setTimeout(() => location.reload(), 2000);
-                        } else {
-                          showToast(logoutData.error || "Logout failed", {
-                            color: "error",
-                          });
-                        }
-                      } catch (error) {
-                        showToast("An error occurred during logout", {
-                          color: "error",
-                        });
-                      }
-                    },
-                  },
-                  {
-                    text: "Cancel",
-                    image: "/static/images/LongButtonTwo.png",
-                    onClick: () => showSettings(),
-                  },
-                ]
-              );
-            },
-          },
-        ]);
+        `;
+
+        const modal = showModal("Settings", "", settingsHTML, [], true);
+
+        const modalFooter = document.createElement("div");
+        modalFooter.className = "modal-footer custom-modal-footer";
+        modal.querySelector(".modal-content").appendChild(modalFooter);
+
+        // Edit Username button
+        const editUsernameButton = document.createElement("button");
+        editUsernameButton.className = "btn btn-primary btn-long";
+        editUsernameButton.textContent = "Edit Username";
+        editUsernameButton.addEventListener("click", () =>
+          showEditUsername(data.username)
+        );
+        modalFooter.appendChild(editUsernameButton);
+
+        // Edit Avatar button
+        const editAvatarButton = document.createElement("button");
+        editAvatarButton.className = "btn btn-secondary btn-long";
+        editAvatarButton.textContent = "Edit Avatar";
+        editAvatarButton.addEventListener("click", () => showEditAvatar());
+        modalFooter.appendChild(editAvatarButton);
+
+        // OR separator
+        const separator = document.createElement("div");
+        separator.className = "modal-seperator";
+        separator.innerHTML = `<span class="modal-seperator-text">OR</span>`;
+        modalFooter.appendChild(separator);
+
+        // Logout button
+        const logoutButton = document.createElement("button");
+        logoutButton.className = "btn btn-outline-danger btn-long";
+        logoutButton.textContent = "Logout";
+        logoutButton.addEventListener("click", () => showLogoutConfirmation());
+        modalFooter.appendChild(logoutButton);
       }
     })
     .catch((err) => {
@@ -99,91 +68,66 @@ function showSettings() {
       console.log(`Profile loading error: ${err}`);
     });
 }
+
 function showEditUsername(username) {
-  editHTML = `
-    <div class="settings-form-group settings-form-group-row" style="margin-bottom: 10px;">
-      <label for="username" class="settings-label">Username:</label>
+  const editHTML = `
+    <form class="form-floating">
       <input
         type="text"
+        class="form-control"
         id="username"
         name="username"
         value="@${username}"
-        class="settings-input"
+        placeholder="@username"
+        required
       />
-    </div>
-    `;
-  showModal("Edit Username", editHTML, [
-    {
-      text: "Save",
-      onClick: async () => {
-        saveButton.disabled = true;
-        document.getElementById("save-btn-text").textContent = "Saving...";
-        saveBtnText = document.getElementById("save-btn-text");
-        saveBtnText.textContent = "Saving.";
-        let dots = 1;
-        const interval = setInterval(() => {
-          dots = (dots % 3) + 1;
-          saveBtnText.textContent = "Saving" + ".".repeat(dots);
-        }, 300);
-        const newUsername = usernameInput.value.slice(1);
-        try {
-          const response = await fetch("/api/edit_profile", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            credentials: "include",
-            body: JSON.stringify({ username: newUsername }),
-          });
-          clearInterval(interval);
-          if (response.ok) {
-            showToast("Username updated!", { color: "success" });
-            showSettings();
-          } else {
-            const errorData = await response.json();
-            showToast(errorData.error || "Username already taken.", {
-              color: "error",
-            });
-            console.log("Update username error:", errorData.error);
-            document.getElementById("save-btn-text").textContent = "Save";
-          }
-        } catch (err) {
-          showToast("An error occurred while updating your username", {
-            color: "error",
-          });
-          console.log("Update username error:", err);
-          saveBtnText.textContent = "Save";
-          saveButton.disabled = false;
-        }
-      },
-      id: "save-btn",
-      textid: "save-btn-text",
-    },
-    {
-      text: "Cancel",
-      image: "/static/images/LongButtonTwo.png",
-      onClick: () => showSettings(),
-    },
-  ]);
-  const saveButton = document.getElementById("save-btn");
-  const usernameInput = document.getElementById("username");
+      <label for="username">Username</label>
+      <div class="form-text">Username must be 3-19 characters and contain only letters and numbers</div>
+    </form>
+  `;
+
+  const modal = showModal("Edit Username", "", editHTML, [], true);
+
+  const modalFooter = document.createElement("div");
+  modalFooter.className = "modal-footer custom-modal-footer";
+  modal.querySelector(".modal-content").appendChild(modalFooter);
+
+  const usernameInput = modal.querySelector("#username");
+
+  // Save button
+  const saveButton = document.createElement("button");
+  saveButton.className = "btn btn-primary btn-long";
+  saveButton.textContent = "Save";
+  saveButton.id = "save-btn";
+  saveButton.disabled = true;
+  modalFooter.appendChild(saveButton);
+
+  // Cancel button
+  const cancelButton = document.createElement("button");
+  cancelButton.className = "btn btn-secondary btn-long";
+  cancelButton.textContent = "Cancel";
+  cancelButton.addEventListener("click", () => showSettings());
+  modalFooter.appendChild(cancelButton);
+
   let usernameValid = false;
+
   function updateSaveBtn() {
     saveButton.disabled = !usernameValid;
   }
+
   usernameInput.addEventListener("input", function () {
     let cleanedValue = this.value
       .replace(/ /g, "")
       .replace(/[^a-zA-Z0-9]/g, "")
       .toLowerCase();
     this.value = "@" + cleanedValue;
+
     usernameValid =
       cleanedValue.length > 2 &&
       cleanedValue.length < 20 &&
-      cleanedValue !== "";
-    if (cleanedValue === username) {
-      usernameValid = false;
-    }
+      cleanedValue !== "" &&
+      cleanedValue !== username;
+
     if (usernameValid) {
       this.classList.remove("error");
     } else {
@@ -191,10 +135,55 @@ function showEditUsername(username) {
     }
     updateSaveBtn();
   });
-  saveButton.disabled = true;
+
+  saveButton.addEventListener("click", async () => {
+    saveButton.disabled = true;
+    saveButton.textContent = "Saving.";
+    let dots = 1;
+    const interval = setInterval(() => {
+      dots = (dots % 3) + 1;
+      saveButton.textContent = "Saving" + ".".repeat(dots);
+    }, 300);
+
+    const newUsername = usernameInput.value.slice(1);
+    try {
+      const response = await fetch("/api/edit_profile", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({ username: newUsername }),
+      });
+
+      clearInterval(interval);
+
+      if (response.ok) {
+        showToast("Username updated!", { color: "success" });
+        showSettings();
+      } else {
+        const errorData = await response.json();
+        showToast(errorData.error || "Username already taken.", {
+          color: "error",
+        });
+        console.log("Update username error:", errorData.error);
+        saveButton.textContent = "Save";
+        saveButton.disabled = false;
+      }
+    } catch (err) {
+      clearInterval(interval);
+      showToast("An error occurred while updating your username", {
+        color: "error",
+      });
+      console.log("Update username error:", err);
+      saveButton.textContent = "Save";
+      saveButton.disabled = false;
+    }
+  });
 }
+
 function showEditAvatar() {
-  fetch("/api/me", {
+  fetch("/api/user", {
     method: "GET",
     credentials: "include",
   })
@@ -207,7 +196,7 @@ function showEditAvatar() {
         } catch (e) {}
       }
       let avatar_background = data.avatar_background ?? "GREY";
-      let avatar_border = data.avatar_border ?? "NONE";
+
       const bgColors = [
         { value: "GREY", cls: "grey", title: "Grey" },
         { value: "RED", cls: "red", title: "Red" },
@@ -219,6 +208,7 @@ function showEditAvatar() {
         { value: "WHITE", cls: "white", title: "White" },
         { value: "BLACK", cls: "black", title: "Black" },
       ];
+
       const faceOptions = [
         {
           value: "white",
@@ -231,6 +221,7 @@ function showEditAvatar() {
           img: "/static/images/avatars/face/brown.png",
         },
       ];
+
       const eyesOptions = [
         {
           value: "blue",
@@ -253,6 +244,7 @@ function showEditAvatar() {
           img: "/static/images/avatars/eyes/green.png",
         },
       ];
+
       const hairOptions = [
         {
           value: "one_blonde",
@@ -275,6 +267,7 @@ function showEditAvatar() {
           img: "/static/images/avatars/hair/two_brown.png",
         },
       ];
+
       const buildOptionsHTML = (items, isColorBox = false) =>
         items
           .map((it) =>
@@ -283,106 +276,76 @@ function showEditAvatar() {
               : `<div class="avatar-option" data-value="${it.value}" title="${it.title}"><img src="${it.img}" alt="${it.title}"></div>`
           )
           .join("");
+
       const bgOptionsHTML = buildOptionsHTML(bgColors, true);
       const faceOptionsHTML = buildOptionsHTML(faceOptions, false);
       const eyesOptionsHTML = buildOptionsHTML(eyesOptions, false);
       const hairOptionsHTML = buildOptionsHTML(hairOptions, false);
-      modalHTML = `
-            <div class="profile-modal-content">
-                <div class="profile-scrollable">
-                    <div id="preview-avatar" class="profile-avatar ${avatar_background.toLowerCase()}"> 
-                      <img id="preview-face" src="/static/images/avatars/face/${
-                        currentAvatar.face
-                      }.png">
-                      <img id="preview-eyes" src="/static/images/avatars/eyes/${
-                        currentAvatar.eyes
-                      }.png">
-                      <img id="preview-hair" src="/static/images/avatars/hair/${
-                        currentAvatar.hair
-                      }.png">
-                    </div>
-                    <div class="profile-details">
-                      <div class="avatar-category">
-                        <label>Background:</label>
-                        <div class="avatar-options" id="background-options">
-                          ${bgOptionsHTML}
-                        </div>
-                      </div>
-                      <div class="avatar-category">
-                        <label>Face:</label>
-                        <div class="avatar-options" id="face-options">
-                          ${faceOptionsHTML}
-                        </div>
-                      </div>     
-                      <div class="avatar-category">
-                        <label>Eyes:</label>
-                        <div class="avatar-options" id="eyes-options">
-                          ${eyesOptionsHTML}
-                        </div>
-                      </div>
-                      <div class="avatar-category">
-                        <label>Hair:</label>
-                        <div class="avatar-options" id="hair-options">
-                          ${hairOptionsHTML}
-                        </div>
-                      </div>
-                    </div>
-                </div>
+
+      const modalHTML = `
+        <div class="profile-modal-content">
+          <div class="profile-scrollable">
+            <div id="preview-avatar" class="profile-avatar ${avatar_background.toLowerCase()}"> 
+              <img id="preview-face" src="/static/images/avatars/face/${
+                currentAvatar.face
+              }.png">
+              <img id="preview-eyes" src="/static/images/avatars/eyes/${
+                currentAvatar.eyes
+              }.png">
+              <img id="preview-hair" src="/static/images/avatars/hair/${
+                currentAvatar.hair
+              }.png">
             </div>
+            <div class="profile-details">
+              <div class="avatar-category">
+                <label>Background:</label>
+                <div class="avatar-options" id="background-options">
+                  ${bgOptionsHTML}
+                </div>
+              </div>
+              <div class="avatar-category">
+                <label>Face:</label>
+                <div class="avatar-options" id="face-options">
+                  ${faceOptionsHTML}
+                </div>
+              </div>     
+              <div class="avatar-category">
+                <label>Eyes:</label>
+                <div class="avatar-options" id="eyes-options">
+                  ${eyesOptionsHTML}
+                </div>
+              </div>
+              <div class="avatar-category">
+                <label>Hair:</label>
+                <div class="avatar-options" id="hair-options">
+                  ${hairOptionsHTML}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       `;
-      showModal("Edit Avatar", modalHTML, [
-        {
-          text: "Save",
-          onClick: async () => {
-            try {
-              const selectedFace = document.querySelector(
-                "#face-options .avatar-option.selected"
-              );
-              const face = selectedFace ? selectedFace.dataset.value : "white";
-              const selectedEyes = document.querySelector(
-                "#eyes-options .avatar-option.selected"
-              );
-              const eyes = selectedEyes ? selectedEyes.dataset.value : "blue";
-              const selectedHair = document.querySelector(
-                "#hair-options .avatar-option.selected"
-              );
-              const hair = selectedHair
-                ? selectedHair.dataset.value
-                : "one_brown";
-              const selectedBackground = document.querySelector(
-                "#background-options .avatar-option.selected"
-              );
-              const background = selectedBackground
-                ? selectedBackground.dataset.value
-                : avatar_background ?? "GREY";
-              const newAvatar = JSON.stringify({ face, eyes, hair });
-              const response = await fetch("/api/edit_profile", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                credentials: "include",
-                body: JSON.stringify({
-                  avatar: newAvatar,
-                  avatar_background: background,
-                }),
-              });
-              if (response.ok) {
-                showToast("Avatar updated!", { color: "success" });
-                showProfile();
-              } else {
-                showToast("An error occurred while updating avatar", {
-                  color: "error",
-                });
-              }
-            } catch (err) {
-              showToast("An error occurred while updating avatar", {
-                color: "error",
-              });
-            }
-          },
-          id: "save-avatar-btn",
-          textid: "save-avatar-text",
-        },
-      ]);
+
+      const modal = showModal("Edit Avatar", "", modalHTML, [], true);
+
+      const modalFooter = document.createElement("div");
+      modalFooter.className = "modal-footer custom-modal-footer";
+      modal.querySelector(".modal-content").appendChild(modalFooter);
+
+      // Save button
+      const saveButton = document.createElement("button");
+      saveButton.className = "btn btn-primary btn-long";
+      saveButton.textContent = "Save";
+      saveButton.id = "save-avatar-btn";
+      modalFooter.appendChild(saveButton);
+
+      // Cancel button
+      const cancelButton = document.createElement("button");
+      cancelButton.className = "btn btn-secondary btn-long";
+      cancelButton.textContent = "Cancel";
+      cancelButton.addEventListener("click", () => showSettings());
+      modalFooter.appendChild(cancelButton);
+
       const selectMatching = (containerSelector, matchValue) => {
         const list = document.querySelectorAll(
           `${containerSelector} .avatar-option`
@@ -391,10 +354,12 @@ function showEditAvatar() {
           if (opt.dataset.value === matchValue) opt.classList.add("selected");
         });
       };
+
       selectMatching("#face-options", currentAvatar.face);
       selectMatching("#eyes-options", currentAvatar.eyes);
       selectMatching("#hair-options", currentAvatar.hair);
       selectMatching("#background-options", avatar_background);
+
       const attachImageOptionHandler = (containerId, previewImgId) => {
         document
           .querySelectorAll(`#${containerId} .avatar-option`)
@@ -413,9 +378,11 @@ function showEditAvatar() {
             });
           });
       };
+
       attachImageOptionHandler("face-options", "preview-face");
       attachImageOptionHandler("eyes-options", "preview-eyes");
       attachImageOptionHandler("hair-options", "preview-hair");
+
       const bgClassList = bgColors.map((b) => b.cls);
       document
         .querySelectorAll("#background-options .avatar-option")
@@ -434,8 +401,143 @@ function showEditAvatar() {
             }
           });
         });
+
+      saveButton.addEventListener("click", async () => {
+        saveButton.disabled = true;
+        saveButton.textContent = "Saving.";
+        let dots = 1;
+        const interval = setInterval(() => {
+          dots = (dots % 3) + 1;
+          saveButton.textContent = "Saving" + ".".repeat(dots);
+        }, 300);
+
+        try {
+          const selectedFace = document.querySelector(
+            "#face-options .avatar-option.selected"
+          );
+          const face = selectedFace ? selectedFace.dataset.value : "white";
+          const selectedEyes = document.querySelector(
+            "#eyes-options .avatar-option.selected"
+          );
+          const eyes = selectedEyes ? selectedEyes.dataset.value : "blue";
+          const selectedHair = document.querySelector(
+            "#hair-options .avatar-option.selected"
+          );
+          const hair = selectedHair ? selectedHair.dataset.value : "one_brown";
+          const selectedBackground = document.querySelector(
+            "#background-options .avatar-option.selected"
+          );
+          const background = selectedBackground
+            ? selectedBackground.dataset.value
+            : avatar_background ?? "GREY";
+
+          const newAvatar = JSON.stringify({ face, eyes, hair });
+
+          const response = await fetch("/api/edit_profile", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+            body: JSON.stringify({
+              avatar: newAvatar,
+              avatar_background: background,
+            }),
+          });
+
+          clearInterval(interval);
+
+          if (response.ok) {
+            showToast("Avatar updated!", { color: "success" });
+            showSettings();
+          } else {
+            const errorData = await response.json();
+            showToast(
+              errorData.error || "An error occurred while updating avatar",
+              {
+                color: "error",
+              }
+            );
+            saveButton.textContent = "Save";
+            saveButton.disabled = false;
+          }
+        } catch (err) {
+          clearInterval(interval);
+          showToast("An error occurred while updating avatar", {
+            color: "error",
+          });
+          console.log("Update avatar error:", err);
+          saveButton.textContent = "Save";
+          saveButton.disabled = false;
+        }
+      });
     })
     .catch((err) => {
       showToast("Failed to load current avatar", { color: "error" });
+      console.log("Load avatar error:", err);
     });
+}
+
+function showLogoutConfirmation() {
+  const confirmationHTML = `
+    <p class="modal-text">Are you sure you want to logout?</p>
+  `;
+
+  const modal = showModal("Logout?", "", confirmationHTML, [], true);
+
+  const modalFooter = document.createElement("div");
+  modalFooter.className = "modal-footer custom-modal-footer";
+  modal.querySelector(".modal-content").appendChild(modalFooter);
+
+  // Logout button
+  const logoutButton = document.createElement("button");
+  logoutButton.className = "btn btn-danger btn-long";
+  logoutButton.textContent = "Logout";
+  modalFooter.appendChild(logoutButton);
+
+  // Cancel button
+  const cancelButton = document.createElement("button");
+  cancelButton.className = "btn btn-secondary btn-long";
+  cancelButton.textContent = "Cancel";
+  cancelButton.addEventListener("click", () => showSettings());
+  modalFooter.appendChild(cancelButton);
+
+  logoutButton.addEventListener("click", async () => {
+    logoutButton.disabled = true;
+    logoutButton.textContent = "Logging out.";
+    let dots = 1;
+    const interval = setInterval(() => {
+      dots = (dots % 3) + 1;
+      logoutButton.textContent = "Logging out" + ".".repeat(dots);
+    }, 300);
+
+    try {
+      const response = await fetch("/api/auth/logout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+      });
+
+      clearInterval(interval);
+
+      const logoutData = await response.json();
+      if (response.ok) {
+        showToast("Logged out successfully!", {
+          color: "success",
+        });
+        setTimeout(() => location.reload(), 2000);
+      } else {
+        showToast(logoutData.error || "Logout failed", {
+          color: "error",
+        });
+        logoutButton.textContent = "Logout";
+        logoutButton.disabled = false;
+      }
+    } catch (error) {
+      clearInterval(interval);
+      showToast("An error occurred during logout", {
+        color: "error",
+      });
+      console.log("Logout error:", error);
+      logoutButton.textContent = "Logout";
+      logoutButton.disabled = false;
+    }
+  });
 }

@@ -32,10 +32,19 @@ document.addEventListener("DOMContentLoaded", async () => {
           class="bi bi-copy copy-icon"
           style="cursor: pointer; margin-left: 10px; font-size: 1rem"
           title="Copy URL"
+        ></i> <i
+          class="bi bi-gear-fill settings-icon"
+          style="cursor: pointer; margin-left: 10px; font-size: 1rem"
+          title="Settings"
         ></i>` || "???";
         const copyIcon = document.querySelector(".copy-icon");
         if (copyIcon) {
           copyIcon.addEventListener("click", shareProfile);
+        }
+
+        const settingsIcon = document.querySelector(".settings-icon");
+        if (settingsIcon) {
+          settingsIcon.addEventListener("click", showSettings);
         }
 
         document.getElementById("profile-level").textContent =

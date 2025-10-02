@@ -17,51 +17,6 @@
   margin-right: 10px;
 }
 
-.settings-form-group input[type="text"] {
-  padding: 12px;
-  padding-right: 40px;
-  border: 2px solid #171843;
-  border-radius: 8px;
-  font-size: 16px;
-  transition: border-color 0.3s ease;
-  background-color: #2b2c6d;
-  position: relative;
-  box-sizing: border-box;
-}
-
-.settings-form-group input[type="text"]:disabled {
-  color: #dadada;
-}
-
-.settings-input {
-  flex: 1;
-}
-
-.settings-edit-btn {
-  border: none;
-  background: none;
-  cursor: pointer;
-  position: absolute;
-  right: 10px;
-  top: 32.5px;
-  padding: 0;
-}
-
-.settings-edit-img {
-  width: 32px;
-  height: 32px;
-  transition: opacity 0.2s;
-}
-
-.settings-edit-img.disabled {
-  cursor: default;
-  opacity: 0.65;
-}
-
-.settings-edit-img:hover {
-  opacity: 0.65;
-}
-
 .avatar-category {
   display: flex;
   flex-direction: column;
@@ -78,9 +33,9 @@
 .avatar-option {
   width: 40px;
   height: 40px;
-  border: 2px solid #171843;
+  border: 2px solid var(--text-muted);
   border-radius: 8px;
-  background-color: #2b2c6d;
+  background-color: var(--bg-tertiary);
   cursor: pointer;
   transition: border-color 0.3s;
   display: flex;
@@ -90,15 +45,51 @@
 }
 
 .avatar-option:hover {
-  border-color: #27285f;
+  border-color: var(--text-primary);
 }
 
 .avatar-option.selected {
-  border-color: #6fd372; /* Green for selected */
+  border-color: #6fd372;
 }
 
 .avatar-option img {
   width: 100%;
   height: 100%;
   border-radius: 4px;
+}
+
+.form-text {
+  color: var(--text-primary);
+}
+.color-box.grey {
+  background-color: rgb(92, 92, 92);
+}
+.color-box.red {
+  background-color: rgb(255, 78, 78);
+}
+.color-box.orange {
+  background-color: rgb(255, 172, 77);
+}
+.color-box.yellow {
+  background-color: rgb(255, 252, 87);
+}
+.color-box.green {
+  background-color: rgb(65, 255, 122);
+}
+.color-box.blue {
+  background-color: rgb(54, 125, 255);
+}
+.color-box.purple {
+  background-color: rgb(190, 49, 255);
+}
+.color-box.white {
+  background-color: rgb(255, 255, 255);
+}
+.color-box.black {
+  background-color: rgb(0, 0, 0);
+}
+
+.color-box {
+  width: 100%;
+  height: 100%;
 }

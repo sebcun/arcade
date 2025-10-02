@@ -3,6 +3,10 @@
   rel="stylesheet"
   href="{{ url_for('static', filename='css/profile.css') }}"
 />
+<link
+  rel="stylesheet"
+  href="{{ url_for('static', filename='css/settings.css') }}"
+/>
 {% endblock %} {% block content %}
 <div class="profile-container container-fluid">
   <div class="row">
@@ -32,9 +36,6 @@
       </div>
       <div class="profile-details mt-3">
         <h2 id="profile-username">Loading</h2>
-        {#
-        <p>The one and only owned of Arcade.</p>
-        #}
         <div class="profile-badges" id="profile-badges"></div>
         <p><strong>Created On:</strong> <span id="profile-creation">?</span></p>
         <p><strong>Level:</strong> <span id="profile-level">?</span></p>
@@ -108,6 +109,7 @@
       });
     });
   </script>
+  <script src="static/js/settings.js"></script>
 
   {% endblock %}
 </div>
