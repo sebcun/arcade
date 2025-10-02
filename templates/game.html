@@ -9,6 +9,10 @@
   <div class="row">
     <div class="col-12 mt-3">
       <div class="game-preview-container" id="gamePreviewContainer">
+        <span class="game-title-header"
+          ><span id="gameName"></span> | <a id="gameAuthor" target="_blank"></a
+        ></span>
+
         <div class="game-canvas-wrapper">
           <canvas id="gameCanvas" width="676" height="380"></canvas>
           <div id="previewStartOverlay" class="preview-start-overlay">
@@ -48,5 +52,6 @@
 <script src="{{ url_for('static', filename='js/game.js') }}"></script>
 <script>
   const GAMEID = "{{ GAMEID }}";
+  const WEBSITEURL = "{{ WEBSITE_URL }}";
 </script>
 {% endblock %}

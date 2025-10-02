@@ -169,3 +169,19 @@
 .red-liked {
   color: var(--accent-secondary);
 }
+
+.game-title-header {
+  text-align: center;
+  font-weight: 600;
+  font-size: 2rem;
+}
+
+#gameAuthor {
+  text-decoration: none;
+  color: var(--text-primary);
+  transition: color 0.3s ease;
+}
+
+#gameAuthor:hover {
+  color: var(--text-muted);
+}

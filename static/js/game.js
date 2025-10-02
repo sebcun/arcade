@@ -10,6 +10,9 @@ window.addEventListener("DOMContentLoaded", () => {
       const canvas = document.getElementById("gameCanvas");
       const overlay = document.getElementById("previewStartOverlay");
 
+      const gameName = document.getElementById("gameName");
+      gameName.textContent = data.title;
+
       const likeBtn = document.getElementById("like-btn");
       const likeIcon = document.getElementById("like-icon");
       const likeCount = document.getElementById("like-count");
@@ -84,6 +87,24 @@ window.addEventListener("DOMContentLoaded", () => {
         }
         startGame(canvas, overlay, processedSprites, gameCode);
       });
+
+      const gameAuthor = document.getElementById("gameAuthor");
+      fetch(`/api/user?id=${data.author}`)
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error(`Profile fetch failed: ${response.status}`);
+          }
+          return response.json();
+        })
+        .then((pdata) => {
+          console.log(pdata);
+          gameAuthor.textContent = `@${pdata.username}`;
+          gameAuthor.href = `${WEBSITEURL}/profile/${data.author}`;
+        })
+        .catch((err) => {
+          console.warn("Could not fetch author profile:", err);
+          gameAuthor.textContent = ` | ${data.author}`;
+        });
     })
     .catch((err) => {
       console.error("Error starting game:", err);
