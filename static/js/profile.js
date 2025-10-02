@@ -206,7 +206,7 @@ function createGameCard(game) {
   const gameId = game.id !== undefined ? String(game.id) : "";
   const thumbnail =
     game.thumbnail ||
-    "https://hc-cdn.hel1.your-objectstorage.com/s/v3/f5875e19da9c3d8f541114abe98599df3b7818aa_image.png";
+    "https://hc-cdn.hel1.your-objectstorage.com/s/v3/e3e093448e581885bec0d2944645d9adbc0ec443_black.png";
   const likes = formatNumber(game.likes || 0);
   const plays = formatNumber(game.plays || 0);
 
