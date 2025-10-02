@@ -210,11 +210,10 @@ function openYSWSEvent() {
        - All games must be individual work<br>
        - Games that copy the tutorial directly will not be accepted<br>
        - Have fun!<br><br>
-    Ready to submit your project? <a href="https://google.com">Fill out this form.</a><br><br>
+    Ready to submit your project? <a href="https://forms.fillout.com/t/a59CMX3rfNus">Fill out this form.</a><br><br>
     Need some help getting started, <a href="https://pixelcade.sebcun.com/develop?docs&tutorial=CATCHTHEGUY">visit our docs and tutorial section for a tutorial on how to make a basic game.</a><br><br>
-    Stickers, stickers, stickers! Here are some examples of the stickers you may receive:<br>
+    Stickers, stickers, stickers! Here are some examples of the stickers you may receive: (You will also receive a Pixelcade sticker but that is still WIP)<br>
     <img src="https://hc-cdn.hel1.your-objectstorage.com/s/v3/11d970ea35b1a6e36ab56a4377f3a9cc5304d679_cow.png">
-    <img src="https://hc-cdn.hel1.your-objectstorage.com/s/v3/06a3d1a0a73f4028a72b0fdfc2cdf3cfcb47b948_startwo.png">
     <img src="https://hc-cdn.hel1.your-objectstorage.com/s/v3/06a3d1a0a73f4028a72b0fdfc2cdf3cfcb47b948_startwo.png">
     </div>
        `

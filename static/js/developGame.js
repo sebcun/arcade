@@ -442,7 +442,6 @@ async function loadCodeEditor() {
         "AS",
         "TO",
         "WITH",
-        "IS",
 
         // GIVE XP SIZES
 
@@ -516,7 +515,6 @@ async function loadCodeEditor() {
           AS: true,
           TO: true,
           WITH: true,
-          IS: true,
         };
 
         var sizeModifiers = {

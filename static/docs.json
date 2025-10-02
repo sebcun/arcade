@@ -725,8 +725,9 @@
         },
         {
           "type": "img",
-          "content": "https://i.imgur.com/5NyBpkA.png"
+          "content": "https://i.imgur.com/LLAFZoO.png"
         },
+        { "type": "br", "content": "" },
         {
           "type": "text",
           "content": "Once you have created your 2 sprites, to make sure we don't lose our valuable art, we will save the game. To do this, click the save button in the top action bar."
@@ -817,6 +818,152 @@
         {
           "type": "code",
           "content": "STORE 0 AS score\nSTORE 0 AS lastScore\nTEXT 'You are the RED person. Use W/A/S/D to move around to touch the BLUE person to score!'\nSPAWN sprite1 AT 0,50\nSPAWN sprite2 AT 400,50\n\nONKEY 'w'\n  MOVE sprite1 TO sprite1.x,sprite1.y-5\nENDKEY\n\nONKEY 's'\n  MOVE sprite1 TO sprite1.x,sprite1.y+5\nENDKEY\n\nONKEY 'a'\n  MOVE sprite1 TO sprite1.x-5,sprite1.y\nENDKEY\n\nONKEY 'd'\n  MOVE sprite1 TO sprite1.x+5,sprite1.y\nENDKEY\n\nONTOUCH sprite1 WITH sprite2\n  GIVEXP small\n  STORE score+1 AS score\n  STORE lastScore+1 AS lastScore\n  TEXT \"SCORE: ${score}\"\n  STORE 0#570 AS randomX\n  STORE 0#350 AS randomY\n  MOVE sprite2 TO randomX,randomY\n\n  IF lastScore = 5\n    STORE 0 AS lastScore\n    GIVEXP medium\n  ENDIF\n\nENDTOUCH"
+        },
+        { "type": "br", "content": "" },
+        { "type": "br", "content": "" }
+      ]
+    },
+    "RUNFROMTHEGUY": {
+      "title": "RUN FROM THE GUY Tutorial",
+      "docTitle": "RUN FROM THE GUY",
+      "content": [
+        {
+          "type": "text",
+          "content": "In this tutorial, we will go over how to create a simple 'Run From The Guy' game where you must move around to avoid being touched by the person chasing you. If you would like to see how this game will look once you have finished the tutorial, you can view it "
+        },
+        {
+          "type": "link",
+          "content": "here.",
+          "url": "https://pixelcade.sebcun.com/game/2"
+        },
+        { "type": "sub", "content": "Create a Project" },
+        {
+          "type": "text",
+          "content": "We will start by creating a new project. We can do this by visiting "
+        },
+        {
+          "type": "link",
+          "content": "here.",
+          "url": "https://pixelcade.sebcun.com/develop"
+        },
+        {
+          "type": "text",
+          "content": " On this page, open the 'Games' sidebar and click 'Create a Game'. Give it a memorable title!"
+        },
+        {
+          "type": "img",
+          "content": "https://i.imgur.com/kRLmaoJ.png"
+        },
+        { "type": "sub", "content": "Creating Sprites" },
+        {
+          "type": "text",
+          "content": "For this game, we need 2 sprites. We can create a sprite by on the sidebar of our new game, clicking 'Sprite Editor'. You then want to click 'New Sprite'. "
+        },
+        {
+          "type": "img",
+          "content": "https://i.imgur.com/gZ1aaV5.png"
+        },
+
+        {
+          "type": "text",
+          "content": "You can then draw on the pixel canvas. Once you are done, click save sprite. For our version of the game, we want 2 stick figure sprites. Be creative! But below is how ours will look in this tutorial."
+        },
+        {
+          "type": "img",
+          "content": "https://i.imgur.com/4NgHFdB.png"
+        },
+        { "type": "br", "content": "" },
+        {
+          "type": "text",
+          "content": "Once you have created your 2 sprites, to make sure we don't lose our valuable art, we will save the game. To do this, click the save button in the top action bar."
+        },
+        {
+          "type": "img",
+          "content": "https://i.imgur.com/5NyBpkA.png"
+        },
+        { "type": "sub", "content": "Coding the Game" },
+        {
+          "type": "text",
+          "content": "We can now start coding the game. Begin by clicking 'Code Editor' on your sidebar."
+        },
+        {
+          "type": "img",
+          "content": "https://i.imgur.com/9cFpLkZ.png"
+        },
+        {
+          "type": "text",
+          "content": "We will start by spawning our sprites on other sides of the game canvas by using the SPAWN command. We will also set the text to some basic instructions so the player knows what to do, as well as storing the score."
+        },
+        { "type": "br", "content": "" },
+        {
+          "type": "code",
+          "content": "TEXT 'You are the RED person. Use W/A/S/D to move around to run from the BLUE person.'\nSPAWN sprite1 AT 0,50\nSPAWN sprite2 AT 400,50"
+        },
+        { "type": "br", "content": "" },
+        { "type": "br", "content": "" },
+        {
+          "type": "text",
+          "content": "Next we are going to move our sprite that we control, using the ONKEY event as well as sprite variables."
+        },
+        { "type": "br", "content": "" },
+        {
+          "type": "code",
+          "content": "TEXT 'You are the RED person. Use W/A/S/D to move around to run from the BLUE person.'\nSPAWN sprite1 AT 0,50\nSPAWN sprite2 AT 400,50\n\nONKEY 'w'\n  MOVE sprite1 TO sprite1.x,sprite1.y-5\nENDKEY\n\nONKEY 's'\n  MOVE sprite1 TO sprite1.x,sprite1.y+5\nENDKEY\n\nONKEY 'a'\n  MOVE sprite1 TO sprite1.x-5,sprite1.y\nENDKEY\n\nONKEY 'd'\n  MOVE sprite1 TO sprite1.x+5,sprite1.y\nENDKEY"
+        },
+        { "type": "br", "content": "" },
+        { "type": "br", "content": "" },
+        {
+          "type": "text",
+          "content": "You should then save your game again so we don't lose any progress. We can also test our game by clicking 'Preview' in the sidebar, and then clicking 'Start Game'. When you click this, in the popup once you click W/A/S/D you should see that the sprite moves."
+        },
+        { "type": "br", "content": "" },
+        {
+          "type": "img",
+          "content": "https://i.imgur.com/BncM2zg.png"
+        },
+        { "type": "br", "content": "" },
+        { "type": "br", "content": "" },
+        {
+          "type": "text",
+          "content": "We are now going to make it so the blue guy (sprite2) constantly moves towards you (sprite1)."
+        },
+        { "type": "br", "content": "" },
+        {
+          "type": "code",
+          "content": "TEXT 'You are the RED person. Use W/A/S/D to move around to run from the BLUE person.'\nSPAWN sprite1 AT 0,50\nSPAWN sprite2 AT 400,50\n\nONKEY 'w'\n  MOVE sprite1 TO sprite1.x,sprite1.y-5\nENDKEY\n\nONKEY 's'\n  MOVE sprite1 TO sprite1.x,sprite1.y+5\nENDKEY\n\nONKEY 'a'\n  MOVE sprite1 TO sprite1.x-5,sprite1.y\nENDKEY\n\nONKEY 'd'\n  MOVE sprite1 TO sprite1.x+5,sprite1.y\nENDKEY\n\nLOOP\n  IF sprite2.x < sprite1.x\n    MOVE sprite2 TO sprite2.x+5,sprite2.y\n  ENDIF\n  \n  IF sprite2.x > sprite1.x\n    MOVE sprite2 TO sprite2.x-5,sprite2.y\n  ENDIF\n  \n  IF sprite2.y < sprite1.y\n    MOVE sprite2 TO sprite2.x,sprite2.y+5\n  ENDIF\n  \n  IF sprite2.y > sprite1.y\n    MOVE sprite2 TO sprite2.x,sprite2.y-5\n  ENDIF\n  \n  WAIT 0.6\nENDLOOP"
+        },
+        { "type": "br", "content": "" },
+        { "type": "br", "content": "" },
+        {
+          "type": "text",
+          "content": "Lets now make it so when you get caught, you stop moving."
+        },
+        { "type": "br", "content": "" },
+        {
+          "type": "code",
+          "content": "STORE \"no\" AS caught\nTEXT 'You are the RED person. Use W/A/S/D to move around to run from the BLUE person.'\nSPAWN sprite1 AT 0,50\nSPAWN sprite2 AT 400,50\n\nONKEY 'w'\n  IF caught = \"no\"\n    MOVE sprite1 TO sprite1.x,sprite1.y-5\n  ENDIF\nENDKEY\n\nONKEY 's'\n  IF caught = \"no\"\n    MOVE sprite1 TO sprite1.x,sprite1.y+5\n  ENDIF\nENDKEY\n\nONKEY 'a'\n  IF caught = \"no\"\n    MOVE sprite1 TO sprite1.x-5,sprite1.y\n  ENDIF\nENDKEY\n\nONKEY 'd'\n  IF caught = \"no\"\n    MOVE sprite1 TO sprite1.x+5,sprite1.y\n  ENDIF\nENDKEY\n\nLOOP\n  IF sprite2.x < sprite1.x\n    MOVE sprite2 TO sprite2.x+5,sprite2.y\n  ENDIF\n  \n  IF sprite2.x > sprite1.x\n    MOVE sprite2 TO sprite2.x-5,sprite2.y\n  ENDIF\n  \n  IF sprite2.y < sprite1.y\n    MOVE sprite2 TO sprite2.x,sprite2.y+5\n  ENDIF\n  \n  IF sprite2.y > sprite1.y\n    MOVE sprite2 TO sprite2.x,sprite2.y-5\n  ENDIF\n  \n  WAIT 0.6\nENDLOOP\n\nONTOUCH sprite1 WITH sprite2\n  STORE \"yes\" AS caught\nENDTOUCH"
+        },
+        { "type": "br", "content": "" },
+        { "type": "br", "content": "" },
+        {
+          "type": "text",
+          "content": "Lets now make it so when you get caught, you stop moving."
+        },
+        { "type": "br", "content": "" },
+        {
+          "type": "code",
+          "content": "STORE \"no\" AS caught\nTEXT 'You are the RED person. Use W/A/S/D to move around to run from the BLUE person.'\nSPAWN sprite1 AT 0,50\nSPAWN sprite2 AT 400,50\n\nONKEY 'w'\n  IF caught = \"no\"\n    MOVE sprite1 TO sprite1.x,sprite1.y-5\n  ENDIF\nENDKEY\n\nONKEY 's'\n  IF caught = \"no\"\n    MOVE sprite1 TO sprite1.x,sprite1.y+5\n  ENDIF\nENDKEY\n\nONKEY 'a'\n  IF caught = \"no\"\n    MOVE sprite1 TO sprite1.x-5,sprite1.y\n  ENDIF\nENDKEY\n\nONKEY 'd'\n  IF caught = \"no\"\n    MOVE sprite1 TO sprite1.x+5,sprite1.y\n  ENDIF\nENDKEY\n\nLOOP\n  IF sprite2.x < sprite1.x\n    MOVE sprite2 TO sprite2.x+5,sprite2.y\n  ENDIF\n  \n  IF sprite2.x > sprite1.x\n    MOVE sprite2 TO sprite2.x-5,sprite2.y\n  ENDIF\n  \n  IF sprite2.y < sprite1.y\n    MOVE sprite2 TO sprite2.x,sprite2.y+5\n  ENDIF\n  \n  IF sprite2.y > sprite1.y\n    MOVE sprite2 TO sprite2.x,sprite2.y-5\n  ENDIF\n  \n  WAIT 0.6\nENDLOOP\n\nONTOUCH sprite1 WITH sprite2\n  STORE \"yes\" AS caught\nENDTOUCH"
+        },
+        { "type": "br", "content": "" },
+        { "type": "br", "content": "" },
+        {
+          "type": "text",
+          "content": "Finally, lets add a scoring system."
+        },
+        { "type": "br", "content": "" },
+        {
+          "type": "code",
+          "content": "STORE \"no\" AS caught\nSTORE 0 AS secsLast\n\nTEXT \"You are the RED person. Use W/A/S/D to move around to run from the BLUE person.\"\nSPAWN sprite1 AT 0,50\nSPAWN sprite2 AT 400,50\n\nONKEY \"w\"\n  IF caught = \"no\"\n    MOVE sprite1 TO sprite1.x,sprite1.y-5\n  ENDIF\nENDKEY\n\nONKEY \"s\"\n  IF caught = \"no\"\n    MOVE sprite1 TO sprite1.x,sprite1.y+5\n  ENDIF\nENDKEY\n\nONKEY \"a\"\n  IF caught = \"no\"\n    MOVE sprite1 TO sprite1.x-5,sprite1.y\n  ENDIF\nENDKEY\n\nONKEY \"d\"\n  IF caught = \"no\"\n    MOVE sprite1 TO sprite1.x+5,sprite1.y\n  ENDIF\nENDKEY\n\nLOOP\n  IF sprite2.x < sprite1.x\n    MOVE sprite2 TO sprite2.x+5,sprite2.y\n  ENDIF\n  \n  IF sprite2.x > sprite1.x\n    MOVE sprite2 TO sprite2.x-5,sprite2.y\n  ENDIF\n  \n  IF sprite2.y < sprite1.y\n    MOVE sprite2 TO sprite2.x,sprite2.y+5\n  ENDIF\n  \n  IF sprite2.y > sprite1.y\n    MOVE sprite2 TO sprite2.x,sprite2.y-5\n  ENDIF\n  \n  WAIT 0.6\nENDLOOP\n\nONTOUCH sprite1 WITH sprite2\n  STORE \"yes\" AS caught\nENDTOUCH\n\nLOOP\n\n  IF caught = \"yes\"\n    TEXT \"You Lasted: ${secsLast}\"\n    STOPLOOP\n  ENDIF\n  \n  IF caught = \"no\"\n    STORE secsLast+1 AS secsLast\n    TEXT \"You are the RED person. Use W/A/S/D to move around to run from the BLUE person. | Seconds Lasted: ${secsLast}\"\n    WAIT 1\n  ENDIF\n  \nENDLOOP"
         },
         { "type": "br", "content": "" },
         { "type": "br", "content": "" }
