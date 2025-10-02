@@ -225,17 +225,6 @@ function createGameCard(game) {
                 >${escapeHtml(likes)}</small
               >
             </div>
-            <div class="d-flex align-items-center">
-              <i
-                class="bi bi-eye-fill text-info me-1"
-                style="font-size: 0.8rem"
-              ></i>
-              <small
-                class="text-light fw-semibold"
-                style="font-size: 0.7rem"
-                >${escapeHtml(plays)}</small
-              >
-            </div>
           </div>
         </div>
       </div>
