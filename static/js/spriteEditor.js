@@ -132,17 +132,22 @@ function setupCanvasDrawing() {
 
   pixelCanvas.addEventListener("mousedown", (e) => {
     drawing = true;
-    const pos = getXYFromEvent(e);
-    if (pos) handleDrawAt(pos.x, pos.y);
+    handleDrawAt(e);
   });
   window.addEventListener("mouseup", () => (drawing = false));
   pixelCanvas.addEventListener("mousemove", (e) => {
     if (!drawing) return;
-    const pos = getXYFromEvent(e);
-    if (pos) handleDrawAt(pos.x, pos.y);
+    handleDrawAt(e);
   });
 
-  function handleDrawAt(x, y) {
+  function handleDrawAt(e) {
+    const rect = pixelCanvas.getBoundingClientRect();
+    const x = Math.floor((e.clientX - rect.left) / CELL_SIZE);
+    const y = Math.floor((e.clientY - rect.top) / CELL_SIZE);
+
+    // Add bounds checking to prevent errors
+    if (x < 0 || y < 0 || x >= SPRITE_DIM || y >= SPRITE_DIM) return;
+
     if (tool === "pencil") {
       drawnPixels[x][y] = true;
       pixelColors[x][y] = currentColor;
