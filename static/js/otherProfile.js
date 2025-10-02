@@ -138,7 +138,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         function shareProfile() {
           // Copy to clipboard
           navigator.clipboard
-            .writeText(`${WEBSITE_URL}/?profile=${data.id}`)
+            .writeText(`${WEBSITE_URL}/profile/${data.id}`)
             .then(() => {
               showToast("Link copied to clipboard.");
             })

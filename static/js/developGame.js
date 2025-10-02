@@ -752,3 +752,18 @@ if (saveButton) {
     await saveGame();
   });
 }
+
+const shareBtn = document.getElementById("share-button");
+shareBtn.addEventListener("click", (e) => {
+  e.preventDefault();
+  navigator.clipboard
+    .writeText(`${WEBSITE_URL}/game/${GAMEID}`)
+    .then(() => {
+      showToast("Link copied to clipboard.");
+    })
+    .catch((err) => {
+      // Error while sharing
+      showError("There was an issue while creating a link for your game.");
+      console.log(`Game sharing error: ${err}`);
+    });
+});
