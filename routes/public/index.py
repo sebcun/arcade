@@ -6,7 +6,7 @@ index_bp = Blueprint("index", __name__)
 
 @index_bp.route("/")
 def index():
-    website_url = os.getenv("WEBSITE", "https://arcade.sebcun.com")
+    website_url = os.getenv("WEBSITE", "https://pixelcade.sebcun.com")
 
     if "userid" in session:
         return render_template("index.html", LOGGEDIN=True, WEBSITE=website_url)

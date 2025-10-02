@@ -507,3 +507,36 @@ input:-webkit-autofill:hover {
 .square-btn:hover {
   opacity: 0.65;
 }
+
+.content p,
+.content pre,
+.content code {
+  color: white;
+}
+.code-block {
+  border-radius: 6px;
+  overflow: auto;
+  white-space: pre;
+  line-height: 1.45;
+  background-color: var(--bg-tertiary);
+}
+.code-block code {
+  display: block;
+  background-color: var(--input-bg);
+  color: var(--text-primary);
+  border: 1px solid var(--border-primary);
+  padding: 5px;
+}
+
+.content pre {
+  background-color: #171843;
+  padding: 1rem;
+  border-radius: 4px;
+  overflow-x: auto;
+}
+
+.content code {
+  background-color: #2b2c6d;
+  padding: 0.2rem 0.4rem;
+  border-radius: 2px;
+}

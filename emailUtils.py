@@ -18,13 +18,13 @@ def send(recipientEmail, otp, expiry_minutes=5):
     user = os.environ.get("EMAIL_HOST_USER")
     password = os.environ.get("EMAIL_HOST_PASSWORD")
     useTLS = os.environ.get("EMAIL_USE_TLS", "True").lower() == "true"
-    domain = os.environ.get("WEBSITE", "https://arcade.sebcun.com")
+    domain = os.environ.get("WEBSITE", "https://pixelcade.sebcun.com")
 
     if not all([host, port, user, password]):
         return False
 
     otp_str = str(otp)
-    preheader = f"Your Arcade one-time code — valid for {expiry_minutes} minutes."
+    preheader = f"Your Pixelcade one-time code — valid for {expiry_minutes} minutes."
 
     plain_content = (
         f"{preheader}\n\n"
@@ -35,7 +35,7 @@ def send(recipientEmail, otp, expiry_minutes=5):
     msg = EmailMessage()
     msg["From"] = user
     msg["To"] = recipientEmail
-    msg["Subject"] = "Arcade — Your One-Time Code"
+    msg["Subject"] = "Pixelcade — Your One-Time Code"
     msg.set_content(plain_content)
 
     background_color = "#F3F4F6"
@@ -60,9 +60,9 @@ def send(recipientEmail, otp, expiry_minutes=5):
     <div style="max-width: 580px; margin: 0 auto;">
       <div class="container" style="background: {card_bg}; border-radius:12px; padding:28px; box-shadow: 0 6px 18px rgba(2,6,23,0.06);">
         <div style="text-align:center;">
-          <img src="https://i.imgur.com/zCeHsMz.png" alt="Arcade" width="72" style="display:block; margin:0 auto 14px auto;" onerror="this.style.display='none'"/>
+          <img src="https://i.imgur.com/zCeHsMz.png" alt="Pixelcade" width="72" style="display:block; margin:0 auto 14px auto;" onerror="this.style.display='none'"/>
           <h1 style="margin:0 0 10px 0; color:{text_color}; font-size:20px;">Here is your One-Time Code</h1>
-          <p style="margin:0 0 18px 0; color:#334155;">Enter the code below on the Arcade site. It expires in {expiry_minutes} minutes.</p>
+          <p style="margin:0 0 18px 0; color:#334155;">Enter the code below on the Pixelcade site. It expires in {expiry_minutes} minutes.</p>
         </div>
 
         <div style="text-align:center; margin:18px 0;">
@@ -78,7 +78,7 @@ def send(recipientEmail, otp, expiry_minutes=5):
         <hr style="border:none; height:1px; background:#eef2f7; margin:18px 0;" />
 
         <p style="color:#94a3b8; font-size:12px; text-align:center; margin:0;">
-          Arcade • <a href="{domain}" style="color:#94a3b8; text-decoration:underline;">{domain}</a>
+          Pixelcade • <a href="{domain}" style="color:#94a3b8; text-decoration:underline;">{domain}</a>
         </p>
       </div>
     </div>

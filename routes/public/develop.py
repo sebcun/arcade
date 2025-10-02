@@ -6,7 +6,7 @@ develop_bp = Blueprint("develop", __name__)
 
 @develop_bp.route("/develop")
 def develop():
-    website_url = os.getenv("WEBSITE", "https://arcade.sebcun.com")
+    website_url = os.getenv("WEBSITE", "https://pixelcade.sebcun.com")
 
     if "userid" in session:
         return render_template("develop.html", LOGGEDIN=True, WEBSITE=website_url)

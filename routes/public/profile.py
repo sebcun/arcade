@@ -6,7 +6,7 @@ profile_bp = Blueprint("profile", __name__)
 
 @profile_bp.route("/profile")
 def profile():
-    website_url = os.getenv("WEBSITE", "https://arcade.sebcun.com")
+    website_url = os.getenv("WEBSITE", "https://pixelcade.sebcun.com")
 
     if "userid" in session:
         return render_template("profile.html", WEBSITE=website_url)
@@ -15,5 +15,5 @@ def profile():
 
 @profile_bp.route("/profile/<userid>")
 def otherProfile(userid):
-    website_url = os.getenv("WEBSITE", "https://arcade.sebcun.com")
+    website_url = os.getenv("WEBSITE", "https://pixelcade.sebcun.com")
     return render_template("otherProfile.html", WEBSITE=website_url, USERID=userid)

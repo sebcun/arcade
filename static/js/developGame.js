@@ -401,7 +401,7 @@ async function loadCodeEditor() {
             <div class="code-editor-container">
               <textarea 
                 class="form-control w-100" 
-                placeholder="Start coding your Arcade game here!" 
+                placeholder="Start coding your Pixelcade game here!" 
                 id="code-editor"
               ></textarea>
             </div>

@@ -107,7 +107,7 @@ body {
   border-radius: 5px;
   overflow-y: auto;
   padding: 5px;
-  max-height: 84.5vh;
+  max-height: 82.5vh;
 
   &::-webkit-scrollbar {
     height: 8px;

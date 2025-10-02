@@ -9,7 +9,7 @@ develop_game_bp = Blueprint("develop_game", __name__)
 
 @develop_game_bp.route("/develop/<game_id>")
 def developGame(game_id):
-    website_url = os.getenv("WEBSITE", "https://arcade.sebcun.com")
+    website_url = os.getenv("WEBSITE", "https://pixelcade.sebcun.com")
 
     if "userid" not in session:
         return redirect(url_for("index.index") + "?login")

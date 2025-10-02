@@ -18,9 +18,15 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   loadDevelop(
-    "Arcade Develop Portal",
-    "Welcome to the Arcade develop portal!<br><br>Use the sidebar to navigate the documentation, your games, and more!"
+    "Pixelcade Develop Portal",
+    "Welcome to the Pixelcade develop portal!<br><br>Use the sidebar to navigate the documentation, your games, and more!"
   );
+  const urlParams = new URLSearchParams(window.location.search);
+  const openDocs = urlParams.has("ysws");
+
+  if (openDocs) {
+    openYSWSEvent();
+  }
 
   fetch(`/api/user`, {
     method: "GET",
@@ -76,8 +82,8 @@ function loadDevelop(title, content, copy = null) {
 
 function openDevelopHome() {
   loadDevelop(
-    "Arcade Develop Portal",
-    "Welcome to the Arcade develop portal!<br><br>Use the sidebar to navigate the documentation, your games, and more!"
+    "Pixelcade Develop Portal",
+    "Welcome to the Pixelcade develop portal!<br><br>Use the sidebar to navigate the documentation, your games, and more!"
   );
 
   document
@@ -183,4 +189,48 @@ function openCreateModal() {
         console.error(err);
       });
   });
+}
+
+function openYSWSEvent() {
+  loadDevelop(
+    "YSWS Event",
+    `
+    <div>
+    Want some free stickers for a task that should take less than 30 minutes? This is the event for you.<br><br>
+
+    Simply create a game using Pixelcade's game editor, and 10 games will be chosen to receive a pack of stickers (3) shipped directly to you!<br>
+    The 10 games will be chosen off of a criteria including functionality, originality, and looks.<br><br>
+    
+    We are also giving you the chance to get even more stickers!<br>Games with certain aspects that excel (eg code, or pixel art) will be given exclusive stickers for this event and for that aspect. For example, if your game is chosen to have amazing sprites/pixel art, you will receive a bonus cow sticker!<br><br>
+    Games must be published and submitted by 11:59AEST October 31st 2025. Any games or changes made to games after this will not be counted.<br>
+    Winners will be chosen and contacted on the 1st of November 2025 regarding shipment info.<br><br>
+    There are some rules:<br>
+       - Participants must be 18 or under at the end of the period (31st October, 2025)<br>
+       - Participants can submit one game only<br>
+       - All games must be individual work<br>
+       - Games that copy the tutorial directly will not be accepted<br>
+       - Have fun!<br><br>
+    Ready to submit your project? <a href="https://google.com">Fill out this form.</a><br><br>
+    Need some help getting started, <a href="https://pixelcade.sebcun.com/develop?docs&tutorial=CATCHTHEGUY">visit our docs and tutorial section for a tutorial on how to make a basic game.</a><br><br>
+    Stickers, stickers, stickers! Here are some examples of the stickers you may receive:<br>
+    <img src="https://hc-cdn.hel1.your-objectstorage.com/s/v3/11d970ea35b1a6e36ab56a4377f3a9cc5304d679_cow.png">
+    <img src="https://hc-cdn.hel1.your-objectstorage.com/s/v3/06a3d1a0a73f4028a72b0fdfc2cdf3cfcb47b948_startwo.png">
+    <img src="https://hc-cdn.hel1.your-objectstorage.com/s/v3/06a3d1a0a73f4028a72b0fdfc2cdf3cfcb47b948_startwo.png">
+    </div>
+       `
+  );
+
+  document
+    .querySelectorAll(".sidebar a")
+    .forEach((link) => link.classList.remove("active"));
+
+  document.querySelectorAll(".collapse").forEach((el) => {
+    el.classList.remove("show");
+    const btn = document.querySelector(`[data-bs-target  ="#${el.id}"]`);
+    if (btn) btn.setAttribute("aria-expanded", "false");
+  });
+
+  const navbarYSWSEvent = document.getElementById("navbarYSWSEvent");
+
+  navbarYSWSEvent.classList.add("active");
 }

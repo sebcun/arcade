@@ -3,7 +3,7 @@ const params = new URLSearchParams(window.location.search);
 
 function clearParameters() {
   window.history.replaceState({}, "", `${window.location.pathname}`);
-  window.name = "Arcade";
+  window.name = "Pixelcade";
 }
 function setParameter(key, value, noValue = false) {
   clearParameters();
