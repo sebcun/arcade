@@ -1,247 +1,244 @@
 document.addEventListener("DOMContentLoaded", () => {
-  let docsData = {};
+  const documentationCollapseContents = document.getElementById(
+    "documentationCollapseContents"
+  );
 
-  // Load docs.json
   fetch("/static/docs.json")
     .then((response) => response.json())
     .then((data) => {
-      docsData = data;
-      populateSidebar();
+      const keyMap = {};
+      Object.keys(data).forEach((k) => {
+        keyMap[k.toLowerCase()] = k;
+      });
+
+      Object.entries(data).forEach(([categoryName, contents]) => {
+        if (contents["title"]) {
+          const a = document.createElement("a");
+          a.href = "#";
+          a.className = "list-group-item list-group-item-action";
+          a.textContent = contents["title"];
+          a.dataset.section = categoryName;
+          a.dataset.page = "";
+          a.addEventListener("click", (event) => {
+            event.preventDefault();
+            document
+              .querySelectorAll(".sidebar a")
+              .forEach((link) => link.classList.remove("active"));
+            event.target.classList.add("active");
+            loadDoc(categoryName, contents["title"], contents);
+          });
+          documentationCollapseContents.appendChild(a);
+        } else {
+          const button = document.createElement("button");
+          button.className = "list-group-item list-group-item-action";
+          button.type = "button";
+          button.setAttribute("data-bs-toggle", "collapse");
+          button.setAttribute("data-bs-target", `#${categoryName}Collapse`);
+          button.setAttribute("aria-expanded", "false");
+          button.setAttribute("aria-controls", `${categoryName}Collapse`);
+          button.textContent = categoryName;
+
+          const icon = document.createElement("i");
+          icon.className = "bi bi-chevron-right chevron-icon ms-auto";
+          button.appendChild(icon);
+
+          documentationCollapseContents.appendChild(button);
+
+          const collapseDiv = document.createElement("div");
+          collapseDiv.className = "collapse";
+          collapseDiv.id = `${categoryName}Collapse`;
+
+          const listGroup = document.createElement("div");
+          listGroup.className = "list-group list-group-flush ms-3";
+          collapseDiv.appendChild(listGroup);
+
+          Object.entries(contents).forEach(([docName, content]) => {
+            const a = document.createElement("a");
+            a.href = "#";
+            a.className = "list-group-item list-group-item-action";
+            a.textContent = content["docTitle"] || content["title"] || docName;
+            a.dataset.section = categoryName;
+            a.dataset.page = docName;
+
+            a.addEventListener("click", (event) => {
+              event.preventDefault();
+
+              document
+                .querySelectorAll(".sidebar a")
+                .forEach((link) => link.classList.remove("active"));
+
+              event.target.classList.add("active");
+
+              loadDoc(categoryName, content["title"], content);
+            });
+
+            listGroup.appendChild(a);
+          });
+
+          documentationCollapseContents.appendChild(collapseDiv);
+        }
+      });
 
       const urlParams = new URLSearchParams(window.location.search);
-      let initialSection = "introduction";
+      const introKey = keyMap["introduction"] || Object.keys(data)[0];
+
+      const openDocs = urlParams.has("docs");
+
+      let initialSectionKey = openDocs ? introKey : null;
       let initialPage = null;
-
-      if (urlParams.has("command")) {
-        const cmd = urlParams.get("command");
-        if (docsData.commands && docsData.commands[cmd]) {
-          initialSection = "commands";
-          initialPage = cmd;
-        }
-      } else if (urlParams.has("event")) {
-        const evt = urlParams.get("event");
-        if (docsData.events && docsData.events[evt]) {
-          initialSection = "events";
-          initialPage = evt;
-        }
-      } else if (urlParams.has("tutorial")) {
-        const tut = urlParams.get("tutorial");
-        if (docsData.tutorials && docsData.tutorials[tut]) {
-          initialSection = "tutorials";
-          initialPage = tut;
-        }
-      }
-
-      loadSection(initialSection, initialPage);
-
-      document
-        .querySelectorAll(".sidebar-nav a")
-        .forEach((a) => a.classList.remove("active"));
-
-      const activeLink = document.querySelector(
-        `a[data-section="${initialSection}"][data-page="${initialPage || ""}"]`
-      );
-      if (activeLink) {
-        activeLink.classList.add("active");
-        if (initialPage) {
-          const submenu = activeLink.closest(".submenu");
-          if (submenu) {
-            submenu.classList.add("show");
-            const toggle = document.querySelector(
-              `.toggle-submenu[data-submenu="${initialSection}"]`
-            );
-            if (toggle) toggle.classList.add("open");
+      if (openDocs) {
+        if (urlParams.has("command")) {
+          const cmd = urlParams.get("command");
+          if (keyMap["commands"]) {
+            const commandsKey = keyMap["commands"];
+            if (data[commandsKey] && data[commandsKey][cmd]) {
+              initialSectionKey = commandsKey;
+              initialPage = cmd;
+            }
+          }
+        } else if (urlParams.has("event")) {
+          const evt = urlParams.get("event");
+          if (keyMap["events"]) {
+            const eventsKey = keyMap["events"];
+            if (data[eventsKey] && data[eventsKey][evt]) {
+              initialSectionKey = eventsKey;
+              initialPage = evt;
+            }
+          }
+        } else if (urlParams.has("tutorial")) {
+          const tut = urlParams.get("tutorial");
+          if (keyMap["tutorials"]) {
+            const tutorialsKey = keyMap["tutorials"];
+            if (data[tutorialsKey] && data[tutorialsKey][tut]) {
+              initialSectionKey = tutorialsKey;
+              initialPage = tut;
+            }
           }
         }
       }
 
-      history.replaceState(null, "", window.location.pathname);
+      let toLoad = null;
+      if (initialSectionKey && initialPage) {
+        toLoad = data[initialSectionKey][initialPage];
+      } else if (initialSectionKey) {
+        const sectionObj = data[initialSectionKey];
+        if (sectionObj && sectionObj.title) {
+          toLoad = sectionObj;
+          initialPage = "";
+        } else if (sectionObj) {
+          const firstDocKey = Object.keys(sectionObj)[0];
+          initialPage = firstDocKey;
+          toLoad = sectionObj[firstDocKey];
+        }
+      }
 
-      document.querySelectorAll(".sidebar-nav a").forEach((link) => {
-        link.addEventListener("click", (e) => {
-          e.preventDefault();
-          const section = e.target.dataset.section;
-          const page = e.target.dataset.page;
-          loadSection(section, page);
-
+      if (openDocs && initialSectionKey) {
+        const navLink = document.querySelector(
+          `.sidebar a[data-section="${initialSectionKey.toLowerCase()}"]`
+        );
+        if (navLink) {
           document
-            .querySelectorAll(".sidebar-nav a")
-            .forEach((a) => a.classList.remove("active"));
-          e.target.classList.add("active");
-        });
-      });
+            .querySelectorAll(".sidebar a")
+            .forEach((link) => link.classList.remove("active"));
+          navLink.classList.add("active");
+        }
+      }
+
+      if (openDocs && toLoad) {
+        document
+          .querySelectorAll(".list-group a")
+          .forEach((link) => link.classList.remove("active"));
+
+        const anchorSelector = `.list-group a[data-section="${initialSectionKey}"][data-page="${
+          initialPage || ""
+        }"]`;
+        const anchor = document.querySelector(anchorSelector);
+        if (anchor) {
+          anchor.classList.add("active");
+        }
+
+        loadDoc(
+          initialSectionKey,
+          toLoad.title || toLoad.docTitle || "",
+          toLoad
+        );
+      }
     })
     .catch((error) => console.error("Error loading docs:", error));
-
-  // Populate sidebar submenus
-  function populateSidebar() {
-    const commandsUl = document.getElementById("commands-submenu");
-    const eventsUl = document.getElementById("events-submenu");
-    const apiUl = document.getElementById("api-submenu");
-    const tutorialsUl = document.getElementById("tutorials-submenu");
-
-    Object.keys(docsData.commands || {}).forEach((key) => {
-      const li = document.createElement("li");
-      li.innerHTML = `<a href="#" data-section="commands" data-page="${key}">${docsData.commands[key].title}</a>`;
-      commandsUl.appendChild(li);
-    });
-
-    Object.keys(docsData.events || {}).forEach((key) => {
-      const li = document.createElement("li");
-      li.innerHTML = `<a href="#" data-section="events" data-page="${key}">${docsData.events[key].title}</a>`;
-      eventsUl.appendChild(li);
-    });
-
-    Object.keys(docsData.api || {}).forEach((key) => {
-      const li = document.createElement("li");
-      li.innerHTML = `<a href="#" data-section="api" data-page="${key}">${docsData.api[key].title}</a>`;
-      apiUl.appendChild(li);
-    });
-
-    Object.keys(docsData.tutorials || {}).forEach((key) => {
-      const li = document.createElement("li");
-      li.innerHTML = `<a href="#" data-section="tutorials" data-page="${key}">${docsData.tutorials[key].title}</a>`;
-      tutorialsUl.appendChild(li);
-    });
-  }
-
-  // Load section/page
-  function loadSection(section, page = null) {
-    const contentDiv = document.getElementById("content");
-    let data;
-    if (page) {
-      data = docsData[section][page];
-    } else {
-      data = docsData[section];
-    }
-
-    let param = "";
-    if (section === "commands" && page) {
-      param = `?command=${page}`;
-    } else if (section === "events" && page) {
-      param = `?event=${page}`;
-    } else if (section === "tutorials" && page) {
-      param = `?tutorial=${page}`;
-    }
-
-    const fullUrl = window.location.origin + "/docs" + param;
-
-    let html = `<h1>${data.title} <i class="bi bi-copy copy-icon" style="cursor: pointer; margin-left: 10px; font-size: 1.2rem;" title="Copy URL"></i></h1>`;
-    data.content.forEach((content) => {
-      if (content.type === "text") {
-        html += content.content.replace(/\n/g, "<br>");
-      } else if (content.type === "sub") {
-        html += `<h2>${content.content.replace(/\n/g, "<br>")}</h2>`;
-      } else if (content.type === "code") {
-        const escaped = content.content
-          .replace(/&/g, "&amp;")
-          .replace(/</g, "&lt;")
-          .replace(/>/g, "&gt;");
-        html += `<div class="code-block"><code>${escaped}</code></div>`;
-      } else if (content.type === "br") {
-        html += `<br>`;
-      } else if (content.type === "img") {
-        html += `<img src="${content.content}" alt="Documentation image" style="max-width: 100%; height: auto;">`;
-      } else if (content.type === "link") {
-        html += `<a href="${content.url}" target="_blank" rel="noopener noreferrer">${content.content}</a>`;
-      } else if (content.type === "vid") {
-        html += `<video src="${content.content}" controls style="max-width: 100%; height: auto;" alt="Documentation video"></video>`;
-      }
-    });
-    contentDiv.innerHTML = html;
-
-    const copyIcon = contentDiv.querySelector(".copy-icon");
-    if (copyIcon) {
-      copyIcon.addEventListener("click", () => {
-        navigator.clipboard
-          .writeText(fullUrl)
-          .then(() => {
-            showToast("URL copied to clipboard!", { color: "success" });
-          })
-          .catch((err) => {
-            console.error("Failed to copy: ", err);
-            showToast("Failed to copy URL", { color: "error" });
-          });
-      });
-    }
-  }
-
-  // Toggle submenus
-  document.querySelectorAll(".toggle-submenu").forEach((toggle) => {
-    toggle.addEventListener("click", (e) => {
-      e.preventDefault();
-      const submenu = document.getElementById(
-        `${e.target.dataset.submenu}-submenu`
-      );
-      submenu.classList.toggle("show");
-      e.target.classList.toggle("open");
-    });
-  });
-
-  // Search functionality
-  const searchInput = document.getElementById("search-input");
-  const searchBtn = document.getElementById("search-btn");
-
-  function performSearch() {
-    const query = searchInput.value.toLowerCase();
-    const contentDiv = document.getElementById("content");
-    if (!query) {
-      loadSection("introduction");
-      return;
-    }
-
-    let results = [];
-    Object.keys(docsData).forEach((section) => {
-      if (typeof docsData[section] === "object" && docsData[section].title) {
-        // Introduction
-        if (docsData[section].title.toLowerCase().includes(query)) {
-          results.push({ section, page: null, data: docsData[section] });
-        }
-      } else {
-        Object.keys(docsData[section]).forEach((page) => {
-          const item = docsData[section][page];
-          if (item.title.toLowerCase().includes(query)) {
-            results.push({ section, page, data: item });
-          }
-        });
-      }
-    });
-
-    if (results.length > 0) {
-      contentDiv.innerHTML = `<h1>Search Results for "${query}"</h1>`;
-      results.forEach((result) => {
-        // Generate preview from text-type content only
-        const previewText = result.data.content
-          .filter((c) => c.type === "text")
-          .map((c) => c.content)
-          .join(" ");
-        const preview =
-          previewText.substring(0, 200) +
-          (previewText.length > 200 ? "..." : "");
-        contentDiv.innerHTML += `<h2><a href="#" data-section="${
-          result.section
-        }" data-page="${result.page || ""}">${
-          result.data.title
-        }</a></h2><p>${preview}</p>`;
-      });
-      contentDiv.querySelectorAll("a[data-section]").forEach((link) => {
-        link.addEventListener("click", (e) => {
-          e.preventDefault();
-          loadSection(e.target.dataset.section, e.target.dataset.page || null);
-        });
-      });
-    } else {
-      contentDiv.innerHTML = `<h1>No results for "${query}"</h1>`;
-    }
-  }
-
-  searchInput.addEventListener("input", performSearch);
-  searchBtn.addEventListener("click", performSearch);
-
-  // Mobile sidebar toggle
-  const sidebar = document.getElementById("sidebar");
-  const toggleBtn = document.getElementById("sidebar-toggle");
-  toggleBtn.addEventListener("click", () => {
-    sidebar.classList.toggle("open");
-  });
 });
+
+function loadDoc(section, title, content, copy) {
+  document.querySelectorAll(".collapse").forEach((el) => {
+    if (el.id !== `${section}Collapse` && el.id !== "documentationCollapse") {
+      el.classList.remove("show");
+      const btn = document.querySelector(`[data-bs-target  ="#${el.id}"]`);
+      if (btn) btn.setAttribute("aria-expanded", "false");
+    }
+  });
+
+  const docCollapse = document.getElementById(`documentationCollapse`);
+  if (docCollapse && !docCollapse.classList.contains("show")) {
+    docCollapse.classList.add("show");
+    const button = document.querySelector(
+      `[data-bs-target="#documentationCollapse"]`
+    );
+    if (button) {
+      button.setAttribute("aria-expanded", "true");
+    }
+  }
+
+  const sectionCollapse = document.getElementById(`${section}Collapse`);
+  if (sectionCollapse && !sectionCollapse.classList.contains("show")) {
+    sectionCollapse.classList.add("show");
+    const button = document.querySelector(
+      `[data-bs-target="#${section}Collapse"]`
+    );
+    if (button) {
+      button.setAttribute("aria-expanded", "true");
+    }
+  }
+
+  const developHeading = document.getElementById("developHeading");
+  const developContainer = document.getElementById("developContainer");
+
+  let html = "<div>";
+  content.content.forEach((item) => {
+    if (item.type === "text") {
+      html += item.content.replace(/\n/g, "<br>");
+    } else if (item.type === "sub") {
+      html += `<br><br><h5>${item.content.replace(/\n/g, "<br>")}</h5>`;
+    } else if (item.type === "code") {
+      const escaped = item.content
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+      html += `<div class="code-block"><code>${escaped}</code></div>`;
+    } else if (item.type === "br") {
+      html += `<br>`;
+    } else if (item.type === "img") {
+      html += `<img src="${item.content}" alt="Documentation image" style="max-width: 100%; height: auto;">`;
+    } else if (item.type === "link") {
+      html += `<a href="${item.url}" target="_blank" rel="noopener noreferrer">${item.content}</a>`;
+    } else if (item.type === "vid") {
+      html += `<video src="${item.content}" controls style="max-width: 100%; height: auto;" alt="Documentation video"></video>`;
+    }
+  });
+  html += "</div>";
+  developHeading.textContent = title;
+  developContainer.innerHTML = html;
+
+  let docTitle = (content["docTitle"] || "").replace(/\s+/g, "");
+  let copyUrl = `${WEBSITE_URL}/develop?docs`;
+  if (section === "Commands") {
+    copyUrl += `&command=${docTitle}`;
+  } else if (section === "Events") {
+    copyUrl += `&event=${docTitle}`;
+  } else if (section === "Tutorials") {
+    copyUrl += `&tutorial=${docTitle}`;
+  }
+
+  const copyBtn = document.getElementById("copy-button");
+  if (copyBtn) copyBtn.dataset.copyText = copyUrl;
+  const copyBtnImg = document.getElementById("copy-button-img");
+  copyBtnImg.classList.remove("d-none");
+}

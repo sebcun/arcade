@@ -1,17 +1,41 @@
 from flask import Blueprint, request, session, jsonify
-from db import getAllGames, createGame, getGamesSorted
+from db import (
+    getAllGames,
+    createGame,
+    getGamesSorted,
+    getGame,
+    getLikesForGame,
+    userLikedGame,
+)
 
-games_bp = Blueprint("games", __name__)
+games_bp = Blueprint("apI_games", __name__)
 
 
 @games_bp.route("/games", methods=["GET"])
 def get_games():
     author = request.args.get("author")
+    id = request.args.get("id")
     sort = request.args.get("sort")
     limit_str = request.args.get("limit")
     limit = int(limit_str) if limit_str and limit_str.isdigit() else None
-    
-    if sort in ['liked', 'played', 'recent']:
+
+    if id:
+        result, status = getGame(id)
+
+        if isinstance(result, dict) and status == 200:
+            try:
+                likes = getLikesForGame(id)
+                user_liked = False
+                if "userid" in session:
+                    user_liked = userLikedGame(id, session["userid"])
+                result["likes"] = likes
+                result["liked"] = bool(user_liked)
+            except Exception:
+                result["likes"] = 0
+                result["liked"] = False
+        return jsonify(result), status
+
+    if sort in ["liked", "played", "recent"]:
         games, status = getGamesSorted(sort, limit or 30)
     else:
         games, status = getAllGames()
@@ -52,16 +76,3 @@ def get_games():
     ]
 
     return jsonify(normalized), status
-
-
-@games_bp.route("/games", methods=["POST"])
-def create_new_game():
-    if "userid" not in session:
-        return jsonify({"error": "Not logged in"}), 401
-
-    data = request.get_json()
-    title = data.get("title")
-    description = data.get("description", "")
-
-    result, status = createGame(session["userid"], title, description)
-    return jsonify(result), status

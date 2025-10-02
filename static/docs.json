@@ -11,9 +11,10 @@
       { "type": "code", "content": "Hello world!" }
     ]
   },
-  "commands": {
+  "Commands": {
     "WAIT": {
       "title": "WAIT Command",
+      "docTitle": "WAIT",
       "content": [
         {
           "type": "text",
@@ -44,6 +45,7 @@
     },
     "SPAWN": {
       "title": "SPAWN Command",
+      "docTitle": "SPAWN",
       "content": [
         {
           "type": "text",
@@ -87,6 +89,7 @@
     },
     "DESPAWN": {
       "title": "DESPAWN Command",
+      "docTitle": "DESPAWN",
       "content": [
         {
           "type": "text",
@@ -117,6 +120,7 @@
     },
     "MOVE": {
       "title": "MOVE Command",
+      "docTitle": "MOVE",
       "content": [
         {
           "type": "text",
@@ -157,6 +161,7 @@
     },
     "SCALE": {
       "title": "SCALE Command",
+      "docTitle": "SCALE",
       "content": [
         {
           "type": "text",
@@ -197,6 +202,7 @@
     },
     "TINT": {
       "title": "TINT Command",
+      "docTitle": "TINT",
       "content": [
         {
           "type": "text",
@@ -237,6 +243,7 @@
     },
     "ROTATE": {
       "title": "ROTATE Command",
+      "docTitle": "ROTATE",
       "content": [
         {
           "type": "text",
@@ -267,6 +274,7 @@
     },
     "HIDE": {
       "title": "HIDE Command",
+      "docTitle": "HIDE",
       "content": [
         {
           "type": "text",
@@ -291,6 +299,7 @@
     },
     "SHOW": {
       "title": "SHOW Command",
+      "docTitle": "SHOW",
       "content": [
         {
           "type": "text",
@@ -311,6 +320,7 @@
     },
     "STORE": {
       "title": "STORE Command",
+      "docTitle": "STORE",
       "content": [
         {
           "type": "text",
@@ -360,6 +370,7 @@
     },
     "LOG": {
       "title": "LOG Command",
+      "docTitle": "LOG",
       "content": [
         {
           "type": "text",
@@ -397,6 +408,7 @@
     },
     "TEXT": {
       "title": "TEXT Command",
+      "docTitle": "TEXT",
       "content": [
         {
           "type": "text",
@@ -428,6 +440,7 @@
     },
     "GIVE": {
       "title": "GIVE XP Command",
+      "docTitle": "GIVE",
       "content": [
         {
           "type": "text",
@@ -468,6 +481,7 @@
     },
     "LOOP": {
       "title": "LOOP Logic",
+      "docTitle": "LOOP",
       "content": [
         {
           "type": "text",
@@ -501,6 +515,7 @@
     },
     "IF": {
       "title": "IF Logic",
+      "docTitle": "IF",
       "content": [
         {
           "type": "text",
@@ -571,9 +586,10 @@
       ]
     }
   },
-  "events": {
+  "Events": {
     "ONKEY": {
       "title": "ON KEY Event",
+      "docTitle": "ON KEY",
       "content": [
         {
           "type": "text",
@@ -617,6 +633,7 @@
     },
     "ONTOUCH": {
       "title": "ON TOUCH Event",
+      "docTitle": "ON TOUCH",
       "content": [
         {
           "type": "text",
@@ -659,10 +676,11 @@
       ]
     }
   },
-  "api": {},
-  "tutorials": {
+  "API": {},
+  "Tutorials": {
     "CATCHTHEGUY": {
       "title": "CATCH THE GUY Tutorial",
+      "docTitle": "CATCH THE GUY",
       "content": [
         {
           "type": "text",

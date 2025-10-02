@@ -1,0 +1,33 @@
+/* Ensure the page container can provide a height reference */
+html,
+body {
+  height: 100%;
+}
+
+/* Make the develop container fill available viewport height (adjust offset if you have a header) */
+#developContainer {
+  /* subtract header/topbars if present; adjust 120px to match your header size */
+  min-height: calc(100vh - 120px);
+  display: flex;
+  flex-direction: column;
+}
+
+/* Make the row take the remaining height inside developContainer */
+#developContainer .row.full-height {
+  flex: 1 1 auto;
+  display: flex; /* turn the row into a flex container so columns can stretch */
+  align-items: stretch;
+}
+
+/* Make the left column a flex column so its inner .sprite-list can stretch */
+#developContainer .col-5.h-100,
+#developContainer .col-5.d-flex {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Have the sprite list fill the column and scroll when content overflows */
+.sprite-list {
+  flex: 1 1 auto;
+  overflow: auto;
+}

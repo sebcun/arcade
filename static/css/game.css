@@ -1,0 +1,171 @@
+.game-controls-row {
+  display: flex;
+  gap: 1rem;
+  align-items: stretch;
+}
+
+.game-output-text {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-primary);
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  font-family: "Consolas", "Monaco", "Courier New", monospace;
+  font-size: 14px;
+  line-height: 1.4;
+  color: var(--text-primary);
+  min-height: 60px;
+  max-height: 120px;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+  flex: 1;
+}
+
+.game-output-text:empty::before {
+  content: "Game output will appear here...";
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.game-output-text::-webkit-scrollbar {
+  width: 6px;
+}
+
+.game-output-text::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.game-output-text::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 3px;
+}
+
+.game-output-text::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.fullscreen-btn {
+  background: transparent;
+  border: 1px solid var(--border-primary);
+  color: var(--text-primary);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 60px;
+  height: 60px;
+  min-width: 60px;
+  min-height: 60px;
+  flex-shrink: 0;
+}
+
+.fullscreen-btn:hover {
+  background: var(--bg-secondary);
+  border-color: var(--input-focus);
+  color: var(--input-focus);
+  transform: translateY(-1px);
+}
+
+.fullscreen-btn:active {
+  transform: translateY(0);
+}
+
+.fullscreen-btn i {
+  font-size: 1.2rem;
+}
+
+.game-preview-container {
+  background: var(--input-bg);
+  border: 1px solid var(--border-primary);
+  border-radius: 12px;
+  padding: 1rem;
+  height: 77.5vh;
+  max-height: 77.5vh;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  box-sizing: border-box;
+}
+
+.game-canvas-wrapper {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex: 1;
+  min-height: 0;
+  background: none;
+  border-radius: 8px;
+  padding: 1rem;
+  border: none;
+  box-sizing: border-box;
+}
+
+#gameCanvas {
+  border: 2px solid var(--border-primary);
+  border-radius: 8px;
+  background: var(--bg-tertiary);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+#gameCanvas:hover {
+  border-color: var(--input-focus);
+  box-shadow: 0 6px 20px rgba(0, 255, 224, 0.15);
+  transform: translateY(-2px);
+}
+
+.preview-start-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  user-select: none;
+  text-align: center;
+}
+
+.start-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.start-content i {
+  font-size: 3rem;
+  color: var(--input-focus);
+}
+
+.start-content span {
+  font-size: 1.1rem;
+  letter-spacing: 0.5px;
+}
+
+.like-btn-vertical {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  gap: 2px !important;
+}
+
+.like-btn-vertical i {
+  font-size: 1.2rem;
+}
+
+.like-btn-vertical span {
+  font-size: 0.8rem;
+  line-height: 1;
+}
+
+.red-liked {
+  color: var(--accent-secondary);
+}

@@ -1,0 +1,113 @@
+{% extends 'base.html' %} {% block styles %}
+<link
+  rel="stylesheet"
+  href="{{ url_for('static', filename='css/profile.css') }}"
+/>
+{% endblock %} {% block content %}
+<div class="profile-container container-fluid">
+  <div class="row">
+    <div class="col-md-4">
+      <div class="profile-avatar" id="profile-avatar">
+        <img
+          id="profile-avatar-face"
+          src="/static/images/avatars/face/white.png"
+          alt="Face"
+        />
+        <img
+          id="profile-avatar-eyes"
+          src="/static/images/avatars/eyes/blue.png"
+          alt="Eyes"
+        />
+        <img
+          id="profile-avatar-hair"
+          src="/static/images/avatars/hair/one_blonde.png"
+          alt="Hair"
+        />
+        <img
+          class="level-image"
+          src="/static/images/levels/StarOne.png"
+          alt="Level 1"
+          id="profile-avatar-level"
+        />
+      </div>
+      <div class="profile-details mt-3">
+        <h2 id="profile-username">Loading</h2>
+        {#
+        <p>The one and only owned of Arcade.</p>
+        #}
+        <div class="profile-badges" id="profile-badges"></div>
+        <p><strong>Created On:</strong> <span id="profile-creation">?</span></p>
+        <p><strong>Level:</strong> <span id="profile-level">?</span></p>
+      </div>
+    </div>
+
+    <div class="col-md-8">
+      <h3>Posted Games</h3>
+      <div class="scroll-container">
+        <button class="scroll-arrow left-arrow">
+          <i class="bi bi-chevron-left"></i>
+        </button>
+        <div class="scroll-wrapper">
+          <div class="game-container d-flex" id="postedGameContainer"></div>
+        </div>
+        <button class="scroll-arrow right-arrow">
+          <i class="bi bi-chevron-right"></i>
+        </button>
+      </div>
+
+      <h3 class="mt-4">Liked Games</h3>
+      <div class="scroll-container">
+        <button class="scroll-arrow left-arrow">
+          <i class="bi bi-chevron-left"></i>
+        </button>
+        <div class="scroll-wrapper">
+          <div class="game-container d-flex" id="likedGameContainer"></div>
+        </div>
+        <button class="scroll-arrow right-arrow">
+          <i class="bi bi-chevron-right"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  {% endblock %} {% block scripts %}
+  <script src="static/js/profile.js"></script>
+
+  <!-- Scroll Handler -->
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const containers = document.querySelectorAll(".scroll-container");
+      containers.forEach((container) => {
+        const wrapper = container.querySelector(".scroll-wrapper");
+        const leftArrow = container.querySelector(".left-arrow");
+        const rightArrow = container.querySelector(".right-arrow");
+
+        window.updateArrows = function () {
+          containers.forEach((cont) => {
+            const wrap = cont.querySelector(".scroll-wrapper");
+            const leftArr = cont.querySelector(".left-arrow");
+            const rightArr = cont.querySelector(".right-arrow");
+            const atStart = wrap.scrollLeft === 0;
+            const atEnd =
+              wrap.scrollLeft + wrap.clientWidth >= wrap.scrollWidth;
+            leftArr.style.display = atStart ? "none" : "flex";
+            rightArr.style.display = atEnd ? "none" : "flex";
+          });
+        };
+
+        window.updateArrows();
+        wrapper.addEventListener("scroll", window.updateArrows);
+
+        leftArrow.addEventListener("click", function () {
+          wrapper.scrollBy({ left: -200, behavior: "smooth" });
+        });
+
+        rightArrow.addEventListener("click", function () {
+          wrapper.scrollBy({ left: 200, behavior: "smooth" });
+        });
+      });
+    });
+  </script>
+
+  {% endblock %}
+</div>

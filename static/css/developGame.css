@@ -1,0 +1,577 @@
+#developContainer {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 0.75rem;
+}
+
+#gameDescription {
+  height: 300px;
+  min-height: 300px;
+  max-height: 300px;
+  overflow: auto;
+  resize: none;
+
+  &::-webkit-scrollbar {
+    height: 8px;
+  }
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 4px;
+  }
+  &::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5);
+  }
+
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+}
+
+.form-floating > textarea:focus ~ label::after,
+.form-floating > textarea:not(:placeholder-shown) ~ label::after {
+  background: none;
+}
+
+.form-select,
+select.form-control {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+
+  background-color: var(--input-bg);
+  color: var(--text-primary);
+  border: 1px solid var(--border-primary);
+  border-radius: 8px;
+  padding: 0.65rem 2.5rem 0.65rem 0.75rem;
+  height: 46px;
+  line-height: 1.2;
+  box-shadow: none;
+  box-sizing: border-box;
+  font-family: inherit;
+  font-weight: 300;
+  transition: border-color 0.12s ease, box-shadow 0.12s ease,
+    background-color 0.12s ease, color 0.12s ease;
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 18px;
+  cursor: pointer;
+}
+
+.form-select.form-select-lg,
+select.form-control.form-select-lg {
+  height: 46px;
+  padding-top: 0.65rem;
+  padding-bottom: 0.65rem;
+}
+
+.form-select:focus,
+select.form-control:focus {
+  outline: none;
+  border-color: var(--input-focus);
+  box-shadow: 0 0 0 0.18rem rgba(0, 255, 224, 0.12);
+  color: var(--text-primary);
+}
+
+.form-select:disabled,
+select.form-control:disabled,
+.form-select[aria-disabled="true"] {
+  opacity: 0.65;
+  cursor: not-allowed;
+  color: var(--text-muted);
+}
+
+.form-floating > .form-select:focus + label,
+.form-floating > select:focus + label {
+  color: var(--input-focus);
+}
+
+.sprite-list {
+  border: 1px solid var(--border-primary);
+  border-radius: 8px;
+  padding: 0.75rem;
+  height: 79.5vh;
+  max-height: 79.5vh;
+}
+
+.sprite-list-container {
+  overflow-y: auto;
+  height: 70vh;
+  max-height: 70vh;
+}
+
+.sprite-list-item {
+  border: 1px solid var(--border-primary);
+  border-radius: 8px;
+  padding: 0.75rem;
+  height: 50px;
+}
+
+.sprite-btn {
+  color: var(--text-primary);
+  transition: color 0.3s ease;
+}
+.sprite-btn:hover {
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.canvas-area {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.pixel {
+  border: 1px solid #eee;
+  background-color: white;
+  box-sizing: border-box;
+}
+
+.sidebar-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.sidebar-btn {
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--border-primary);
+  border-radius: 8px;
+  background-color: var(--input-bg);
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.sidebar-btn:hover {
+  background-color: var(--bg-secondary);
+  border-color: var(--input-focus);
+}
+
+.sidebar-btn.active {
+  background-color: var(--input-focus);
+  color: black;
+}
+
+.sidebar-btn i {
+  font-size: 1.2rem;
+}
+
+.color-circle {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+}
+
+button[title="Red"] .color-circle {
+  background-color: red;
+}
+
+button[title="Orange"] .color-circle {
+  background-color: orange;
+}
+
+button[title="Yellow"] .color-circle {
+  background-color: yellow;
+}
+
+button[title="Green"] .color-circle {
+  background-color: green;
+}
+
+button[title="Blue"] .color-circle {
+  background-color: blue;
+}
+
+.canvas-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  min-width: 0;
+  padding: 0.5rem 0;
+}
+
+.canvas-center .sprite-canvas {
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(16, 1fr);
+  grid-template-rows: repeat(16 1fr);
+  width: 380px;
+  height: 380px;
+  border: 1px solid var(--border-primary);
+  background-color: white;
+}
+
+.canvas-actions {
+  width: 380px;
+  display: flex;
+  justify-content: center;
+  margin-top: 0;
+}
+
+.canvas-actions .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.code-editor-container {
+  border: 1px solid var(--border-primary);
+  border-radius: 8px;
+  height: 77.5vh;
+  max-height: 77.5vh;
+  overflow: hidden;
+}
+
+.code-editor-container .CodeMirror {
+  height: 100%;
+  font-family: "Consolas", "Monaco", "Courier New", monospace !important;
+  font-size: 14px;
+  line-height: 1.5;
+  background-color: var(--input-bg);
+  color: var(--text-primary);
+  border: none;
+  border-radius: 8px;
+}
+
+.code-editor-container .CodeMirror-code {
+  font-family: "Consolas", "Monaco", "Courier New", monospace !important;
+  font-size: 14px !important;
+}
+
+.code-editor-container .CodeMirror-line {
+  font-family: "Consolas", "Monaco", "Courier New", monospace !important;
+  font-size: 14px !important;
+}
+
+.code-editor-container .CodeMirror pre {
+  font-family: "Consolas", "Monaco", "Courier New", monospace !important;
+  font-size: 14px !important;
+}
+
+.code-editor-container .CodeMirror-lines {
+  font-family: "Consolas", "Monaco", "Courier New", monospace !important;
+  font-size: 14px !important;
+}
+
+.code-editor-container .CodeMirror span {
+  font-family: "Consolas", "Monaco", "Courier New", monospace !important;
+}
+
+.code-editor-container .CodeMirror-gutters {
+  background-color: var(--bg-secondary);
+  border-right: 1px solid var(--border-primary);
+  color: var(--text-muted);
+  padding: 0;
+}
+
+.code-editor-container .CodeMirror-linenumber {
+  color: var(--text-muted);
+  padding: 0 8px;
+  font-family: "Consolas", "Monaco", "Courier New", monospace;
+}
+
+.code-editor-container .CodeMirror-cursor {
+  border-left: 1px solid var(--text-primary);
+}
+
+.code-editor-container .CodeMirror-selected {
+  background-color: rgba(0, 255, 224, 0.12);
+}
+
+.code-editor-container .CodeMirror-activeline-background {
+  background-color: var(--bg-secondary);
+}
+
+.code-editor-container .CodeMirror-focused .CodeMirror-selected {
+  background-color: rgba(0, 255, 224, 0.18);
+}
+
+.code-editor-container .CodeMirror-scrollbar-filler,
+.code-editor-container .CodeMirror-gutter-filler {
+  background-color: var(--input-bg);
+}
+
+.code-editor-container .CodeMirror-vscrollbar::-webkit-scrollbar,
+.code-editor-container .CodeMirror-hscrollbar::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.code-editor-container .CodeMirror-vscrollbar::-webkit-scrollbar-track,
+.code-editor-container .CodeMirror-hscrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.code-editor-container .CodeMirror-vscrollbar::-webkit-scrollbar-thumb,
+.code-editor-container .CodeMirror-hscrollbar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 4px;
+}
+
+.code-editor-container .CodeMirror-vscrollbar::-webkit-scrollbar-thumb:hover,
+.code-editor-container .CodeMirror-hscrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.5);
+}
+
+/* Commands, Events, etc */
+.code-editor-container .cm-keyword {
+  color: var(--accent-primary) !important;
+  font-weight: bold !important;
+}
+
+/* Strings */
+.code-editor-container .cm-string {
+  color: #ce9178 !important;
+}
+
+/* Numbers */
+.code-editor-container .cm-number {
+  color: var(--accent-secondary) !important;
+}
+
+/* Variables */
+.code-editor-container .cm-variable {
+  color: var(--accent-tertiary) !important;
+}
+
+.code-editor-container .cm-variable-2 {
+  color: var(--text-primary) !important;
+}
+
+.code-editor-container .cm-property {
+  color: var(--accent-tertiary) !important;
+}
+
+.code-editor-container .cm-def {
+  color: var(--accent-tertiary) !important;
+}
+
+.code-editor-container .cm-operator {
+  color: var(--text-primary) !important;
+}
+
+.code-editor-container .cm-comment {
+  color: var(--accent-tertiary) !important;
+  font-style: italic !important;
+}
+
+#code-editor {
+  display: none;
+}
+
+.CodeMirror-hints {
+  background: var(--input-bg) !important;
+  border: 1px solid var(--border-primary) !important;
+  border-radius: 8px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+  font-family: "Consolas", "Monaco", "Courier New", monospace !important;
+  font-size: 14px !important;
+  max-height: 200px !important;
+  overflow-y: auto !important;
+}
+
+.CodeMirror-hint {
+  color: var(--text-primary) !important;
+  padding: 6px 10px !important;
+  margin: 0 !important;
+  border-radius: 4px !important;
+  cursor: pointer !important;
+}
+
+.CodeMirror-hint-active {
+  background-color: var(--input-focus) !important;
+  color: black !important;
+}
+
+.CodeMirror-hint:hover {
+  background-color: var(--bg-secondary) !important;
+}
+
+/* Game preview */
+.game-controls-row {
+  display: flex;
+  gap: 1rem;
+  align-items: stretch;
+}
+
+.game-output-text {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-primary);
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  font-family: "Consolas", "Monaco", "Courier New", monospace;
+  font-size: 14px;
+  line-height: 1.4;
+  color: var(--text-primary);
+  min-height: 60px;
+  max-height: 120px;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+  flex: 1;
+}
+
+.game-output-text:empty::before {
+  content: "Game output will appear here...";
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.game-output-text::-webkit-scrollbar {
+  width: 6px;
+}
+
+.game-output-text::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.game-output-text::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 3px;
+}
+
+.game-output-text::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.fullscreen-btn {
+  background: transparent;
+  border: 1px solid var(--border-primary);
+  color: var(--text-primary);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 60px;
+  height: 60px;
+  min-width: 60px;
+  min-height: 60px;
+  flex-shrink: 0;
+}
+
+.fullscreen-btn:hover {
+  background: var(--bg-secondary);
+  border-color: var(--input-focus);
+  color: var(--input-focus);
+  transform: translateY(-1px);
+}
+
+.fullscreen-btn:active {
+  transform: translateY(0);
+}
+
+.fullscreen-btn i {
+  font-size: 1.2rem;
+}
+
+.game-preview-container {
+  background: var(--input-bg);
+  border: 1px solid var(--border-primary);
+  border-radius: 12px;
+  padding: 1.5rem;
+  height: 77.5vh;
+  max-height: 77.5vh;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.game-canvas-wrapper {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex: 1;
+  min-height: 0;
+  background: none;
+  border-radius: 8px;
+  padding: 2rem;
+  border: none;
+}
+
+#gameCanvas {
+  border: 2px solid var(--border-primary);
+  border-radius: 8px;
+  background: var(--bg-tertiary);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+#gameCanvas:hover {
+  border-color: var(--input-focus);
+  box-shadow: 0 6px 20px rgba(0, 255, 224, 0.15);
+  transform: translateY(-2px);
+}
+
+.preview-start-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  user-select: none;
+  text-align: center;
+}
+
+.start-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.start-content i {
+  font-size: 3rem;
+  color: var(--input-focus);
+}
+
+.start-content span {
+  font-size: 1.1rem;
+  letter-spacing: 0.5px;
+}
+
+.game-preview-container.fullscreen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 9999;
+  border-radius: 0;
+  max-height: none;
+  background: #000;
+}
+
+.game-preview-container.fullscreen .game-canvas-wrapper {
+  background: #000;
+  border: none;
+  padding: 0;
+}
+
+.game-preview-container.fullscreen #gameCanvas {
+  border: none;
+  box-shadow: none;
+  transform: none;
+}
+
+.game-preview-container.fullscreen .fullscreen-btn i::before {
+  content: "\f662";
+}

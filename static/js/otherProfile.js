@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", async () => {
-  fetch(`/api/user`, {
+  fetch(`/api/user?id=${USERID}`, {
     method: "GET",
   })
     .then((response) => response.json())

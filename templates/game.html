@@ -1,0 +1,52 @@
+{% extends 'base.html' %} {% block styles %}
+<link
+  rel="stylesheet"
+  href="{{ url_for('static', filename='css/game.css') }}"
+/>
+
+{% endblock %} {% block content %}
+<div class="container-fluid px-3">
+  <div class="row">
+    <div class="col-12 mt-3">
+      <div class="game-preview-container" id="gamePreviewContainer">
+        <div class="game-canvas-wrapper">
+          <canvas id="gameCanvas" width="676" height="380"></canvas>
+          <div id="previewStartOverlay" class="preview-start-overlay">
+            <div class="start-content">
+              <i class="bi bi-play-circle-fill"></i>
+              <span>Click to Start Game</span>
+            </div>
+          </div>
+        </div>
+        <div class="game-controls-row">
+          <button
+            id="like-btn"
+            class="btn btn-outline-secondary fullscreen-btn like-btn-vertical"
+            title="Like"
+          >
+            <i class="bi bi-heart" id="like-icon"></i>
+            <span id="like-count">?</span>
+          </button>
+          <div id="gameText" class="game-output-text"></div>
+          {#
+          <button
+            id="fullscreen-btn"
+            class="btn btn-outline-secondary fullscreen-btn"
+            title="Fullscreen"
+          >
+            <i class="bi bi-fullscreen"></i>
+          </button>
+          #}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %} {% block scripts %}
+<script src="{{ url_for('static', filename='js/codeParser.js') }}"></script>
+<script src="{{ url_for('static', filename='js/game.js') }}"></script>
+<script>
+  const GAMEID = "{{ GAMEID }}";
+</script>
+{% endblock %}

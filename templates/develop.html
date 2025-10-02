@@ -1,0 +1,105 @@
+{% extends 'base.html' %} {% block styles %}
+<link
+  rel="stylesheet"
+  href="{{ url_for('static', filename='css/develop.css') }}"
+/>
+{% endblock %} {% block content %}
+<div class="container-fluid">
+  <div class="row h-100">
+    <!-- Sidebar -->
+    <div class="col-md-2 h-100 d-flex flex-column sidebar">
+      <div class="list-group list-group-flush flex-grow-1 mt-3">
+        <a
+          href="#"
+          class="list-group-item list-group-item-action active"
+          onclick="openDevelopHome()"
+          id="navbarDevelopHome"
+          >Home</a
+        >
+
+        <!-- Documentation -->
+        <button
+          class="list-group-item list-group-item-action"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#documentationCollapse"
+          aria-expanded="false"
+          aria-controls="documentationCollapse"
+        >
+          Documentation <i class="bi bi-chevron-right chevron-icon ms-auto"></i>
+        </button>
+        <div class="collapse" id="documentationCollapse">
+          <div
+            class="list-group list-group-flush ms-3"
+            id="documentationCollapseContents"
+          ></div>
+        </div>
+
+        <!-- Top-level collapsible: Games -->
+        <button
+          class="list-group-item list-group-item-action"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#gamesCollapse"
+          aria-expanded="false"
+          aria-controls="gamesCollapse"
+        >
+          Games <i class="bi bi-chevron-right chevron-icon ms-auto"></i>
+        </button>
+        <div class="collapse" id="gamesCollapse">
+          <div class="list-group list-group-flush ms-3">
+            <a
+              href="#"
+              class="list-group-item list-group-item-action"
+              onclick="openCreateModal()"
+              >Create a Game</a
+            >
+            <div id="gamesContainer">
+              <a href="#" class="list-group-item list-group-item-action"
+                >Loading your games...</a
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="col-md-10 h-100 pt-3">
+      <div class="develop-container h-100 d-flex flex-column gap-2 p-2">
+        <div class="develop-heading shadow">
+          <h3 id="developHeading">Arcade Develop Portal</h3>
+          <div class="develop-heading-buttons">
+            <a
+              class="btn square-btn p-0 d-none d-lg-block"
+              id="copy-button"
+              data-copy-text=""
+            >
+              <img
+                src="/static/images/ShareBtn.png"
+                alt="Profile"
+                style="width: 40px; height: 40px; object-fit: cover"
+                class="d-none"
+                id="copy-button-img"
+              />
+            </a>
+          </div>
+        </div>
+        <div class="flex-grow-1">
+          <div
+            class="d-flex h-100 develop-container-text p-3 overflow-auto"
+            id="developContainer"
+          >
+            Welcome to the Arcade develop portal!<br /><br />Use the sidebar to
+            navigate the documentation, your games, and more!
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block scripts %}
+<script src="static/js/docs.js"></script>
+<script src="static/js/develop.js"></script>
+<!-- Scroll Handler -->
+{% endblock %}

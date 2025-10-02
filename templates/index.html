@@ -1,24 +1,90 @@
 {% extends 'base.html' %} {% block styles %}
 <link
   rel="stylesheet"
-  href="{{ url_for('static', filename='css/home.css') }}"
+  href="{{ url_for('static', filename='css/index.css') }}"
 />
-{% endblock %} {% block scripts %}
-<script src="{{ url_for('static', filename='js/home.js') }}"></script>
 {% endblock %} {% block content %}
-
-<div id="home-sections">
-  <div class="section" id="most-liked-section">
+<div class="index-container">
+  <!-- Most Liked Games Section -->
+  <section>
     <h2>Most Liked Games</h2>
-    <div class="carousel" id="most-liked-carousel"></div>
-  </div>
-  <div class="section" id="most-played-section">
+    <div class="scroll-container">
+      <button class="scroll-arrow left-arrow">
+        <i class="bi bi-chevron-left"></i>
+      </button>
+      <div class="scroll-wrapper">
+        <div id="mostLikedContainer" class="game-container"></div>
+      </div>
+      <button class="scroll-arrow right-arrow">
+        <i class="bi bi-chevron-right"></i>
+      </button>
+    </div>
+  </section>
+
+  <!-- Recent Games Section -->
+  <section>
+    <h2>Recent Games</h2>
+    <div class="scroll-container">
+      <button class="scroll-arrow left-arrow">
+        <i class="bi bi-chevron-left"></i>
+      </button>
+      <div class="scroll-wrapper">
+        <div id="mostRecentContainer" class="game-container"></div>
+      </div>
+      <button class="scroll-arrow right-arrow">
+        <i class="bi bi-chevron-right"></i>
+      </button>
+    </div>
+  </section>
+
+  <!-- Most Played Games Section -->
+  <section>
     <h2>Most Played Games</h2>
-    <div class="carousel" id="most-played-carousel"></div>
-  </div>
-  <div class="section" id="most-recent-section">
-    <h2>Most Recently Updated Games</h2>
-    <div class="carousel" id="most-recent-carousel"></div>
-  </div>
+    <div class="scroll-container">
+      <button class="scroll-arrow left-arrow">
+        <i class="bi bi-chevron-left"></i>
+      </button>
+      <div class="scroll-wrapper">
+        <div id="mostPlayedContainer" class="game-container"></div>
+      </div>
+      <button class="scroll-arrow right-arrow">
+        <i class="bi bi-chevron-right"></i>
+      </button>
+    </div>
+  </section>
 </div>
+
+{% endblock %} {% block scripts %}
+<script src="static/js/index.js"></script>
+
+<!-- Scroll Handler -->
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const containers = document.querySelectorAll(".scroll-container");
+    containers.forEach((container) => {
+      const wrapper = container.querySelector(".scroll-wrapper");
+      const leftArrow = container.querySelector(".left-arrow");
+      const rightArrow = container.querySelector(".right-arrow");
+
+      function updateArrows() {
+        const atStart = wrapper.scrollLeft === 0;
+        const atEnd =
+          wrapper.scrollLeft + wrapper.clientWidth >= wrapper.scrollWidth;
+        leftArrow.style.display = atStart ? "none" : "flex";
+        rightArrow.style.display = atEnd ? "none" : "flex";
+      }
+
+      updateArrows();
+      wrapper.addEventListener("scroll", updateArrows);
+
+      leftArrow.addEventListener("click", function () {
+        wrapper.scrollBy({ left: -200, behavior: "smooth" });
+      });
+
+      rightArrow.addEventListener("click", function () {
+        wrapper.scrollBy({ left: 200, behavior: "smooth" });
+      });
+    });
+  });
+</script>
 {% endblock %}

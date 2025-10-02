@@ -1,0 +1,124 @@
+.scroll-container {
+  display: flex;
+  padding: 0 20px 20px 20px;
+  position: relative;
+}
+
+.scroll-wrapper {
+  overflow-x: auto;
+  overflow-y: hidden;
+  flex: 1;
+  scroll-behavior: smooth;
+
+  &::-webkit-scrollbar {
+    height: 8px;
+  }
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 4px;
+  }
+  &::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5);
+  }
+
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+}
+
+@media (max-width: 768px) {
+  .scroll-wrapper {
+    -webkit-scrollbar {
+      display: none;
+    }
+    scrollbar-width: none;
+  }
+}
+
+.game-container {
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+  width: max-content;
+  padding: 10px 10px 20px 0;
+}
+
+.scroll-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(40, 44, 52, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  color: white;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  z-index: 10;
+}
+
+.scroll-arrow:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateY(-50%) scale(1.1);
+}
+
+.left-arrow {
+  left: 10px;
+}
+
+.right-arrow {
+  right: 10px;
+}
+
+.card-game {
+  background: rgba(40, 44, 52, 0.95) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 16px !important;
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+  scroll-snap-align: start;
+  text-decoration: none !important;
+}
+
+.card-game:hover {
+  text-decoration: none !important;
+  transform: translateY(-8px) scale(1.02);
+}
+
+.card-title {
+  text-decoration: none !important;
+}
+
+.game-card {
+  text-decoration: none !important;
+  color: inherit !important;
+}
+
+.game-card:hover {
+  text-decoration: none !important;
+  color: inherit !important;
+}
+
+.card-game .card-img-top {
+  margin: 16px 16px 4px 16px;
+  width: calc(100% - 32px);
+  height: 80px;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.card-game:hover .card-img-top {
+  transform: scale(1.05);
+}
+
+.card-game .card-body {
+  background: transparent !important;
+  padding-top: 8px !important;
+}

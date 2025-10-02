@@ -1,194 +1,140 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Arcade</title>
-
-    {# Imports #}
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{% block title %}Arcade{% endblock %}</title>
+    <!-- Bootstrap CSS -->
     <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
       rel="stylesheet"
-      href="{{ url_for('static', filename='css/base.css')}}"
+      integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB"
+      crossorigin="anonymous"
     />
     <link
       rel="stylesheet"
-      href="{{ url_for('static', filename='css/modal.css')}}"
-    />
-    <link
-      rel="stylesheet"
-      href="{{ url_for('static', filename='css/toasts.css')}}"
-    />
-    <link
-      rel="stylesheet"
-      href="{{ url_for('static', filename='css/profile.css')}}"
-    />
-    <link
-      rel="stylesheet"
-      href="{{ url_for('static', filename='css/settings.css')}}"
-    />
-    <link
-      rel="stylesheet"
-      href="{{ url_for('static', filename='css/loading.css')}}"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"
     />
 
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Rowdies:wght@300;400;700&family=TASA+Explorer:wght@400..800&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Rowdies:wght@300;400;700&display=swap"
       rel="stylesheet"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"
     />
 
+    <!-- CSS -->
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/base.css') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/modals.css') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/cards.css') }}"
+    />
     {% block styles %}{% endblock %}
   </head>
   <body>
-    <div id="loading-screen">
-      <div class="loading-content">
-        <div class="spinner"></div>
-        <p>Loading</p>
-      </div>
-    </div>
-
     <!-- Navbar -->
-    <div class="navbar">
-      <div class="navbar-brand">
-        <a href="/">
+    <nav class="navbar navbar-expand-lg">
+      <div class="container-fluid">
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarToggler"
+          aria-controls="navbarToggler"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <a class="navbar-brand" href="/">
           <img
-            src="{{ url_for('static', filename='images/ArcadeLogo.png') }}"
-            alt="Arcade Logo"
+            src="/static/images/ArcadeLogo.png"
+            alt="Bootstrap"
+            height="24"
           />
         </a>
-      </div>
-      <!-- Hamburger button for mobile -->
-      <button class="hamburger" aria-label="Toggle menu">
-        <i class="bi bi-list"></i>
-      </button>
-      <div class="navbar-search">
-        <div class="search-container">
-          <input type="search" placeholder="Search" aria-label="Search" />
-          <button type="submit" class="search-btn">
-            <img
-              src="{{ url_for('static', filename='images/Search.png') }}"
-              alt="Search"
-            />
-          </button>
-        </div>
-      </div>
-      <div class="navbar-buttons">
-        <a id="profile-btn">
-          <img
-            src="{{ url_for('static', filename='images/ProfileBtn.png') }}"
-            alt="Profile"
-          />
-        </a>
-        {% if LOGGEDIN %}
-        <a id="create-btn" href="/create">
-          <img
-            src="{{ url_for('static', filename='images/AddBtn.png') }}"
-            alt="Create"
-          />
-        </a>
-        <a id="settings-btn">
-          <img
-            src="{{ url_for('static', filename='images/SettingsBtn.png') }}"
-            alt="Settings"
-          />
-        </a>
-        {% endif %}
-      </div>
-      <div class="mobile-menu">
-        <div class="mobile-search">
-          <div class="search-container">
-            <input type="search" placeholder="Search" aria-label="Search" />
-            <button type="submit" class="search-btn">
+        <div class="collapse navbar-collapse" id="navbarToggler">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="/">Home</a>
+            </li>
+            <li class="nav-item dropdown">
+              <a
+                class="nav-link dropdown-toggle"
+                href="#"
+                role="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                Develop
+              </a>
+              <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="/create">Create</a></li>
+                <li><a class="dropdown-item" href="/docs">Docs</a></li>
+              </ul>
+            </li>
+            <li class="nav-item d-lg-none">
+              <a class="nav-link" href="/profile">Profile</a>
+            </li>
+          </ul>
+          <div class="d-flex align-items-center">
+            <form class="d-flex me-3" role="search">
+              <div class="input-group">
+                <input
+                  type="search"
+                  class="form-control"
+                  placeholder="Search games..."
+                  aria-label="Search"
+                />
+                <button class="btn" type="submit">
+                  <i class="bi bi-search"></i>
+                </button>
+              </div>
+            </form>
+            <a href="/profile" class="btn p-0 d-none d-lg-block">
               <img
-                src="{{ url_for('static', filename='images/Search.png') }}"
-                alt="Search"
-              />
-            </button>
-          </div>
-        </div>
-        <div class="mobile-buttons">
-          <div class="mobile-button">
-            <a id="profile-btn-mobile">
-              <img
-                src="{{ url_for('static', filename='images/ProfileBtn.png') }}"
+                src="/static/images/ProfileBtn.png"
                 alt="Profile"
+                style="width: 40px; height: 40px; object-fit: cover"
               />
             </a>
-            <span>Profile</span>
           </div>
-          {% if LOGGEDIN %}
-          <div class="mobile-button">
-            <a id="create-btn-mobile" href="/create">
-              <img
-                src="{{ url_for('static', filename='images/AddBtn.png') }}"
-                alt="Create"
-              />
-            </a>
-            <span>Notification</span>
-          </div>
-          <div class="mobile-button">
-            <a id="settings-btn-mobile">
-              <img
-                src="{{ url_for('static', filename='images/SettingsBtn.png') }}"
-                alt="Settings"
-              />
-            </a>
-            <span>Settings</span>
-          </div>
-          {% endif %}
         </div>
       </div>
-    </div>
+    </nav>
+
+    <!-- Toasts -->
+    <div
+      id="toast-container"
+      class="position-fixed bottom-0 end-0 p-3"
+      style="z-index: 10800"
+      aria-live="polite"
+      aria-atomic="true"
+    ></div>
+
     {% block content %}{% endblock %}
 
-    <!-- Modal -->
-    <div id="game-modal" class="modal">
-      <div class="modal-content">
-        <span class="close">&times;</span>
-        <h2 id="game-modal-title">Placeholder title.</h2>
-        <div id="game-modal-contents"></div>
-      </div>
-    </div>
-
-    <!-- Modal -->
-    <div id="modal" class="modal showontop">
-      <div class="modal-content">
-        <span class="close">&times;</span>
-        <h2 id="modal-title">Placeholder title.</h2>
-        <div id="modal-contents"></div>
-        <div id="modal-buttons" class="modal-buttons"></div>
-      </div>
-    </div>
-
-    <div id="toast-container"></div>
-
     <!-- Scripts -->
-
-    <!-- Constant Variables -->
     <script>
-      LOGGEDIN = "{{ LOGGEDIN }}";
-      WEBSITE_URL = "{{ WEBSITE }}";
+      const WEBSITE_URL = "{{ WEBSITE }}";
+      const LOGGEDIN = "{{ LOGGEDIN }}";
     </script>
-
-    <!-- Script Imports -->
-    <script src="{{ url_for('static', filename='js/modal.js')}}"></script>
-    <script src="{{ url_for('static', filename='js/navbar.js')}}"></script>
-    <script src="{{ url_for('static', filename='js/toasts.js')}}"></script>
-    <script src="{{ url_for('static', filename='js/profile.js')}}"></script>
-    <script src="{{ url_for('static', filename='js/settings.js')}}"></script>
-    <script src="{{ url_for('static', filename='js/loading.js')}}"></script>
-    <script src="{{ url_for('static', filename='js/games.js')}}"></script>
-    <script src="{{ url_for('static', filename='js/codeParser.js')}}"></script>
-    <script src="{{ url_for('static', filename='js/parameters.js')}}"></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+      crossorigin="anonymous"
+    ></script>
+    <script src="{{ url_for('static', filename='js/modals.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/toasts.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/parameters.js') }}"></script>
 
     {% block scripts %}{% endblock %}
   </body>

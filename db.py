@@ -80,6 +80,7 @@ def initDb():
                         user_id INTEGER NOT NULL,
                         title TEXT NOT NULL,
                         description TEXT,
+                        visibility INTEGER DEFAULT -1,
                         plays INTEGER DEFAULT 0,
                         created_at INTEGER DEFAULT (CAST(strftime('%s', 'now') AS INTEGER)),
                         updated_at INTEGER DEFAULT (CAST(strftime('%s', 'now') AS INTEGER)),
@@ -549,7 +550,7 @@ def createGame(user_id, title, description=""):
 def getAllGames():
     conn = getDbConnection()
     games = conn.execute(
-        "SELECT id, title, user_id, description, plays, created_at, updated_at FROM games ORDER BY updated_at DESC"
+        "SELECT id, title, user_id, description, plays, visibility, created_at, updated_at FROM games ORDER BY updated_at DESC"
     ).fetchall()
     conn.close()
 
@@ -560,6 +561,7 @@ def getAllGames():
             "author": game["user_id"],
             "description": game["description"],
             "plays": game["plays"],
+            "visibility": game["visibility"],
             "created_at": game["created_at"],
             "updated_at": game["updated_at"],
         }
@@ -606,6 +608,7 @@ def getGame(game_id):
         "code": code_content,
         "sprites": sprites,
         "plays": game["plays"],
+        "visibility": game["visibility"],
     }, 200
 
 
@@ -637,9 +640,42 @@ def incrementPlay(game_id):
         return {"error": "Failed to increment play count."}, 500
 
 
-def saveGame(game_id, user_id, code="", sprites_data=None):
+def saveGame(
+    game_id,
+    user_id,
+    code=None,
+    sprites_data=None,
+    title=None,
+    description=None,
+    visibility=None,
+):
     if not game_id or not user_id:
         return {"error": "Game ID and User ID are requred"}, 400
+
+    if title is not None:
+        if not isinstance(title, str):
+            return {"error": "Title must be a string."}, 400
+        if len(title) == 0:
+            return {"error": "Title cannot be empty."}, 400
+        if len(title) > 100:
+            return {"error": "Title must be 100 characters or less"}, 400
+
+    if description is not None:
+        if not isinstance(description, str):
+            return {"error": "Description must be a string."}, 400
+        if len(description) > 500:
+            return {"error": "Description must be 500 characters or less"}, 400
+
+    if visibility is not None:
+        try:
+            visibility = int(visibility)
+        except Exception:
+            return {"error": "Invalid visibility value"}, 400
+        if visibility not in (-1, 0, 1):
+            return {"error": "Invalid visibility value"}, 400
+
+    if all(v is None for v in (code, sprites_data, title, description, visibility)):
+        return {"error": "No fields provided to update."}, 400
 
     conn = getDbConnection()
     game = conn.execute(
@@ -651,33 +687,45 @@ def saveGame(game_id, user_id, code="", sprites_data=None):
         return {"error": "Game not found"}, 404
 
     try:
-        conn.execute(
-            "UPDATE games SET updated_at = CAST(strftime('%s', 'now') AS INTEGER) where id = ?",
-            (game_id,),
-        )
-        conn.commit()
+        fields = ["updated_at = CAST(strftime('%s', 'now') AS INTEGER)"]
+        params = []
+
+        if title is not None:
+            fields.append("title = ?")
+            params.append(title)
+        if description is not None:
+            fields.append("description = ?")
+            params.append(description)
+        if visibility is not None:
+            fields.append("visibility = ?")
+            params.append(visibility)
+
+        if fields:
+            update_query = "UPDATE games SET " + ", ".join(fields) + " WHERE id = ?"
+            params.append(game_id)
+            conn.execute(update_query, tuple(params))
+            conn.commit()
 
         game_dir = os.path.join(GAMES_DIR, str(game_id))
         os.makedirs(game_dir, exist_ok=True)
 
-        with open(os.path.join(game_dir, "code.ar"), "w", encoding="utf-8") as f:
-            f.write(code)
+        if code is not None:
+            with open(os.path.join(game_dir, "code.ar"), "w", encoding="utf-8") as f:
+                f.write(code)
 
-        if sprites_data:
+        if sprites_data is not None:
             with open(
                 os.path.join(game_dir, "sprites.json"), "w", encoding="utf-8"
             ) as f:
                 json.dump(sprites_data, f)
-        else:
-            if not os.path.exists(os.path.join(game_dir, "sprites.json")):
-                with open(
-                    os.path.join(game_dir, "sprites.json"), "w", encoding="utf-8"
-                ) as f:
-                    json.dump([], f)
 
         return {"message": "Game saved successfully"}, 200
 
     except Exception as e:
+        try:
+            conn.close()
+        except Exception:
+            pass
         return {"error": "failed to save game"}, 400
     finally:
         try:
@@ -808,37 +856,40 @@ def toggleLike(game_id, user_id):
             pass
         return {"error": "Failed to toggle like."}, 500
 
+
 def getGamesSorted(sort_type, limit=30):
-    conn=getDbConnection()
-    
-    if sort_type == 'liked':
-        games = conn.execute("""
+    conn = getDbConnection()
+
+    if sort_type == "liked":
+        games = conn.execute(
+            """
             SELECT g.id, g.title, g.user_id as author, g.description, g.plays, g.created_at, g.updated_at, COUNT(l.id) as likes
             FROM games g LEFT JOIN likes l ON g.id = l.game_id
             GROUP BY g.id
             ORDER BY likes DESC
             LIMIT ?
-        """, (limit,)).fetchall()
-        
-    elif sort_type == 'played':
+        """,
+            (limit,),
+        ).fetchall()
+
+    elif sort_type == "played":
         games = conn.execute(
             "SELECT id, title, user_id as author, description, plays, created_at, updated_at FROM games ORDER BY plays DESC LIMIT ?",
-            (limit,)
+            (limit,),
         ).fetchall()
-        
-    elif sort_type == 'recent':
+
+    elif sort_type == "recent":
         games = conn.execute(
             "SELECT id, title, user_id as author, description, plays, created_at, updated_at FROM games ORDER BY created_at DESC LIMIT ?",
-            (limit,)
+            (limit,),
         ).fetchall()
-        
+
     else:
         games = conn.execute(
             "SELECT id, title, user_id as author, description, plays, created_at, updated_at FROM games ORDER BY updated_at DESC LIMIT ?",
-            (limit,)
+            (limit,),
         ).fetchall()
-        
-        
+
     conn.close()
     return [
         {

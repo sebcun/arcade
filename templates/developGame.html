@@ -1,0 +1,104 @@
+{% extends 'base.html' %} {% block styles %}
+<link
+  rel="stylesheet"
+  href="{{ url_for('static', filename='css/developGame.css') }}"
+/>
+<link
+  rel="stylesheet"
+  href="{{ url_for('static', filename='css/develop.css') }}"
+/>
+<link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/codemirror.min.css"
+/>
+<link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/theme/monokai.min.css"
+/>
+<link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/addon/hint/show-hint.min.css"
+/>
+
+{% endblock %} {% block content %}
+<div class="container-fluid">
+  <div class="row h-100">
+    <!-- Sidebar -->
+    <div class="col-md-2 h-100 d-flex flex-column sidebar">
+      <div class="list-group list-group-flush flex-grow-1 mt-3">
+        <a
+          href="/develop"
+          class="list-group-item list-group-item-action"
+          id="navbarDevelopHome"
+          ><i class="bi bi-arrow-left"></i> Back</a
+        >
+        <a
+          href="#"
+          class="list-group-item list-group-item-action active"
+          onclick="loadOverview()"
+          id="overviewSidebarLink"
+          >Overview</a
+        >
+        <a
+          href="#"
+          class="list-group-item list-group-item-action"
+          onclick="loadSpriteEditor()"
+          id="spriteEditorSidebarLink"
+          >Sprite Editor</a
+        >
+        <a
+          href="#"
+          class="list-group-item list-group-item-action"
+          onclick="loadCodeEditor()"
+          id="codeEditorSidebarLink"
+          >Code Editor</a
+        >
+        <a
+          href="#"
+          class="list-group-item list-group-item-action"
+          onclick="loadGamePreview()"
+          id="gamePreviewSidebarLink"
+          >Preview</a
+        >
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="col-md-10 h-100 pt-3">
+      <div class="develop-container h-100 d-flex flex-column gap-2 p-2">
+        <div class="develop-heading shadow">
+          <h3 id="developHeading"></h3>
+          <div class="develop-heading-buttons">
+            <a class="btn square-btn p-0 d-none d-lg-block" id="save-button">
+              <img
+                src="/static/images/SaveBtn.png"
+                alt="Profile"
+                style="width: 40px; height: 40px; object-fit: cover"
+                id="save-button-img"
+              />
+            </a>
+          </div>
+        </div>
+        <div class="flex-grow-1">
+          <div
+            class="d-flex h-100 develop-container-text p-3 overflow-auto"
+            id="developContainer"
+          ></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block scripts %}
+<script src="{{ url_for('static', filename='js/developGame.js') }}"></script>
+<script src="{{ url_for('static', filename='js/codeParser.js') }}"></script>
+<script src="{{ url_for('static', filename='js/spriteEditor.js') }}"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/mode/javascript/javascript.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/addon/mode/simple.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/addon/hint/show-hint.min.js"></script>
+<!-- Scroll Handler -->
+<script>
+  const GAMEID = "{{ GAMEID }}";
+</script>
+{% endblock %}

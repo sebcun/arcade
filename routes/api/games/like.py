@@ -1,7 +1,7 @@
 from flask import Blueprint, session, jsonify
 from db import toggleLike
 
-like_bp = Blueprint("like", __name__)
+like_bp = Blueprint("api_games_like", __name__)
 
 
 @like_bp.route("/games/<int:game_id>/like", methods=["POST"])

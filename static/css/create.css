@@ -1,178 +1,64 @@
-.create-container {
-  display: flex;
-  flex-direction: column;
-  padding: 15px;
-  gap: 20px;
-  background-color: #111d35;
-  overflow-x: auto;
-  overflow-y: auto;
-  min-height: 100vh;
-}
-
-.project-info-bar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background-color: #171843;
-  padding: 10px 15px;
-  border-radius: 8px;
-  border: 1px solid #2b2c6d;
-}
-
-.project-info h2 {
-  margin: 0;
-}
-
-.project-info p {
-  margin: 5px 0 0 0;
-  font-size: 14px;
-}
-
-.project-actions {
-  display: flex;
-  gap: 10px;
-}
-
-.editor-container {
-  display: flex;
-  flex-direction: row;
+#spriteEditor {
   width: 100%;
-  gap: 20px;
-}
-
-.pixel-editor-section {
-  flex: 0 0 30%;
-  background-color: #171843;
-  padding: 10px;
-  border-radius: 8px;
-  border: 1px solid #2b2c6d;
-}
-
-.code-section {
-  flex: 1;
-  background-color: #171843;
-  padding: 10px;
-  border-radius: 8px;
-  border: 1px solid #2b2c6d;
-}
-
-.preview-section {
-  flex: 0 0 50%;
-  background-color: #171843;
-  padding: 10px;
-  border-radius: 8px;
-  border: 1px solid #2b2c6d;
-}
-
-#pixelCanvas {
-  border: 2px solid #2b2c6d;
-  cursor: crosshair;
-  background-color: #111d35;
-  display: block;
-  margin: 0 auto;
-}
-
-.tools {
-  margin-top: 10px;
+  height: 100%;
+  overflow: hidden;
   display: flex;
   gap: 10px;
-  flex-wrap: wrap;
 }
 
-.tools button,
-#resetButton {
-  background-color: #2b2c6d;
-  color: white;
-  border: none;
-  padding: 8px 16px;
-  border-radius: 4px;
-  cursor: pointer;
-  font-family: "Rowdies", sans-serif;
-  font-weight: 300;
-  transition: background-color 0.3s ease;
+.sprite-select {
+  height: 100%;
+  min-height: 200px;
+  background-color: var(--bg-secondary);
+  border-radius: 5px;
 }
 
-.tools button:hover,
-#resetButton:hover {
-  background-color: #171843;
+.pixel-editor {
+  background-color: var(--bg-secondary);
+  border-radius: 5px;
+  height: 100%;
+  min-height: 200px;
 }
 
-#spritesList {
-  margin-top: 10px;
-}
-
-#spritesList div {
-  margin: 5px 0;
-  padding: 5px;
-  background-color: #2b2c6d;
-  color: white;
-  border: 1px solid #171843;
-  border-radius: 4px;
-}
-
-#codeBox {
-  width: 94%;
-  height: 400px;
-  font-family: monospace;
-  color: white;
-  background-color: #111d35;
-  border: 2px solid #2b2c6d;
-  border-radius: 4px;
-  padding: 10px;
-  resize: vertical;
-}
-
-#previewCanvas {
-  border: 2px solid #2b2c6d;
-  display: block;
-  background-color: #111d35;
+.sprite-img {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
   margin: 0 auto;
 }
 
-@media (max-width: 480px) {
-  .create-container {
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  .editor-container {
-    flex-direction: column;
-  }
-
-  .pixel-editor-section,
-  .code-section,
-  .preview-section {
-    width: 100%;
-    flex: none;
-  }
-
-  .tools {
-    justify-content: center;
-  }
+.sprite-title {
+  color: white;
+  font-size: 0.9em;
 }
 
-@media (max-width: 768px) {
-  .create-container {
-    padding: 10px;
-  }
-
-  #pixelCanvas,
-  #previewCanvas {
-    width: 100%;
-    height: auto;
-  }
-
-  #codeBox {
-    height: 300px;
-  }
+.sprite-icon {
+  color: white;
+  cursor: pointer;
+  font-size: 0.8em;
+  transition: font-size 0.3s ease;
+}
+.sprite-icon:hover {
+  font-size: 1em;
 }
 
-.project-list {
-  display: flex;
-  flex-wrap: wrap;
+#colorPicker {
+  appearance: none;
+  -moz-appearance: none;
+  -webkit-appearance: none;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  height: 100%;
+  padding: 0;
+  width: 3em;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+  border-radius: 8px;
+  transition: transform 120ms ease, box-shadow 120ms ease, filter 120ms ease;
 }
 
-.project-list .long-button {
-  flex: 1 1 calc(50% - 10px);
-  min-width: 0;
+#colorPicker:hover {
+  filter: brightness(1.03);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.32);
 }

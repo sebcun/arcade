@@ -1,3 +1,37 @@
-ON KEY 'f'
-  GIVE XP MEDIUM
-END KEY
+STORE 0 AS score
+STORE 0 AS lastScore
+TEXT 'You are the RED person. Use W/A/S/D to move around to touch the BLUE person to score!'
+SPAWN sprite1 AT 0,50
+SPAWN sprite2 AT 400,50
+
+ONKEY 'w'
+  MOVE sprite1 TO sprite1.x,sprite1.y-5
+ENDKEY
+
+ONKEY 's'
+  MOVE sprite1 TO sprite1.x,sprite1.y+5
+ENDKEY
+
+ONKEY 'a'
+  MOVE sprite1 TO sprite1.x-5,sprite1.y
+ENDKEY
+
+ONKEY 'd'
+  MOVE sprite1 TO sprite1.x+5,sprite1.y
+ENDKEY
+
+ONTOUCH sprite1 WITH sprite2
+  GIVEXP small
+  STORE score+1 AS score
+  STORE lastScore+1 AS lastScore
+  TEXT "SCORE: ${score}"
+  STORE 0#570 AS randomX
+  STORE 0#350 AS randomY
+  MOVE sprite2 TO randomX,randomY
+
+  IF lastScore IS 5
+    STORE 0 AS lastScore
+    GIVEXP medium
+  ENDIF
+
+ENDTOUCH
