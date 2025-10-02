@@ -113,23 +113,6 @@ function drawCheckboard() {
 function setupCanvasDrawing() {
   let drawing = false;
 
-  function getXYFromEvent(e) {
-    const rect = pixelCanvas.getBoundingClientRect();
-    const clientX =
-      e.clientX !== undefined
-        ? e.clientX
-        : e.touches && e.touches[0] && e.touches[0].clientX;
-    const clientY =
-      e.clientY !== undefined
-        ? e.clientY
-        : e.touches && e.touches[0] && e.touches[0].clientY;
-    if (clientX === undefined || clientY === undefined) return null;
-    const x = Math.floor((clientX - rect.left) / CELL_SIZE);
-    const y = Math.floor((clientY - rect.top) / CELL_SIZE);
-    if (x < 0 || y < 0 || x >= SPRITE_DIM || y >= SPRITE_DIM) return null;
-    return { x, y };
-  }
-
   pixelCanvas.addEventListener("mousedown", (e) => {
     drawing = true;
     handleDrawAt(e);

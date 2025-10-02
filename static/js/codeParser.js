@@ -922,16 +922,34 @@ async function executeCode(
       if (cmd === "IF") {
         const rest = line.slice(2).trim();
         const upperRest = rest.toUpperCase();
-        const isIdx = upperRest.indexOf(" IS ");
-        if (isIdx === -1) {
+
+        const operators = ["<=", ">=", "=", "<", ">"];
+        let operatorFound = null;
+        let operatorIndex = -1;
+
+        for (const op of operators) {
+          const idx = upperRest.indexOf(` ${op} `);
+          if (idx !== -1) {
+            operatorFound = op;
+            operatorIndex = idx;
+            break;
+          }
+        }
+
+        if (!operatorFound) {
           console.log(
-            `${i + 1} IF: invalid syntax. Expected 'IF <left> IS <right>'`
+            `${
+              i + 1
+            } IF: invalid syntax. Expected 'IF <left> <operator> <right>' where operator is one of: <, >, <=, >=, =`
           );
           i++;
           continue;
         }
-        const leftExpr = rest.slice(0, isIdx).trim();
-        const rightExpr = rest.slice(isIdx + 4).trim();
+
+        const leftExpr = rest.slice(0, operatorIndex).trim();
+        const rightExpr = rest
+          .slice(operatorIndex + operatorFound.length + 2)
+          .trim();
 
         let depth = 1;
         const blockLines = [];
@@ -976,7 +994,39 @@ async function executeCode(
           continue;
         }
 
-        const condition = leftVal === rightVal;
+        let condition = false;
+        if (operatorFound === "=") {
+          condition = leftVal == rightVal;
+        } else {
+          const leftNum = Number(leftVal);
+          const rightNum = Number(rightVal);
+
+          if (isNaN(leftNum) || isNaN(rightNum)) {
+            console.log(
+              `${
+                i + 1
+              } IF: comparison operators <, >, <=, >= require numeric values. Got left: ${leftVal}, right: ${rightVal}`
+            );
+            i = j;
+            continue;
+          }
+
+          switch (operatorFound) {
+            case "<":
+              condition = leftNum < rightNum;
+              break;
+            case ">":
+              condition = leftNum > rightNum;
+              break;
+            case "<=":
+              condition = leftNum <= rightNum;
+              break;
+            case ">=":
+              condition = leftNum >= rightNum;
+              break;
+          }
+        }
+
         if (condition) {
           try {
             await executeCode(

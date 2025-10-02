@@ -1,0 +1,38 @@
+SPAWN sprite1 AT 100,100
+SPAWN sprite2 AT 300,300
+
+ONKEY 'w'
+  MOVE sprite1 TO sprite1.x,sprite1.y-10
+ENDKEY
+
+ONKEY 'a'
+  MOVE sprite1 TO sprite1.x-10,sprite1.y
+ENDKEY
+
+ONKEY 's'
+  MOVE sprite1 TO sprite1.x,sprite1.y+10
+ENDKEY
+
+ONKEY 'd'
+  MOVE sprite1 TO sprite1.x+10,sprite1.y
+ENDKEY
+
+LOOP
+  IF sprite2.x < sprite1.x
+    MOVE sprite2 TO sprite2.x+5,sprite2.y
+  ENDIF
+  
+  IF sprite2.x > sprite1.x
+    MOVE sprite2 TO sprite2.x-5,sprite2.y
+  ENDIF
+  
+  IF sprite2.y < sprite1.y
+    MOVE sprite2 TO sprite2.x,sprite2.y+5
+  ENDIF
+  
+  IF sprite2.y > sprite1.y
+    MOVE sprite2 TO sprite2.x,sprite2.y-5
+  ENDIF
+  
+  WAIT 1
+ENDLOOP
