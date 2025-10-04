@@ -1,5 +1,5 @@
 from config import *
-from flask import Flask
+from flask import Flask, redirect, url_for
 from db import initDb
 import os
 
@@ -78,6 +78,13 @@ app.register_blueprint(create_game_bp, url_prefix="/api")
 app.register_blueprint(static_bp)
 app.register_blueprint(images_bp, url_prefix="/api")
 app.register_blueprint(give_xp_bp, url_prefix="/api")
+
+
+# 404
+@app.errorhandler(404)
+def page_not_found(error):
+    return redirect(url_for("index.index") + "?404")
+
 
 if __name__ == "__main__":
 

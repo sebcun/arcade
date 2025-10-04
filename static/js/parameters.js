@@ -51,4 +51,22 @@ if (params.has("login")) {
       clearParameters();
     }
   }
+} else if (params.has("404")) {
+  clearParameters();
+  showModal(
+    "Page not found!",
+    "The page, user, or game was not found. Good luck finding what you were looking for!",
+    null,
+    [],
+    true
+  );
+} else if (params.has("401")) {
+  clearParameters();
+  showModal(
+    "Not authorized!",
+    "You are not meant to see this page! Turn back before it is too late.",
+    null,
+    [],
+    true
+  );
 }

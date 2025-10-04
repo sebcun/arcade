@@ -2,11 +2,13 @@
 
 Here is a complete list of changes made to this project on a week by week bases for Siege.
 
-## Week 1
+## Week 5
 
-- Created the website
-- Created the backend for avatars, accounts, badges, and settings
-- Added profiles
+- Completely redid the frontend to use Bootstrap as well as have a better theme
+- Renamed from Arcade -> Pixelcade (more unique)
+- Added =, <, > operators to IF command
+- Improved security: saving a game checks if you are the author, anything that uses a profile checks if the profile has been deleted
+- Added 404 and 401's
 
 ## Week 4
 
@@ -17,3 +19,9 @@ Here is a complete list of changes made to this project on a week by week bases 
 - Added one time code login and slack login
 - Changed to Blueprints for routes
 - Added Level system
+
+## Week 1
+
+- Created the website
+- Created the backend for avatars, accounts, badges, and settings
+- Added profiles
