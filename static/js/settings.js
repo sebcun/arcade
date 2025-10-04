@@ -501,43 +501,6 @@ function showLogoutConfirmation() {
   modalFooter.appendChild(cancelButton);
 
   logoutButton.addEventListener("click", async () => {
-    logoutButton.disabled = true;
-    logoutButton.textContent = "Logging out.";
-    let dots = 1;
-    const interval = setInterval(() => {
-      dots = (dots % 3) + 1;
-      logoutButton.textContent = "Logging out" + ".".repeat(dots);
-    }, 300);
-
-    try {
-      const response = await fetch("/api/auth/logout", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-      });
-
-      clearInterval(interval);
-
-      const logoutData = await response.json();
-      if (response.ok) {
-        showToast("Logged out successfully!", {
-          color: "success",
-        });
-        setTimeout(() => location.reload(), 2000);
-      } else {
-        showToast(logoutData.error || "Logout failed", {
-          color: "error",
-        });
-        logoutButton.textContent = "Logout";
-        logoutButton.disabled = false;
-      }
-    } catch (error) {
-      clearInterval(interval);
-      showToast("An error occurred during logout", {
-        color: "error",
-      });
-      console.log("Logout error:", error);
-      logoutButton.textContent = "Logout";
-      logoutButton.disabled = false;
-    }
+    window.location.href = "/api/auth/logout";
   });
 }

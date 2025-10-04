@@ -1,5 +1,5 @@
-from flask import Blueprint, session, request, jsonify
-from db import saveGame
+from flask import Blueprint, session, request, jsonify, redirect, url_for
+from db import saveGame, getGame, getUserProfile
 
 save_game_bp = Blueprint("api_games_save", __name__)
 
@@ -9,6 +9,20 @@ def save_game(game_id):
     if "userid" not in session:
         return jsonify({"error": "Not logged in"}), 401
 
+    # Checks if the user profile still exists, if not log out
+    profile = getUserProfile(session["userid"])
+    if not profile:
+        return redirect(url_for("logout.logout"))
+
+    # Check if the author is the one making the changes
+    result, status = getGame(game_id)
+    if isinstance(result, dict) and status == 200:
+        if session["userid"] != result["author"]:
+            return jsonify({"error": "Unauthorized"}), 401
+    else:
+        return jsonify({"error": "Game not found"}), 401
+
+    # Save game
     data = request.get_json()
 
     title = data.get("gameName") if "gameName" in data else None
