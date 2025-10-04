@@ -91,12 +91,10 @@ def send(recipientEmail, otp, expiry_minutes=5):
         if port == 465:
             context = ssl.create_default_context()
             with smtplib.SMTP_SSL(host, port, context=context, timeout=30) as server:
-                server.set_debuglevel(1)
                 server.login(user, password)
                 server.send_message(msg)
         else:
             with smtplib.SMTP(host, port, timeout=30) as server:
-                server.set_debuglevel(1)
                 server.ehlo()
                 if useTLS:
                     context = ssl.create_default_context()

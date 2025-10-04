@@ -1,6 +1,6 @@
 # Pixelcade
 
-![PixelcadeLogo](https://hc-cdn.hel1.your-objectstorage.com/s/v3/ce15a76fdcd526402543776f617eff5b5e264ef3_arcadelogo.png)
+![PixelcadeLogo](https://hc-cdn.hel1.your-objectstorage.com/s/v3/01f2434af778c819c07fdc0bcd04fac3776cc630_logolight.png)
 
 Pixelcade is a site where you can create an account, play games, level up, customize your avatar, and rank up on the leaderboards. This was created for the [HackClub](https://hackclub.com) YSWS (You Ship We Ship) [Siege](https://siege.hackclub.com).
 

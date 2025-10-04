@@ -83,6 +83,7 @@ def initDb():
                         description TEXT,
                         visibility INTEGER DEFAULT -1,
                         plays INTEGER DEFAULT 0,
+                        max_sprites INTEGER DEFAULT 20,
                         created_at INTEGER DEFAULT (CAST(strftime('%s', 'now') AS INTEGER)),
                         updated_at INTEGER DEFAULT (CAST(strftime('%s', 'now') AS INTEGER)),
                         FOREIGN KEY (user_id) REFERENCES users(id)
@@ -640,6 +641,7 @@ def getGame(game_id):
         "sprites": sprites,
         "plays": game["plays"],
         "visibility": game["visibility"],
+        "max_sprites": game["max_sprites"],
     }, 200
 
 
@@ -679,6 +681,7 @@ def saveGame(
     title=None,
     description=None,
     visibility=None,
+    max_sprites=None,  # Add this parameter
 ):
     if not game_id or not user_id:
         return {"error": "Game ID and User ID are requred"}, 400
@@ -705,7 +708,18 @@ def saveGame(
         if visibility not in (-1, 0, 1):
             return {"error": "Invalid visibility value"}, 400
 
-    if all(v is None for v in (code, sprites_data, title, description, visibility)):
+    if max_sprites is not None:
+        try:
+            max_sprites = int(max_sprites)
+        except Exception:
+            return {"error": "Invalid max_sprites value"}, 400
+        if max_sprites < 1 or max_sprites > 100:
+            return {"error": "max_sprites must be between 1 and 100"}, 400
+
+    if all(
+        v is None
+        for v in (code, sprites_data, title, description, visibility, max_sprites)
+    ):
         return {"error": "No fields provided to update."}, 400
 
     conn = getDbConnection()
@@ -730,6 +744,9 @@ def saveGame(
         if visibility is not None:
             fields.append("visibility = ?")
             params.append(visibility)
+        if max_sprites is not None:
+            fields.append("max_sprites = ?")
+            params.append(max_sprites)
 
         if fields:
             update_query = "UPDATE games SET " + ", ".join(fields) + " WHERE id = ?"

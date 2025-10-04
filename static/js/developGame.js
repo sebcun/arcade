@@ -358,8 +358,7 @@ async function loadSpriteEditor() {
 
         </div>
         `;
-
-      window.spriteEditor.init();
+      window.spriteEditor.init(data.max_sprites);
     })
     .catch((err) => {
       console.error("Error loading game:", err);

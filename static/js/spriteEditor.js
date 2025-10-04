@@ -10,6 +10,7 @@ let drawnPixels = [];
 let pixelColors = [];
 let tool = "pencil";
 let currentColor = "#00ff00";
+let maxSprites = 20;
 
 let pixelCanvas, pixelCtx;
 let spriteListEl;
@@ -17,7 +18,10 @@ let colorPickerEl;
 let pencilBtn, eraserBtn, clearBtn, saveSpriteBtn, newSpriteBtn, saveAllBtn;
 let canvasColumnEl;
 
-function init() {
+function init(gameMaxSprites) {
+  if (gameMaxSprites !== undefined) {
+    maxSprites = gameMaxSprites;
+  }
   pixelCanvas = document.getElementById("pixelCanvas");
   pixelCtx = pixelCanvas && pixelCanvas.getContext("2d");
   spriteListEl = document.getElementById("spriteList");
@@ -153,12 +157,89 @@ function createBlankImageData() {
 }
 
 function createNewSprite() {
+  if (sprites.length >= maxSprites) {
+    showSpriteLimit();
+    return;
+  }
+  console.log(sprites.length, maxSprites);
   changesMade = true;
   const imgData = createBlankImageData();
   sprites.push(imgData);
   const newIndex = sprites.length - 1;
   renderSpritesList();
   editSprite(newIndex);
+}
+
+function showSpriteLimit() {
+  const modal = showModal(
+    "Sprite Limit Reached",
+    "",
+    `<p>You've reached your sprite limit of ${maxSprites} sprites.</p><p>Purchase more sprite slots to continue creating!</p>`,
+    [],
+    true
+  );
+
+  const modalFooter = document.createElement("div");
+  modalFooter.className = "modal-footer custom-modal-footer";
+  modal.querySelector(".modal-content").appendChild(modalFooter);
+
+  const purchaseButton = document.createElement("button");
+  purchaseButton.className = "btn btn-primary btn-long";
+  purchaseButton.textContent = "Purchase +2 Slots (20 Coins)";
+  purchaseButton.addEventListener("click", async function (e) {
+    e.preventDefault();
+    await purchaseMoreSprites(modal, purchaseButton);
+  });
+  modalFooter.appendChild(purchaseButton);
+
+  const cancelButton = document.createElement("button");
+  cancelButton.className = "btn btn-secondary btn-long";
+  cancelButton.textContent = "Cancel";
+  cancelButton.addEventListener("click", function (e) {
+    e.preventDefault();
+    closeAllModals();
+  });
+  modalFooter.appendChild(cancelButton);
+}
+
+async function purchaseMoreSprites(modal, button) {
+  button.disabled = true;
+  button.textContent = "Purchasing...";
+
+  try {
+    const response = await fetch("/api/purchase", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+      body: JSON.stringify({
+        item_id: 9,
+        game_id: GAMEID,
+      }),
+    });
+
+    const result = await response.json();
+
+    if (response.ok) {
+      maxSprites += 2;
+
+      closeAllModals();
+      showSuccess &&
+        showSuccess("Sprite slots purchased! You can now create more sprites.");
+
+      createNewSprite();
+    } else {
+      showError && showError(result.error || "Failed to purchase sprite slots");
+      button.disabled = false;
+      button.textContent = "Purchase More Slots (+ 2 Sprites)";
+    }
+  } catch (err) {
+    console.error("Purchase failed:", err);
+    showError && showError("Purchase failed");
+    button.disabled = false;
+    button.textContent = "Purchase More Slots (+ 2 Sprites)";
+  }
 }
 
 function saveCurrentSprite() {

@@ -5,6 +5,8 @@ from db import (
     createPurchase,
     getPurchasable,
     updateUserProfile,
+    getGame,
+    saveGame,
 )
 
 purchase_bp = Blueprint("api_purchase", __name__)
@@ -22,12 +24,26 @@ def purchase():
 
     data = request.get_json()
     item_id = data.get("item_id")
+    game_id = data.get("game_id")
+    if item_id == 9 and not game_id:
+        return jsonify({"error": "No game ID provided"}), 400
 
     purchasable, status = getPurchasable(item_id)
     if status == 200:
         price = purchasable["price"]
         if profile["coins"] >= price:
             new_coins = profile["coins"] - price
+
+            if item_id == 9:
+                result4, status4 = getGame(game_id)
+                if isinstance(result4, dict) and status4 == 200:
+                    max_sprites = result4["max_sprites"] + 2
+                    result5, status5 = saveGame(
+                        game_id, session["userid"], max_sprites=max_sprites
+                    )
+                else:
+                    return jsonify({"error": "Game not found."}), 404
+
             result3, status3 = updateUserProfile(session["userid"], coins=new_coins)
             result, status = createPurchase(session["userid"], item_id)
             return jsonify(result), status
