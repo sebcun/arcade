@@ -26,6 +26,11 @@ from routes.api.auth.logout import logout_bp
 from routes.api.profile.user import user_bp
 from routes.api.profile.editProfile import edit_profile_bp
 
+
+# Purchases
+from routes.api.purchases import purchases_bp
+from routes.api.purchase import purchase_bp
+
 # Games
 from routes.api.games.games import games_bp
 from routes.api.games.saveGame import save_game_bp
@@ -58,6 +63,10 @@ app.register_blueprint(logout_bp, url_prefix="/api/auth")
 app.register_blueprint(user_bp, url_prefix="/api")
 app.register_blueprint(edit_profile_bp, url_prefix="/api")
 
+# Purchases Blueprints
+app.register_blueprint(purchases_bp, url_prefix="/api")
+app.register_blueprint(purchase_bp, url_prefix="/api")
+
 # Games Blueprints
 app.register_blueprint(games_bp, url_prefix="/api")
 app.register_blueprint(save_game_bp, url_prefix="/api")
@@ -71,4 +80,5 @@ app.register_blueprint(images_bp, url_prefix="/api")
 app.register_blueprint(give_xp_bp, url_prefix="/api")
 
 if __name__ == "__main__":
+
     app.run(host="0.0.0.0", debug=True)

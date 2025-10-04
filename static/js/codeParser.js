@@ -1088,9 +1088,7 @@ async function executeCode(
             })
             .catch((error) => {
               console.error("GIVEXP request failed:", error);
-              showToast("Failed to give XP. Please try again.", {
-                color: "error",
-              });
+              showError("Failed to give XP. Please try again.");
             });
         } else {
           console.log(

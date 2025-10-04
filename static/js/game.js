@@ -59,9 +59,7 @@ window.addEventListener("DOMContentLoaded", () => {
               showError("You must be logged in to like games.");
             } else {
               console.error("Error liking game:", err);
-              showToast("Failed to like game. Please try again.", {
-                color: "error",
-              });
+              showError("Failed to like game. Please try again.");
             }
           });
       });

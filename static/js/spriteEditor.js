@@ -360,7 +360,7 @@ async function saveAllSprites() {
     if (!resp || !resp.ok) {
       const text = await resp.text().catch(() => "");
       console.error("saveAllSprites: bad response", resp.status, text);
-      showToast && showToast("Failed to save sprites", { color: "error" });
+      showError("Failed to save sprites");
       return false;
     }
 
@@ -371,15 +371,12 @@ async function saveAllSprites() {
       } catch (e) {}
       return true;
     } else {
-      showToast &&
-        showToast((j && j.error) || "Failed to save sprites", {
-          color: "error",
-        });
+      showError((j && j.error) || "Failed to save sprites");
       return false;
     }
   } catch (e) {
     console.error("saveAllSprites error:", e);
-    showToast && showToast("Failed to save sprites", { color: "error" });
+    showError("Failed to save sprites");
     return false;
   }
 }

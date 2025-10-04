@@ -68,6 +68,7 @@ def initDb():
                         xp INTEGER DEFAULT 0,
                         bio TEXT,
                         badges TEXT DEFAULT "[]",
+                        coins INTEGER DEFAULT 0,
                         created_at INTEGER DEFAULT (CAST(strftime('%s', 'now') AS INTEGER)),
                         FOREIGN KEY (user_id) REFERENCES users(id)
                     )"""
@@ -112,6 +113,30 @@ def initDb():
                 FOREIGN KEY (game_id) REFERENCES games(id),
                 FOREIGN KEY (user_id) REFERENCES users(id)
             )"""
+    )
+
+    # Purchases table
+    conn.execute(
+        """CREATE TABLE IF NOT EXISTS purchases (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        user_id INTEGER NOT NULL,
+                        item_id INTEGER NOT NULL,
+                        description TEXT NOT NULL,
+                        created_at INTEGER DEFAULT (CAST(strftime('%s', 'now') AS INTEGER)),
+                        FOREIGN KEY (user_id) REFERENCES users(id),
+                        FOREIGN KEY (item_id) REFERENCES purchasables(id)
+                 )"""
+    )
+
+    # Purchasables table
+    conn.execute(
+        """CREATE TABLE IF NOT EXISTS purchasables (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        title TEXT NOT NULL,
+                        description TEXT NOT NULL,
+                        price INTEGER NOT NULL,
+                        created_at INTEGER DEFAULT (CAST(strftime('%s', 'now') AS INTEGER))
+        )"""
     )
 
     conn.commit()
@@ -377,6 +402,7 @@ def getUserProfile(userid_or_email):
         "level": profile_row["level"],
         "xp": profile_row["xp"],
         "bio": profile_row["bio"],
+        "coins": profile_row["coins"],
         "badges": badges,
         "created_at": profile_row["created_at"],
     }
@@ -392,6 +418,7 @@ def updateUserProfile(
     bio=None,
     badges=None,
     username=None,
+    coins=None,
 ):
     if not userid:
         return {"error": "User ID is required."}, 400
@@ -447,6 +474,10 @@ def updateUserProfile(
             if xp is not None:
                 conn.execute(
                     "UPDATE profiles SET xp = ? WHERE user_id = ?", (xp, userid)
+                )
+            if coins is not None:
+                conn.execute(
+                    "UPDATE profiles SET coins = ? WHERE user_id = ?", (coins, userid)
                 )
             if bio is not None:
                 conn.execute(
@@ -903,3 +934,96 @@ def getGamesSorted(sort_type, limit=30):
         }
         for game in games
     ], 200
+
+
+def getPurchases(user_id):
+    if not user_id:
+        return {"error": "User ID is required."}, 400
+
+    conn = getDbConnection()
+    try:
+        purchases = conn.execute(
+            "SELECT id, user_id, item_id, description, created_at FROM purchases WHERE user_id = ? ORDER BY created_at DESC",
+            (user_id,),
+        ).fetchall()
+        conn.close()
+
+        return [
+            {
+                "id": purchase["id"],
+                "user_id": purchase["user_id"],
+                "item_id": purchase["item_id"],
+                "description": purchase["description"],
+                "created_at": purchase["created_at"],
+            }
+            for purchase in purchases
+        ], 200
+
+    except Exception as e:
+        try:
+            conn.close()
+        except Exception:
+            pass
+        return {"error": "Failed to get purchases."}, 500
+
+
+def createPurchase(user_id, item_id):
+    if not user_id or not item_id:
+        return {"error": "User ID and item ID are required."}, 400
+
+    conn = getDbConnection()
+    try:
+        purchasable = conn.execute(
+            "SELECT * FROM purchasables WHERE id = ?", (item_id,)
+        ).fetchone()
+        if not purchasable:
+            conn.close()
+            return {"error": "Purchasable not found."}, 404
+
+        profile = conn.execute(
+            "SELECT id FROM profiles WHERE user_id = ?", (user_id,)
+        ).fetchone()
+        if not profile:
+            conn.close()
+            return {"error": "Profile not found."}, 404
+
+        cursor = conn.execute(
+            "INSERT INTO purchases (user_id, item_id, description) VALUES (?, ?, ?)",
+            (user_id, item_id, purchasable["title"]),
+        )
+        purchase_id = cursor.lastrowid
+        conn.commit()
+        conn.close()
+
+        return {
+            "message": "Purchase created successfully.",
+            "purchase_id": purchase_id,
+        }, 201
+    except Exception as e:
+        try:
+            conn.close()
+        except Exception:
+            pass
+        return {"error": "Failed to create purchase."}, 500
+
+
+def getPurchasable(purchasable_id):
+    if not purchasable_id:
+        return {"error": "Purchasable ID is requred"}, 400
+
+    conn = getDbConnection()
+    purchasable = conn.execute(
+        "SELECT * FROM purchasables WHERE id = ?", (purchasable_id,)
+    ).fetchone()
+    conn.close()
+
+    if not purchasable:
+        return {"error": "Purchasable not found"}, 404
+
+    return {
+        "id": purchasable["id"],
+        "title": purchasable["title"],
+        "description": purchasable["description"],
+        "price": purchasable["price"],
+        "created_at": purchasable["created_at"],
+    }, 200

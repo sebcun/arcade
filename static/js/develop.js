@@ -13,7 +13,7 @@ document.addEventListener("DOMContentLoaded", () => {
       })
       .catch((err) => {
         console.error("Failed to copy: ", err);
-        showToast("Failed to copy URL", { color: "error" });
+        showError("Failed to copy URL");
       });
   });
 
@@ -151,7 +151,7 @@ function openCreateModal() {
     const title = document.getElementById("title").value;
     if (!title) {
       titleInput.classList.add("error");
-      showToast("Please enter a game name.", { color: "error" });
+      showError("Please enter a game name.");
       return;
     }
 

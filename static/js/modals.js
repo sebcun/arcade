@@ -314,7 +314,7 @@ function showCodeModal(email, mode = "login", location = "profile") {
       modal.querySelectorAll("#code-inputs .code-digit").forEach((d) => {
         if (!d.value) d.classList.add("error");
       });
-      showToast("Please enter the 6-digit code.", { color: "error" });
+      showError("Please enter the 6-digit code.");
       return;
     }
 
@@ -351,7 +351,7 @@ function showCodeModal(email, mode = "login", location = "profile") {
         clearInterval(interval);
         verifyBtn.textContent = originalText;
         verifyBtn.disabled = false;
-        showToast("Failed to verify code.", { color: "error" });
+        showError("Failed to verify code.");
         console.error(err);
       });
   });
@@ -380,7 +380,7 @@ function showCodeModal(email, mode = "login", location = "profile") {
         clearInterval(sendingInterval);
         const data = await resp.json();
         if (!resp.ok) {
-          showToast(data.error || "Failed to resend code.", { color: "error" });
+          showError(data.error || "Failed to resend code.");
           resendBtn.disabled = false;
           resendBtn.textContent = "Resend Code";
           return;
@@ -390,7 +390,7 @@ function showCodeModal(email, mode = "login", location = "profile") {
       })
       .catch((err) => {
         clearInterval(sendingInterval);
-        showToast("Failed to resend code.", { color: "error" });
+        showError("Failed to resend code.");
         resendBtn.disabled = false;
         resendBtn.textContent = "Resend Code";
         console.error(err);
@@ -488,7 +488,7 @@ function showLoginModal(location = "profile") {
     const email = document.getElementById("email").value;
     if (!email || !emailInput.checkValidity()) {
       emailInput.classList.add("error");
-      showToast("Please enter a valid email.", { color: "error" });
+      showError("Please enter a valid email.");
       return;
     }
 
@@ -513,7 +513,7 @@ function showLoginModal(location = "profile") {
         const data = await resp.json();
         if (!resp.ok) {
           emailInput.classList.add("error");
-          showToast(data.error || "Failed to send code.", { color: "error" });
+          showError(data.error || "Failed to send code.");
           return;
         }
         showToast("Verification code sent.", { color: "success" });
@@ -523,7 +523,7 @@ function showLoginModal(location = "profile") {
         clearInterval(interval);
         nextButton.textContent = "Next";
         nextButton.disabled = false;
-        showToast("Failed to send code.", { color: "error" });
+        showError("Failed to send code.");
         console.error(err);
       });
   });
@@ -669,20 +669,16 @@ function showRegisterModal(location = "profile") {
 
     if (!email || !emailInput.checkValidity()) {
       emailInput.classList.add("error");
-      showToast("Please enter a valid email.", { color: "error" });
+      showError("Please enter a valid email.");
       return;
     }
     if (!username || !usernameValid) {
       usernameInput.classList.add("error");
-      showToast("Please enter a valid username (3-19 chars).", {
-        color: "error",
-      });
+      showError("Please enter a valid username (3-19 chars).");
       return;
     }
     if (!agreed) {
-      showToast("You must agree to the Terms of Service and Privacy Policy.", {
-        color: "error",
-      });
+      showError("You must agree to the Terms of Service and Privacy Policy.");
       return;
     }
 
@@ -711,13 +707,13 @@ function showRegisterModal(location = "profile") {
         const data = await resp.json();
         if (!resp.ok) {
           if (data && data.error) {
-            showToast(data.error, { color: "error" });
+            showError(data.error);
             if ((data.error || "").toLowerCase().includes("email"))
               emailInput.classList.add("error");
             if ((data.error || "").toLowerCase().includes("username"))
               usernameInput.classList.add("error");
           } else {
-            showToast("Failed to send code.", { color: "error" });
+            showError("Failed to send code.");
           }
           return;
         }
@@ -729,7 +725,7 @@ function showRegisterModal(location = "profile") {
         clearInterval(interval);
         nextButton.textContent = "Next";
         nextButton.disabled = false;
-        showToast("Failed to send code.", { color: "error" });
+        showError("Failed to send code.");
         console.error(err);
       });
   });

@@ -540,3 +540,34 @@ input:-webkit-autofill:hover {
   padding: 0.2rem 0.4rem;
   border-radius: 2px;
 }
+
+.d-lg-block {
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+
+.d-lg-block:hover {
+  opacity: 0.6;
+}
+
+.table {
+  position: relative;
+  background-color: var(--border-primary) !important;
+  border: 1px solid var(--border-primary) !important;
+  border-radius: 8px;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+  overflow: hidden;
+  color: var(--text-primary) !important;
+}
+
+th {
+  color: var(--text-primary) !important;
+}
+
+td {
+  color: var(--text-secondary) !important;
+}
+
+.table > :not(caption) > * > * {
+  background-color: var(--bg-secondary) !important;
+}
