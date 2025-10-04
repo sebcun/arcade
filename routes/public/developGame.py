@@ -12,7 +12,7 @@ def developGame(game_id):
     website_url = os.getenv("WEBSITE", "https://pixelcade.sebcun.com")
 
     if "userid" not in session:
-        return redirect(url_for("index.index") + "?login")
+        return redirect(url_for("index.index") + f"?login&target=develop/{game_id}")
 
     game_data, status = getGame(game_id)
 

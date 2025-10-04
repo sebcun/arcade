@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify, session
+from flask import Blueprint, request, jsonify, session, redirect, url_for
 from db import verifyCode, giveBadge
 
 verify_code_bp = Blueprint("verify_code", __name__)

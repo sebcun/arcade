@@ -31,34 +31,24 @@ if (params.has("login")) {
   if (LOGGEDIN === "True") {
     clearParameters();
   } else {
-    showLoginModal();
+    if (params.has("target")) {
+      showLoginModal(params.get("target"));
+      clearParameters();
+    } else {
+      showLoginModal();
+      clearParameters();
+    }
   }
-
-  // Get rid of parameters in URL
 } else if (params.has("register")) {
   if (LOGGEDIN === "True") {
     clearParameters();
   } else {
-    showRegisterModal();
-  }
-} else if (params.has("settings")) {
-  if (LOGGEDIN === "True") {
-    showSettings();
-  } else {
-    showModal(
-      "You are not logged in!",
-      `<p id="modal-text">Create an account or log in to save your results, level up, and customize your avatar!</p>`,
-      [
-        {
-          text: "Login",
-          onClick: () => showLoginModal(),
-        },
-        {
-          text: "Create an Account",
-          image: "/static/images/LongButtonTwo.png",
-          onClick: () => showRegisterModal(),
-        },
-      ]
-    );
+    if (params.has("target")) {
+      showRegisterModal(params.get("target"));
+      clearParameters();
+    } else {
+      showRegisterModal();
+      clearParameters();
+    }
   }
 }

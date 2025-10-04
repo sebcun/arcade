@@ -137,7 +137,7 @@ function closeAllModals() {
   });
 }
 
-function showCodeModal(email, mode = "login") {
+function showCodeModal(email, mode = "login", location = "profile") {
   const title =
     mode === "register" ? "Verify your Email" : "Enter One Time Code";
   const message =
@@ -339,19 +339,13 @@ function showCodeModal(email, mode = "login") {
         verifyBtn.disabled = false;
         const data = await resp.json();
         if (!resp.ok) {
-          showToast(data.error || "Invalid code.", { color: "error" });
+          showError(data.error || "Invalid code.");
           modal.querySelectorAll("#code-inputs .code-digit").forEach((d) => {
             if (!d.value) d.classList.add("error");
           });
           return;
         }
-        showToast(
-          mode === "register" ? "Account created and logged in!" : "Logged in!",
-          { color: "success" }
-        );
-        setTimeout(() => {
-          location.reload();
-        }, 600);
+        window.location.href = `/${location}`;
       })
       .catch((err) => {
         clearInterval(interval);
@@ -404,7 +398,7 @@ function showCodeModal(email, mode = "login") {
   });
 }
 
-function showLoginModal() {
+function showLoginModal(location = "profile") {
   const loginFormHTML = `
   <form class="form-floating">
     <input 
@@ -523,7 +517,7 @@ function showLoginModal() {
           return;
         }
         showToast("Verification code sent.", { color: "success" });
-        showCodeModal(email, "login");
+        showCodeModal(email, "login", location);
       })
       .catch((err) => {
         clearInterval(interval);
@@ -535,7 +529,7 @@ function showLoginModal() {
   });
 }
 
-function showRegisterModal() {
+function showRegisterModal(location = "profile") {
   const registerFormHTML = `
   <form id="register-form" class="register-form">
     <div class="form-floating mb-3">
@@ -729,7 +723,7 @@ function showRegisterModal() {
         }
 
         showToast("Verification code sent.", { color: "success" });
-        showCodeModal(email, "register");
+        showCodeModal(email, "register", location);
       })
       .catch((err) => {
         clearInterval(interval);

@@ -10,4 +10,4 @@ def develop():
 
     if "userid" in session:
         return render_template("develop.html", LOGGEDIN=True, WEBSITE=website_url)
-    return redirect(url_for("index.index") + "?login")
+    return redirect(url_for("index.index") + "?login&target=develop")
