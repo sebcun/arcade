@@ -31,7 +31,6 @@ except Exception as e:
 def getDbConnection():
     dbPath = os.environ.get("DB_PATH") or DB_PATH
 
-    # Ensure parent folder exists
     parent = os.path.dirname(dbPath)
     if parent:
         try:
@@ -681,7 +680,7 @@ def saveGame(
     title=None,
     description=None,
     visibility=None,
-    max_sprites=None,  # Add this parameter
+    max_sprites=None,
 ):
     if not game_id or not user_id:
         return {"error": "Game ID and User ID are requred"}, 400
