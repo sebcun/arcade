@@ -83,7 +83,7 @@ window.addEventListener("DOMContentLoaded", () => {
             return new ImageData(imgData, 320, 320);
           });
         }
-        startGame(canvas, overlay, processedSprites, gameCode);
+        startGame(canvas, overlay, processedSprites, gameCode, data.purchases);
       });
 
       const gameAuthor = document.getElementById("gameAuthor");

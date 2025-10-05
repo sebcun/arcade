@@ -80,6 +80,7 @@ async function executeCode(
   code,
   sprites,
   ctx,
+  purchases,
   signal = null,
   loopController = null,
   isEvent = false
@@ -254,6 +255,7 @@ async function executeCode(
           h.lines.join("\n"),
           sprites,
           ctx,
+          purchases,
           abortController ? abortController.signal : null,
           h.loopController || null,
           true
@@ -316,6 +318,7 @@ async function executeCode(
                 handler.lines.join("\n"),
                 sprites,
                 ctx,
+                purchases,
                 signal,
                 handler.loopController || null,
                 true
@@ -409,6 +412,7 @@ async function executeCode(
                   blockLines.join("\n"),
                   sprites,
                   ctx,
+                  purchases,
                   signal,
                   myLoopController,
                   true
@@ -848,8 +852,14 @@ async function executeCode(
             const rand = Math.floor(Math.random() * (max - min + 1)) + min;
             variables[varname] = rand;
           } else {
-            const value = evaluateExpression(valueExpr, context);
-            variables[varname] = value;
+            if (valueExpr.startsWith('"') && valueExpr.endsWith('"')) {
+              const str = valueExpr.slice(1, -1);
+              const interpolated = interpolateString(str, context);
+              variables[varname] = interpolated;
+            } else {
+              const value = evaluateExpression(valueExpr, context);
+              variables[varname] = value;
+            }
           }
         } catch (e) {
           console.log(`${i + 1} STORE: ${e.message}`);
@@ -914,6 +924,47 @@ async function executeCode(
           } catch (e) {
             console.log(`${i + 1} TEXT: ${e.message}`);
           }
+        }
+        i++;
+        continue;
+      }
+
+      if (cmd === "BACKGROUND") {
+        if (parts.length >= 2) {
+          let hexColor = parts[1];
+
+          context = buildContext();
+          hexColor = evaluateExpression(hexColor, context);
+
+          if (!hexColor.startsWith("#")) {
+            hexColor = "#" + hexColor;
+          }
+
+          const hexRegex = /^#[0-9a-fA-F]{3}$|^#[0-9a-fA-F]{6}$/;
+          if (!hexRegex.test(hexColor)) {
+            console.log(
+              `${
+                i + 1
+              } BACKGROUND: invalid hex color '${hexColor}'. Expected # followed by 3 or 6 hexadecimal digits (e.g., #000 or #000000).`
+            );
+            i++;
+            continue;
+          }
+
+          const gameCanvas = document.getElementById("gameCanvas");
+
+          if (gameCanvas) {
+            gameCanvas.style.background = hexColor;
+          } else {
+            console.log(`${i + 1} BACKGROUND: gameCanvas not found.`);
+          }
+          drawAll(ctx);
+        } else {
+          console.log(
+            `${
+              i + 1
+            } BACKGROUND: invalid syntax. Expected [BACKGROUND (hexcolor), got ${line}`
+          );
         }
         i++;
         continue;
@@ -1033,6 +1084,7 @@ async function executeCode(
               blockLines.join("\n"),
               sprites,
               ctx,
+              purchases,
               signal,
               loopController || null,
               true
@@ -1257,14 +1309,14 @@ function stopExecution() {
   activeLoopStack = [];
 }
 
-function startGame(canvas, overlay, sprites, code) {
+function startGame(canvas, overlay, sprites, code, purchases) {
   const ctx = canvas.getContext("2d");
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   resetSprites();
 
-  executeCode(code, sprites, ctx);
+  executeCode(code, sprites, ctx, purchases);
   overlay.style.display = "none";
 }
 
