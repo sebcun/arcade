@@ -83,6 +83,7 @@ def initDb():
                         visibility INTEGER DEFAULT -1,
                         plays INTEGER DEFAULT 0,
                         max_sprites INTEGER DEFAULT 20,
+                        purchased TEXT DEFAULT '[]',
                         created_at INTEGER DEFAULT (CAST(strftime('%s', 'now') AS INTEGER)),
                         updated_at INTEGER DEFAULT (CAST(strftime('%s', 'now') AS INTEGER)),
                         FOREIGN KEY (user_id) REFERENCES users(id)
@@ -641,6 +642,7 @@ def getGame(game_id):
         "plays": game["plays"],
         "visibility": game["visibility"],
         "max_sprites": game["max_sprites"],
+        "purchases": json.loads(game["purchases"]),
     }, 200
 
 
@@ -1043,3 +1045,25 @@ def getPurchasable(purchasable_id):
         "price": purchasable["price"],
         "created_at": purchasable["created_at"],
     }, 200
+
+
+def addGamePurchase(game_id, item_id):
+    if not game_id or not item_id:
+        return {"error": "Game Id and item ID are required"}, 400
+
+    conn = getDbConnection()
+    try:
+        game = conn.execute(
+            "SELECT id, purchased FROM games WHERE id = ?", (game_id,)
+        ).fetchone()
+
+        if not game:
+            conn.close()
+            return {"error": "Game not found"}, 404
+
+    except Exception as e:
+        try:
+            conn.close()
+        except Exception:
+            pass
+        return {"error": "Failed to add item to game purchases"}, 400

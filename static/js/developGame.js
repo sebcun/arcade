@@ -69,7 +69,7 @@ async function loadOverview() {
 
       const titleEl = document.getElementById("gameName");
       const descEl = document.getElementById("gameDescription");
-      const selectEl = document.getElementById("gameVisibility");
+      // const selectEl = document.getElementById("gameVisibility");
 
       if (descEl) descEl.value = data.description || "";
 
@@ -91,9 +91,9 @@ async function loadOverview() {
         }
       });
 
-      selectEl.addEventListener("change", () => {
-        changesMade = true;
-      });
+      // selectEl.addEventListener("change", () => {
+      //   changesMade = true;
+      // });
     })
     .catch((err) => {
       console.error("Error loading game:", err);
@@ -143,9 +143,9 @@ async function saveGame() {
       // Get the form values
       const titleEl = document.getElementById("gameName");
       const descEl = document.getElementById("gameDescription");
-      const selectEl = document.getElementById("gameVisibility");
+      // const selectEl = document.getElementById("gameVisibility");
 
-      if (!titleEl || !descEl || !selectEl) {
+      if (!titleEl || !descEl) {
         showError && showError("Missing form elements");
         return false;
       }
@@ -163,17 +163,17 @@ async function saveGame() {
         return false;
       }
 
-      // Map visibility values
-      const visibilityMapping = {
-        Private: -1,
-        Public: 0,
-        Unlisted: 1,
-      };
+      // // Map visibility values
+      // const visibilityMapping = {
+      //   Private: -1,
+      //   Public: 0,
+      //   Unlisted: 1,
+      // };
 
       const payload = {
         gameName: titleEl.value.trim(),
         gameDescription: descEl.value,
-        gameVisibility: visibilityMapping[selectEl.value],
+        // gameVisibility: visibilityMapping[selectEl.value],
       };
 
       const response = await fetch(`/api/games/${GAMEID}/save`, {
