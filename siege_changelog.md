@@ -4,6 +4,10 @@ Here is a complete list of changes made to this project on a week by week bases 
 
 ## Week 5
 
+- Coins Coin Coins! Added a "Coin" balance which you get for getting likes on your games, daily bonuses, and creating games.
+- With coins, you can purchase avatar backgrounds from the Avatar editor shop.
+- You can purchase additional Sprite slots for your games.
+- You can purchase the BACKGROUND command for your games. (This is a new command)
 - Completely redid the frontend to use Bootstrap as well as have a better theme
 - Renamed from Arcade -> Pixelcade (more unique)
 - Added =, <, > operators to IF command
