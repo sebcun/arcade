@@ -67,7 +67,7 @@ def initDb():
                         xp INTEGER DEFAULT 0,
                         bio TEXT,
                         badges TEXT DEFAULT "[]",
-                        coins INTEGER DEFAULT 0,
+                        coins INTEGER DEFAULT 100,
                         created_at INTEGER DEFAULT (CAST(strftime('%s', 'now') AS INTEGER)),
                         FOREIGN KEY (user_id) REFERENCES users(id)
                     )"""

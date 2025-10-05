@@ -479,6 +479,43 @@
         }
       ]
     },
+    "BACKGROUND": {
+      "title": "BACKGROUND Command",
+      "docTitle": "BACKGROUND",
+      "content": [
+        {
+          "type": "text",
+          "content": "Sets the background to the specified HEX Color. Please note, this must be purchased from the Game Overview first before using."
+        },
+        { "type": "sub", "content": "Syntax" },
+        {
+          "type": "code",
+          "content": "BACKGROUND (hex color)"
+        },
+        { "type": "sub", "content": "Example 1 — Simple background set" },
+        {
+          "type": "code",
+          "content": "BACKGROUND #000000\nWAIT 1\nBACKGROUND ffffff"
+        },
+        {
+          "type": "text",
+          "content": "Sets the background to black, waits 1 second, then sets it to white."
+        },
+        { "type": "br", "content": "" },
+        {
+          "type": "sub",
+          "content": "Example 2 — On click of a key, set the hex to a random color."
+        },
+        {
+          "type": "code",
+          "content": "ONKEY \"r\"\n  STORE 1#9 AS pos1\n  STORE 1#9 AS pos2\n  STORE 1#9 AS pos3\n  STORE 1#9 AS pos4\n  STORE 1#9 AS pos5\n  STORE 1#9 AS pos6\n  STORE \"${pos1}${pos2}${pos3}${pos4}${pos5}${pos6}\" AS hex\n  BACKGROUND hex\nENDKEY"
+        },
+        {
+          "type": "text",
+          "content": "When 'r' is clicked, the background will be set to a random hex color."
+        }
+      ]
+    },
     "LOOP": {
       "title": "LOOP Logic",
       "docTitle": "LOOP",

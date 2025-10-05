@@ -930,42 +930,51 @@ async function executeCode(
       }
 
       if (cmd === "BACKGROUND") {
-        if (parts.length >= 2) {
-          let hexColor = parts[1];
+        if (purchases.includes(10)) {
+          if (parts.length >= 2) {
+            let hexColor = parts[1];
 
-          context = buildContext();
-          hexColor = evaluateExpression(hexColor, context);
+            context = buildContext();
+            hexColor = evaluateExpression(hexColor, context);
 
-          if (!hexColor.startsWith("#")) {
-            hexColor = "#" + hexColor;
-          }
+            if (!hexColor.startsWith("#")) {
+              hexColor = "#" + hexColor;
+            }
 
-          const hexRegex = /^#[0-9a-fA-F]{3}$|^#[0-9a-fA-F]{6}$/;
-          if (!hexRegex.test(hexColor)) {
+            const hexRegex = /^#[0-9a-fA-F]{3}$|^#[0-9a-fA-F]{6}$/;
+            if (!hexRegex.test(hexColor)) {
+              console.log(
+                `${
+                  i + 1
+                } BACKGROUND: invalid hex color '${hexColor}'. Expected # followed by 3 or 6 hexadecimal digits (e.g., #000 or #000000).`
+              );
+              i++;
+              continue;
+            }
+
+            const gameCanvas = document.getElementById("gameCanvas");
+
+            if (gameCanvas) {
+              gameCanvas.style.background = hexColor;
+            } else {
+              console.log(`${i + 1} BACKGROUND: gameCanvas not found.`);
+            }
+            drawAll(ctx);
+          } else {
             console.log(
               `${
                 i + 1
-              } BACKGROUND: invalid hex color '${hexColor}'. Expected # followed by 3 or 6 hexadecimal digits (e.g., #000 or #000000).`
+              } BACKGROUND: invalid syntax. Expected [BACKGROUND (hexcolor), got ${line}`
             );
-            i++;
-            continue;
           }
-
-          const gameCanvas = document.getElementById("gameCanvas");
-
-          if (gameCanvas) {
-            gameCanvas.style.background = hexColor;
-          } else {
-            console.log(`${i + 1} BACKGROUND: gameCanvas not found.`);
-          }
-          drawAll(ctx);
         } else {
           console.log(
             `${
               i + 1
-            } BACKGROUND: invalid syntax. Expected [BACKGROUND (hexcolor), got ${line}`
+            } BACKGROUND: this must be purchased from the game overview in the develop dashboard`
           );
         }
+
         i++;
         continue;
       }
