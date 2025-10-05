@@ -64,23 +64,6 @@ async function loadOverview() {
           </div>
         </div>
 
-        <div class="col-12 mt-3">
-          <div class="form-floating">
-            <select class="form-select" id="gameVisibility">
-              <option value="Private" ${
-                data["visibility"] === -1 ? "selected" : ""
-              }>Private</option>
-              <option value="Public" ${
-                data["visibility"] === 0 ? "selected" : ""
-              }>Public</option>
-              <option value="Unlisted" ${
-                data["visibility"] === 1 ? "selected" : ""
-              }>Unlisted</option>
-            </select>
-            <label for="gameVisibility">Game Visibility</label>
-          </div>
-        </div>
-
       </div>
       `;
 
