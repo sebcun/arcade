@@ -1054,12 +1054,33 @@ def addGamePurchase(game_id, item_id):
     conn = getDbConnection()
     try:
         game = conn.execute(
-            "SELECT id, purchased FROM games WHERE id = ?", (game_id,)
+            "SELECT id, purchases FROM games WHERE id = ?", (game_id,)
         ).fetchone()
 
         if not game:
             conn.close()
             return {"error": "Game not found"}, 404
+
+        try:
+            current_purchases = (
+                json.loads(game["purchases"]) if game["purchases"] else []
+            )
+        except json.JSONDecodeError:
+            current_purchases = []
+
+        current_purchases.append(item_id)
+        updated_purchases = json.dumps(current_purchases)
+
+        conn.execute(
+            "UPDATE games SET purchases = ? WHERE id = ?", (updated_purchases, game_id)
+        )
+        conn.commit()
+        conn.close()
+
+        return {
+            "message": "Item added to game purchases successfully.",
+            "purchased_items": current_purchases,
+        }, 200
 
     except Exception as e:
         try:

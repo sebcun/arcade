@@ -7,6 +7,7 @@ from db import (
     updateUserProfile,
     getGame,
     saveGame,
+    addGamePurchase,
 )
 
 purchase_bp = Blueprint("api_purchase", __name__)
@@ -41,6 +42,15 @@ def purchase():
                     result5, status5 = saveGame(
                         game_id, session["userid"], max_sprites=max_sprites
                     )
+                else:
+                    return jsonify({"error": "Game not found."}), 404
+
+            if item_id == 10:
+                print(item_id)
+                result4, status4 = getGame(game_id)
+                if isinstance(result4, dict) and status4 == 200:
+                    result5, status5 = addGamePurchase(game_id, 10)
+                    print(result5, status5)
                 else:
                     return jsonify({"error": "Game not found."}), 404
 

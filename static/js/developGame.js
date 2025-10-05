@@ -36,6 +36,8 @@ async function loadOverview() {
     })
     .then((data) => {
       developHeading.textContent = `${data.title} | Overview`;
+
+      let backgroundPurchased = data.purchases.includes(10);
       developContainer.innerHTML = `
       <div class="row">
 
@@ -61,6 +63,20 @@ async function loadOverview() {
               id="gameDescription"
             ></textarea>
             <label for="gameDescription">Game Description</label>
+          </div>
+        </div>
+
+        <div class="col-12 mt-3">
+          <h5>Addons Available</h5>
+          <div class="d-flex justify-content-between align-items-center w-100 mb-2 sprite-list-item">
+            <span>BACKGROUND command</span>
+            <div>
+              <button class="btn btn-secondary btn-small" ${
+                backgroundPurchased ? "disabled" : ""
+              } id="purchaseBackgroundBtn">${
+        backgroundPurchased ? "Purchased" : "Purchase (30 coins)"
+      }</button>
+            </div>
           </div>
         </div>
 
@@ -94,6 +110,47 @@ async function loadOverview() {
       // selectEl.addEventListener("change", () => {
       //   changesMade = true;
       // });
+
+      const purchaseBackgroundBtn = document.getElementById(
+        "purchaseBackgroundBtn"
+      );
+      purchaseBackgroundBtn.addEventListener("click", () => {
+        purchaseBackgroundBtn.disabled = true;
+        purchaseBackgroundBtn.textContent = "Purchasing.";
+        let dots = 1;
+        const interval = setInterval(() => {
+          dots = (dots % 3) + 1;
+          purchaseBackgroundBtn.textContent = "Purchasing" + ".".repeat(dots);
+        }, 300);
+
+        fetch("/api/purchase", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+          body: JSON.stringify({ item_id: 10, game_id: GAMEID }),
+        })
+          .then((response) => {
+            clearInterval(interval);
+            return response.json().then((result) => {
+              if (response.ok) {
+                purchaseBackgroundBtn.textContent = "Purchased";
+                purchaseBackgroundBtn.disabled = true;
+              } else {
+                showError(result.error || "Purchase failed");
+                purchaseBackgroundBtn.textContent = "Purchase (30 coins)";
+                purchaseBackgroundBtn.disabled = false;
+              }
+            });
+          })
+          .catch((err) => {
+            clearInterval(interval);
+            showError("An error occurred during purchase");
+            purchaseBackgroundBtn.textContent = "Purchase (30 coins)";
+            purchaseBackgroundBtn.disabled = false;
+          });
+      });
     })
     .catch((err) => {
       console.error("Error loading game:", err);
