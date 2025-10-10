@@ -1,5 +1,9 @@
 const activeSprites = [];
 
+let activeParticleSystems = [];
+let particleRendererRunning = false;
+let particleAnimationFrameId = null;
+
 let keyHandlers = {};
 window.keyListenerAdded = false;
 let keyListener = null;
@@ -12,69 +16,6 @@ let touchMonitorRAF = null;
 let variables = {};
 let abortController = null;
 let activeLoopStack = [];
-
-function buildContext() {
-  const context = {};
-  activeSprites.forEach((s) => {
-    context[s.name] = {
-      x: s.x,
-      y: s.y,
-      scale: s.scale,
-      rotation: s.rotation,
-      visible: s.visible,
-    };
-  });
-  for (const [key, value] of Object.entries(variables)) {
-    context[key] = value;
-  }
-  return context;
-}
-
-function stripName(token) {
-  if (!token) return token;
-  token = token.trim();
-  if (
-    (token.startsWith("'") && token.endsWith("'")) ||
-    (token.startsWith('"') && token.endsWith('"'))
-  ) {
-    token = token.slice(1, -1);
-  }
-  token = token.replace(/[:;]+$/g, "");
-  return token.toLowerCase();
-}
-
-function evaluateExpression(expr, context) {
-  try {
-    const keys = Object.keys(context);
-    const values = Object.values(context);
-    const func = new Function(...keys, `return (${expr});`);
-    return func(...values);
-  } catch (e) {
-    throw new Error(`Invalid expression: ${expr}. ${e.message}`);
-  }
-}
-
-function interpolateString(str, context) {
-  return str.replace(/\$\{([^}]+)\}/g, (match, expr) => {
-    try {
-      return evaluateExpression(expr, context);
-    } catch (e) {
-      return match;
-    }
-  });
-}
-
-function sleep(ms, signal) {
-  return new Promise((resolve, reject) => {
-    const timeout = setTimeout(resolve, ms);
-    if (signal) {
-      signal.addEventListener("abort", () => {
-        clearTimeout(timeout);
-        reject(new Error("Aborted"));
-      });
-    }
-  });
-}
 
 async function executeCode(
   code,
@@ -979,6 +920,75 @@ async function executeCode(
         continue;
       }
 
+      if (cmd === "PARTICLES") {
+        if (parts.length >= 4 && parts[2].toUpperCase() === "AT") {
+          const particleType = parts[1].toLowerCase().replace(/['"]/g, "");
+          const coordsPart = parts[3];
+
+          const validParticleTypes = ["party", "explosion"];
+
+          if (!validParticleTypes.includes(particleType)) {
+            console.log(
+              `${
+                i + 1
+              } PARTICLES: unknown particle type '${particleType}'. Available types: ${validParticleTypes.join(
+                ", "
+              )}`
+            );
+            i++;
+            continue;
+          }
+
+          const coords = coordsPart.split(",");
+          if (coords.length !== 2) {
+            console.log(
+              `${
+                i + 1
+              } PARTICLES: invalid coordinates. Expected 'x,y', got '${coordsPart}'`
+            );
+            i++;
+            continue;
+          }
+
+          const context = buildContext();
+          const xExpr = coords[0].trim();
+          const yExpr = coords[1].trim();
+
+          let px, py;
+          try {
+            px = evaluateExpression(yExpr, context);
+            py = evaluateExpression(xExpr, context);
+          } catch (e) {
+            console.log(`${i + 1} PARTICLES: ${e.message}`);
+            i++;
+            continue;
+          }
+
+          if (isNaN(px) || isNaN(py)) {
+            console.log(
+              `${
+                i + 1
+              } PARTICLES: invalid coordinates. Expected numbers, got x=${px}, y=${py}`
+            );
+            i++;
+            continue;
+          }
+
+          createParticles(ctx, px, py, particleType);
+
+          i++;
+          continue;
+        } else {
+          console.log(
+            `${
+              i + 1
+            } PARTICLES: invalid syntax. Expected [PARTICLES (particle name) AT (x,y)], got ${line}`
+          );
+        }
+        i++;
+        continue;
+      }
+
       if (cmd === "IF") {
         const rest = line.slice(2).trim();
         const upperRest = rest.toUpperCase();
@@ -1166,6 +1176,215 @@ async function executeCode(
       i++;
     }
   }
+}
+
+function createParticles(ctx, x, y, type) {
+  const particles = [];
+  let particleCount = 0;
+  let duration = 0;
+
+  if (type === "party") {
+    duration = 1500;
+    particleCount = 30;
+
+    const colors = [
+      "#FF6B6B",
+      "#4ECDC4",
+      "#45B7D1",
+      "#FFA07A",
+      "#98D8C8",
+      "#F7DC64",
+      "#BB8FCE",
+    ];
+
+    for (let i = 0; i < particleCount; i++) {
+      particles.push({
+        x: x,
+        y: y,
+        vx: (Math.random() - 0.5) * 8,
+        vy: (Math.random() - 0.5) * 8 - 2,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        size: Math.random() * 4 + 2,
+        life: 1,
+        decay: 0.015,
+      });
+    }
+  } else if (type === "explosion") {
+    duration = 1000;
+    particleCount = 40;
+
+    const colors = ["#FF4500", "#FF6347", "#FFA500", "#FFD700", "#FF8C00"];
+
+    for (let i = 0; i < particleCount; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const speed = Math.random() * 10 + 5;
+
+      particles.push({
+        x: x,
+        y: y,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        size: Math.random() * 5 + 3,
+        life: 1,
+        decay: 0.025,
+        friction: 0.95,
+      });
+    }
+  }
+
+  const particleSystem = {
+    particles: particles,
+    type: type,
+    startTime: Date.now(),
+    duration: duration,
+    active: true,
+  };
+
+  activeParticleSystems.push(particleSystem);
+
+  startParticleRenderer(ctx);
+}
+
+function startParticleRenderer(ctx) {
+  if (particleRendererRunning) return;
+  particleRendererRunning = true;
+
+  function renderAllParticles() {
+    drawAll(ctx);
+
+    const now = Date.now();
+
+    for (let sysIdx = activeParticleSystems.length - 1; sysIdx >= 0; sysIdx--) {
+      const sys = activeParticleSystems[sysIdx];
+      const elapsed = now - sys.startTime;
+
+      if (elapsed >= sys.duration) {
+        activeParticleSystems.splice(sysIdx, 1);
+        continue;
+      }
+
+      sys.particles.forEach((p) => {
+        if (p.friction) {
+          p.vx *= p.friction;
+          p.vy *= p.friction;
+        }
+
+        if (p.wobble !== undefined) {
+          p.wobble += p.wobbleSpeed || 0.05;
+          p.x += Math.sin(p.wobble) * 0.5;
+        }
+
+        if (p.spiral !== undefined) {
+          p.angle += p.spiral;
+          const speed = Math.sqrt(p.vx * p.vx + p.vy * p.vy);
+          p.vx = Math.cos(p.angle) * speed;
+          p.vy = Math.sin(p.angle) * speed;
+        }
+
+        p.x += p.vx;
+        p.y += p.vy;
+
+        if (sys.type === "party" || sys.type === "explosion") {
+          p.vy += 0.2;
+        }
+
+        p.life -= p.decay;
+
+        if (p.life > 0) {
+          ctx.save();
+
+          let alpha = p.life;
+          if (p.twinkle !== undefined) {
+            p.twinkle += 0.2;
+            alpha *= (Math.sin(p.twinkle) + 1) / 2;
+          }
+
+          ctx.globalAlpha = alpha;
+          ctx.fillStyle = p.color;
+
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+          ctx.fill();
+
+          ctx.restore();
+        }
+      });
+    }
+
+    if (activeParticleSystems.length > 0) {
+      particleAnimationFrameId = requestAnimationFrame(renderAllParticles);
+    } else {
+      particleRendererRunning = false;
+      particleAnimationFrameId = null;
+      drawAll(ctx);
+    }
+  }
+
+  renderAllParticles();
+}
+
+function buildContext() {
+  const context = {};
+  activeSprites.forEach((s) => {
+    context[s.name] = {
+      x: s.x,
+      y: s.y,
+      scale: s.scale,
+      rotation: s.rotation,
+      visible: s.visible,
+    };
+  });
+  for (const [key, value] of Object.entries(variables)) {
+    context[key] = value;
+  }
+  return context;
+}
+
+function stripName(token) {
+  if (!token) return token;
+  token = token.trim();
+  if (
+    (token.startsWith("'") && token.endsWith("'")) ||
+    (token.startsWith('"') && token.endsWith('"'))
+  ) {
+    token = token.slice(1, -1);
+  }
+  token = token.replace(/[:;]+$/g, "");
+  return token.toLowerCase();
+}
+
+function evaluateExpression(expr, context) {
+  try {
+    const keys = Object.keys(context);
+    const values = Object.values(context);
+    const func = new Function(...keys, `return (${expr});`);
+    return func(...values);
+  } catch (e) {
+    throw new Error(`Invalid expression: ${expr}. ${e.message}`);
+  }
+}
+
+function interpolateString(str, context) {
+  return str.replace(/\$\{([^}]+)\}/g, (match, expr) => {
+    try {
+      return evaluateExpression(expr, context);
+    } catch (e) {
+      return match;
+    }
+  });
+}
+
+function sleep(ms, signal) {
+  return new Promise((resolve, reject) => {
+    const timeout = setTimeout(resolve, ms);
+    if (signal) {
+      signal.addEventListener("abort", () => {
+        clearTimeout(timeout);
+        reject(new Error("Aborted"));
+      });
+    }
+  });
 }
 
 function resetSprites() {

@@ -2,6 +2,12 @@
 
 Here is a complete list of changes made to this project on a week by week bases for Siege.
 
+## Week 6 (added this so I know what my goal is)
+
+- Added accessories for the avatar (Wizard Hats and Wands!)
+- Added PARTICLE command: shows one of 3 particles are the location (more info at https://pixelcade.sebcun.com/develop?docs&command=PARTICLE)
+- Added persistent variables
+
 ## Week 5
 
 - Coins Coin Coins! Added a "Coin" balance which you get for getting likes on your games, daily bonuses, and creating games.
