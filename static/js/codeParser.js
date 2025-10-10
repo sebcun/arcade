@@ -925,7 +925,7 @@ async function executeCode(
           const particleType = parts[1].toLowerCase().replace(/['"]/g, "");
           const coordsPart = parts[3];
 
-          const validParticleTypes = ["party", "explosion"];
+          const validParticleTypes = ["party", "explosion", "magic"];
 
           if (!validParticleTypes.includes(particleType)) {
             console.log(
@@ -1229,6 +1229,35 @@ function createParticles(ctx, x, y, type) {
         life: 1,
         decay: 0.025,
         friction: 0.95,
+      });
+    }
+  } else if (type === "magic") {
+    duration = 1500;
+    particleCount = 35;
+
+    const colors = [
+      "#f700ffff",
+      "#bb2cc0ff",
+      "#c300ffff",
+      "#9024c2ff",
+      "#a85cffff",
+    ];
+
+    for (let i = 0; i < particleCount; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const radius = Math.random() * 3 + 1;
+
+      particles.push({
+        x: x,
+        y: y,
+        vx: Math.cos(angle) * radius,
+        vy: Math.sin(angle) * radius,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        size: Math.random() * 3 + 2,
+        life: 1,
+        decay: 0.012,
+        angle: angle,
+        spiral: Math.random() * 0.1 + 0.05,
       });
     }
   }

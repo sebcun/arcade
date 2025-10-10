@@ -1,4 +1,1 @@
-PARTICLES party AT 100,100
-PARTICLES explosion AT 200,200
-PARTICLES party AT 150,150
-LOG "This runs immediately!"
+PARTICLES magic AT 100,100
