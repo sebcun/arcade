@@ -36,6 +36,8 @@ async function loadOverview() {
     })
     .then((data) => {
       developHeading.textContent = `${data.title} | Overview`;
+      let global_variable_slots = data.global_variable_slots;
+      let user_variable_slots = data.user_variable_slots;
 
       let backgroundPurchased = data.purchases.includes(10);
       developContainer.innerHTML = `
@@ -78,6 +80,35 @@ async function loadOverview() {
       }</button>
             </div>
           </div>
+          
+          <div class="d-flex justify-content-between align-items-center w-100 mb-2 sprite-list-item">
+            <span id="globalVariableSlotSpan">+1 Global Variable Slot (${global_variable_slots}/10)</span>
+            <div>
+              <button class="btn btn-secondary btn-small" ${
+                global_variable_slots == 10 ? "disabled" : ""
+              } id="purchaseGlobalVarSlotBtn">${
+        global_variable_slots == 10
+          ? "Max Slots Purchased"
+          : "Purchase (30 coins)"
+      }</button>
+            </div>
+          </div>
+
+          <div class="d-flex justify-content-between align-items-center w-100 mb-2 sprite-list-item">
+            <span id="userVariableSlotSpan">+1 User Variable Slot (${
+              data.user_variable_slots
+            }/10)</span>
+              <div>
+              <button class="btn btn-secondary btn-small" ${
+                data.user_variable_slots == 10 ? "disabled" : ""
+              } id="purchaseUserVarSlotBtn">${
+        data.user_variable_slots == 10
+          ? "Max Slots Purchased"
+          : "Purchase (15 coins)"
+      }</button>
+            </div>
+          </div>
+          
         </div>
 
       </div>
@@ -111,6 +142,7 @@ async function loadOverview() {
       //   changesMade = true;
       // });
 
+      // Purchase Background Command
       const purchaseBackgroundBtn = document.getElementById(
         "purchaseBackgroundBtn"
       );
@@ -149,6 +181,109 @@ async function loadOverview() {
             showError("An error occurred during purchase");
             purchaseBackgroundBtn.textContent = "Purchase (30 coins)";
             purchaseBackgroundBtn.disabled = false;
+          });
+      });
+
+      // Purchase Global Variable Slot
+      const purchaseGlobalVarSlotBtn = document.getElementById(
+        "purchaseGlobalVarSlotBtn"
+      );
+      purchaseGlobalVarSlotBtn.addEventListener("click", () => {
+        purchaseGlobalVarSlotBtn.disabled = true;
+        purchaseGlobalVarSlotBtn.textContent = "Purchasing.";
+        let dots = 1;
+        const interval = setInterval(() => {
+          dots = (dots % 3) + 1;
+          purchaseGlobalVarSlotBtn.textContent =
+            "Purchasing" + ".".repeat(dots);
+        }, 300);
+
+        fetch("/api/purchase", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+          body: JSON.stringify({ item_id: 12, game_id: GAMEID }),
+        })
+          .then((response) => {
+            clearInterval(interval);
+            return response.json().then((result) => {
+              if (response.ok) {
+                global_variable_slots += 1;
+                document.getElementById(
+                  "globalVariableSlotSpan"
+                ).textContent = `+1 Global Variable Slot (${global_variable_slots}/10)`;
+                if (global_variable_slots == 10) {
+                  purchaseGlobalVarSlotBtn.textContent = "Max Slots Purchased";
+                  purchaseGlobalVarSlotBtn.disabled = true;
+                } else {
+                  purchaseGlobalVarSlotBtn.textContent = "Purchase (30 coins)";
+                  purchaseGlobalVarSlotBtn.disabled = false;
+                }
+              } else {
+                showError(result.error || "Purchase failed");
+                purchaseGlobalVarSlotBtn.textContent = "Purchase (30 coins)";
+                purchaseGlobalVarSlotBtn.disabled = false;
+              }
+            });
+          })
+          .catch((err) => {
+            clearInterval(interval);
+            showError("An error occurred during purchase");
+            purchaseGlobalVarSlotBtn.textContent = "Purchase (30 coins)";
+            purchaseGlobalVarSlotBtn.disabled = false;
+          });
+      });
+
+      // Purchase Global Variable Slot
+      const purchaseUserVarSlotBtn = document.getElementById(
+        "purchaseUserVarSlotBtn"
+      );
+      purchaseUserVarSlotBtn.addEventListener("click", () => {
+        purchaseUserVarSlotBtn.disabled = true;
+        purchaseUserVarSlotBtn.textContent = "Purchasing.";
+        let dots = 1;
+        const interval = setInterval(() => {
+          dots = (dots % 3) + 1;
+          purchaseUserVarSlotBtn.textContent = "Purchasing" + ".".repeat(dots);
+        }, 300);
+
+        fetch("/api/purchase", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+          body: JSON.stringify({ item_id: 11, game_id: GAMEID }),
+        })
+          .then((response) => {
+            clearInterval(interval);
+            return response.json().then((result) => {
+              if (response.ok) {
+                user_variable_slots += 1;
+                document.getElementById(
+                  "userVariableSlotSpan"
+                ).textContent = `+1 User Variable Slot (${user_variable_slots}/10)`;
+                if (user_variable_slots == 10) {
+                  purchaseUserVarSlotBtn.textContent = "Max Slots Purchased";
+                  purchaseUserVarSlotBtn.disabled = true;
+                } else {
+                  purchaseUserVarSlotBtn.textContent = "Purchase (15 coins)";
+                  purchaseUserVarSlotBtn.disabled = false;
+                }
+              } else {
+                showError(result.error || "Purchase failed");
+                purchaseUserVarSlotBtn.textContent = "Purchase (15 coins)";
+                purchaseUserVarSlotBtn.disabled = false;
+              }
+            });
+          })
+          .catch((err) => {
+            clearInterval(interval);
+            showError("An error occurred during purchase");
+            purchaseGlobalVarSlotBtn.textContent = "Purchase (30 coins)";
+            purchaseGlobalVarSlotBtn.disabled = false;
           });
       });
     })

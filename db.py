@@ -83,6 +83,8 @@ def initDb():
                         visibility INTEGER DEFAULT -1,
                         plays INTEGER DEFAULT 0,
                         max_sprites INTEGER DEFAULT 20,
+                        global_variable_slots INTEGER DEFAULT 0,
+                        user_variable_slots INTEGER DEFAULT 0,
                         purchased TEXT DEFAULT '[]',
                         created_at INTEGER DEFAULT (CAST(strftime('%s', 'now') AS INTEGER)),
                         updated_at INTEGER DEFAULT (CAST(strftime('%s', 'now') AS INTEGER)),
@@ -642,6 +644,8 @@ def getGame(game_id):
         "plays": game["plays"],
         "visibility": game["visibility"],
         "max_sprites": game["max_sprites"],
+        "global_variable_slots": game["global_variable_slots"],
+        "user_variable_slots": game["user_variable_slots"],
         "purchases": json.loads(game["purchases"]),
     }, 200
 
@@ -683,6 +687,8 @@ def saveGame(
     description=None,
     visibility=None,
     max_sprites=None,
+    global_variable_slots=None,
+    user_variable_slots=None,
 ):
     if not game_id or not user_id:
         return {"error": "Game ID and User ID are requred"}, 400
@@ -717,9 +723,34 @@ def saveGame(
         if max_sprites < 1 or max_sprites > 100:
             return {"error": "max_sprites must be between 1 and 100"}, 400
 
+    if global_variable_slots is not None:
+        try:
+            global_variable_slots = int(global_variable_slots)
+        except Exception:
+            return {"error": "Invalid global_variable_slots value"}, 400
+        if global_variable_slots < 0 or global_variable_slots > 10:
+            return {"error": "global_variable_slots must be between 0 and 10"}, 400
+
+    if user_variable_slots is not None:
+        try:
+            user_variable_slots = int(user_variable_slots)
+        except Exception:
+            return {"error": "Invalid user_variable_slots value"}, 400
+        if user_variable_slots < 0 or user_variable_slots > 10:
+            return {"error": "user_variable_slots must be between 0 and 10"}, 400
+
     if all(
         v is None
-        for v in (code, sprites_data, title, description, visibility, max_sprites)
+        for v in (
+            code,
+            sprites_data,
+            title,
+            description,
+            visibility,
+            max_sprites,
+            global_variable_slots,
+            user_variable_slots,
+        )
     ):
         return {"error": "No fields provided to update."}, 400
 
@@ -748,6 +779,12 @@ def saveGame(
         if max_sprites is not None:
             fields.append("max_sprites = ?")
             params.append(max_sprites)
+        if global_variable_slots is not None:
+            fields.append("global_variable_slots = ?")
+            params.append(global_variable_slots)
+        if user_variable_slots is not None:
+            fields.append("user_variable_slots = ?")
+            params.append(user_variable_slots)
 
         if fields:
             update_query = "UPDATE games SET " + ", ".join(fields) + " WHERE id = ?"

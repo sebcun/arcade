@@ -46,11 +46,43 @@ def purchase():
                     return jsonify({"error": "Game not found."}), 404
 
             if item_id == 10:
-                print(item_id)
                 result4, status4 = getGame(game_id)
                 if isinstance(result4, dict) and status4 == 200:
                     result5, status5 = addGamePurchase(game_id, 10)
-                    print(result5, status5)
+                else:
+                    return jsonify({"error": "Game not found."}), 404
+
+            if item_id == 11:
+                result4, status4 = getGame(game_id)
+                if isinstance(result4, dict) and status4 == 200:
+                    user_variable_slots = result4["user_variable_slots"] + 1
+                    if user_variable_slots > 10:
+                        return (
+                            jsonify({"error": "Max user variable slots unlocked."}),
+                            400,
+                        )
+                    result5, status5 = saveGame(
+                        game_id,
+                        session["userid"],
+                        user_variable_slots=user_variable_slots,
+                    )
+                else:
+                    return jsonify({"error": "Game not found."}), 404
+
+            if item_id == 12:
+                result4, status4 = getGame(game_id)
+                if isinstance(result4, dict) and status4 == 200:
+                    global_variable_slots = result4["global_variable_slots"] + 1
+                    if global_variable_slots > 10:
+                        return (
+                            jsonify({"error": "Max global variable slots unlocked."}),
+                            400,
+                        )
+                    result5, status5 = saveGame(
+                        game_id,
+                        session["userid"],
+                        global_variable_slots=global_variable_slots,
+                    )
                 else:
                     return jsonify({"error": "Game not found."}), 404
 
