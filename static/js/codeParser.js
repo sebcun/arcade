@@ -14,8 +14,67 @@ let touchMonitorAdded = false;
 let touchMonitorRAF = null;
 
 let variables = {};
+let globalVariables = {};
 let abortController = null;
 let activeLoopStack = [];
+
+// Global Variables
+async function loadGlobalVariables() {
+  globalVariables = {};
+
+  try {
+    const response = await fetch(`/api/games/${GAMEID}/variables/global`, {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to load global variables: ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    if (data.variables && Array.isArray(data.variables)) {
+      data.variables.forEach((v) => {
+        globalVariables[v.var_name] = v.var_value;
+      });
+      console.log(`Loaded ${data.variables.length} global variable(s)`);
+    }
+  } catch (error) {
+    console.error("Error loading global variables:", error);
+  }
+}
+
+async function setGlobalVariable(varName, value) {
+  try {
+    const response = await fetch(`/api/games/${GAMEID}/variables/global`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({
+        var_name: varName,
+        var_value: String(value),
+      }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.log(
+        `Failed to set global variable: ${
+          errorData.error || response.statusText
+        }`
+      );
+      return false;
+    }
+
+    globalVariables[varName] = String(value);
+    return true;
+  } catch (error) {
+    console.error("Error setting global variable:", error);
+    return false;
+  }
+}
 
 async function executeCode(
   code,
@@ -809,6 +868,124 @@ async function executeCode(
         continue;
       }
 
+      if (cmd === "STOREGLOBAL") {
+        const asIndex = parts.indexOf("AS");
+        if (asIndex === -1 || asIndex < 2 || asIndex === parts.length - 1) {
+          console.log(
+            `${
+              i + 1
+            } STORE: invalid syntax. Expected STORE <value> AS <varname>`
+          );
+          i++;
+          continue;
+        }
+
+        const valueParts = parts.slice(1, asIndex);
+        const valueExpr = valueParts.join(" ");
+        const varname = parts[asIndex + 1];
+
+        if (parts.length > asIndex + 2) {
+          console.log(`${i + 1} STORE: variable name must be one word`);
+          i++;
+          continue;
+        }
+
+        if (/^sprite\d+$/i.test(varname)) {
+          console.log(`${i + 1} STORE: variable name cannot be sprite[number]`);
+          i++;
+          continue;
+        }
+
+        const context = buildContext();
+
+        try {
+          let valueToStore;
+          if (valueExpr.includes("#")) {
+            const idxHash = valueExpr.indexOf("#");
+            const leftExpr = valueExpr.slice(0, idxHash).trim();
+            const rightExpr = valueExpr.slice(idxHash + 1).trim();
+
+            if (!leftExpr || !rightExpr) {
+              console.log(
+                `${
+                  i + 1
+                } STOREGLOBAL: invalid random range '${valueExpr}'. Expected '<expr>#<expr>'`
+              );
+              i++;
+              continue;
+            }
+
+            let leftVal, rightVal;
+            try {
+              leftVal = evaluateExpression(leftExpr, context);
+            } catch (e) {
+              console.log(
+                `${i + 1} STOREGLOBAL: left expression error: ${e.message}`
+              );
+              i++;
+              continue;
+            }
+
+            try {
+              rightVal = evaluateExpression(rightExpr, context);
+            } catch (e) {
+              console.log(
+                `${i + 1} STOREGLOBAL: right expression error: ${e.message}`
+              );
+              i++;
+              continue;
+            }
+
+            const a = Number(leftVal);
+            const b = Number(rightVal);
+            if (isNaN(a) || isNaN(b)) {
+              console.log(
+                `${
+                  i + 1
+                } STOREGLOBAL: invalid random bounds '${leftVal}' and '${rightVal}'. Expected numbers.`
+              );
+              i++;
+              continue;
+            }
+
+            const min = Math.ceil(Math.min(a, b));
+            const max = Math.floor(Math.max(a, b));
+
+            if (max < min) {
+              console.log(
+                `${
+                  i + 1
+                } STOREGLOBAL: invalid random bounds after rounding: min=${min}, max=${max}`
+              );
+              i++;
+              continue;
+            }
+
+            const rand = Math.floor(Math.random() * (max - min + 1)) + min;
+            valueToStore = rand;
+          } else {
+            if (valueExpr.startsWith('"') && valueExpr.endsWith('"')) {
+              const str = valueExpr.slice(1, -1);
+              const interpolated = interpolateString(str, context);
+              valueToStore = interpolated;
+            } else {
+              valueToStore = evaluateExpression(valueExpr, context);
+            }
+          }
+
+          const success = await setGlobalVariable(varname, valueToStore);
+          if (!success) {
+            console.log(
+              `${i + 1} STOREGLOBAL: failed to store variable '${varname}'`
+            );
+          }
+        } catch (e) {
+          console.log(`${i + 1} STOREGLOBAL: ${e.message}`);
+        }
+        i++;
+        continue;
+      }
+
       if (cmd === "LOG") {
         if (parts.length < 2) {
           console.log(`${i + 1} LOG: missing argument`);
@@ -1364,9 +1541,15 @@ function buildContext() {
       visible: s.visible,
     };
   });
+
   for (const [key, value] of Object.entries(variables)) {
     context[key] = value;
   }
+
+  for (const [key, value] of Object.entries(globalVariables)) {
+    context[key] = value;
+  }
+
   return context;
 }
 
@@ -1566,12 +1749,14 @@ function stopExecution() {
   activeLoopStack = [];
 }
 
-function startGame(canvas, overlay, sprites, code, purchases) {
+async function startGame(canvas, overlay, sprites, code, purchases) {
   const ctx = canvas.getContext("2d");
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   resetSprites();
+
+  await loadGlobalVariables();
 
   executeCode(code, sprites, ctx, purchases);
   overlay.style.display = "none";

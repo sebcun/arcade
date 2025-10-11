@@ -142,6 +142,36 @@ def initDb():
         )"""
     )
 
+    # Global Variables Table
+    conn.execute(
+        """CREATE TABLE IF NOT EXISTS global_variables (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        game_id INTEGER NOT NULL,
+                        var_name TEXT NOT NULL,
+                        var_value TEXT,
+                        created_at INTEGER DEFAULT (CAST(strftime('%s', 'now') AS INTEGER)),
+                        updated_at INTEGER DEFAULT (CAST(strftime('%s', 'now') AS INTEGER)),
+                        UNIQUE(game_id, var_name),
+                        FOREIGN KEY (game_id) REFERENCES games(id) ON DELETE CASCADE
+        )"""
+    )
+
+    # User Variables Table
+    conn.execute(
+        """CREATE TABLE IF NOT EXISTS user_variables (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        game_id INTEGER NOT NULL,
+                        user_id INTEGER NOT NULL,
+                        var_name TEXT NOT NULL,
+                        var_value TEXT,
+                        created_at INTEGER DEFAULT (CAST(strftime('%s', 'now') AS INTEGER)),
+                        updated_at INTEGER DEFAULT (CAST(strftime('%s', 'now') AS INTEGER)),
+                        UNIQUE(game_id, user_id, var_name),
+                        FOREIGN KEY (game_id) REFERENCES games(id) ON DELETE CASCADE,
+                        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+        )"""
+    )
+
     conn.commit()
     conn.close()
 
@@ -180,6 +210,7 @@ def _parse_timestamp(value):
     return None
 
 
+# Verification
 def sendVerificationCode(email, username=None, mode="register"):
     if not email or not mode:
         return {"error": "Email and mode required."}, 400
@@ -361,6 +392,7 @@ def verifyCode(email, code, mode="register"):
         return {"error": "Failed to verify code."}, 500
 
 
+# Users
 def getUserProfile(userid_or_email):
     if not userid_or_email:
         return None
@@ -539,6 +571,51 @@ def giveBadge(userid, badgeid, badgeName, badgeDescription, createdAt=None):
     return {"message": "Badge given."}, 200
 
 
+def createUser(email):
+    if not email:
+        return {"error": "Email required."}, 400
+
+    cleanedEmail = cleanEmail(email)
+    if cleanedEmail is False:
+        return {"error": "Invalid email."}, 400
+
+    conn = getDbConnection()
+    try:
+        final_username = _generate_fallback_username(conn)
+        cursor = conn.execute(
+            "INSERT INTO users (email, username) VALUES (?, ?)",
+            (cleanedEmail, final_username),
+        )
+        user_id = cursor.lastrowid
+
+        conn.execute(
+            "INSERT INTO profiles (user_id, avatar, level, bio, badges) VALUES (?, ?, ?, ?, ?)",
+            (user_id, None, 1, None, json.dumps([])),
+        )
+        conn.commit()
+        conn.close()
+
+        return {
+            "message": "Account created.",
+            "userid": user_id,
+            "username": final_username,
+        }, 201
+
+    except sqlite3.IntegrityError:
+        try:
+            conn.close()
+        except Exception:
+            pass
+        return {"error": "Failed to create user; username or email may be taken."}, 500
+    except Exception:
+        try:
+            conn.close()
+        except Exception:
+            pass
+        return {"error": "Failed to create user."}, 500
+
+
+# Games
 def createGame(user_id, title, description=""):
     if not user_id or not title:
         return {"error": "User ID and title are required"}, 400
@@ -820,50 +897,55 @@ def saveGame(
             pass
 
 
-def createUser(email):
-    if not email:
-        return {"error": "Email required."}, 400
-
-    cleanedEmail = cleanEmail(email)
-    if cleanedEmail is False:
-        return {"error": "Invalid email."}, 400
-
+def getGamesSorted(sort_type, limit=30):
     conn = getDbConnection()
-    try:
-        final_username = _generate_fallback_username(conn)
-        cursor = conn.execute(
-            "INSERT INTO users (email, username) VALUES (?, ?)",
-            (cleanedEmail, final_username),
-        )
-        user_id = cursor.lastrowid
 
-        conn.execute(
-            "INSERT INTO profiles (user_id, avatar, level, bio, badges) VALUES (?, ?, ?, ?, ?)",
-            (user_id, None, 1, None, json.dumps([])),
-        )
-        conn.commit()
-        conn.close()
+    if sort_type == "liked":
+        games = conn.execute(
+            """
+            SELECT g.id, g.title, g.user_id as author, g.description, g.plays, g.created_at, g.updated_at, COUNT(l.id) as likes
+            FROM games g LEFT JOIN likes l ON g.id = l.game_id
+            GROUP BY g.id
+            ORDER BY likes DESC
+            LIMIT ?
+        """,
+            (limit,),
+        ).fetchall()
 
-        return {
-            "message": "Account created.",
-            "userid": user_id,
-            "username": final_username,
-        }, 201
+    elif sort_type == "played":
+        games = conn.execute(
+            "SELECT id, title, user_id as author, description, plays, created_at, updated_at FROM games ORDER BY plays DESC LIMIT ?",
+            (limit,),
+        ).fetchall()
 
-    except sqlite3.IntegrityError:
-        try:
-            conn.close()
-        except Exception:
-            pass
-        return {"error": "Failed to create user; username or email may be taken."}, 500
-    except Exception:
-        try:
-            conn.close()
-        except Exception:
-            pass
-        return {"error": "Failed to create user."}, 500
+    elif sort_type == "recent":
+        games = conn.execute(
+            "SELECT id, title, user_id as author, description, plays, created_at, updated_at FROM games ORDER BY created_at DESC LIMIT ?",
+            (limit,),
+        ).fetchall()
+
+    else:
+        games = conn.execute(
+            "SELECT id, title, user_id as author, description, plays, created_at, updated_at FROM games ORDER BY updated_at DESC LIMIT ?",
+            (limit,),
+        ).fetchall()
+
+    conn.close()
+    return [
+        {
+            "id": game["id"],
+            "title": game["title"],
+            "author": game["author"],
+            "description": game["description"],
+            "plays": game["plays"],
+            "created_at": game["created_at"],
+            "updated_at": game["updated_at"],
+        }
+        for game in games
+    ], 200
 
 
+# Likes
 def getLikesForGame(game_id):
     try:
         conn = getDbConnection()
@@ -943,54 +1025,7 @@ def toggleLike(game_id, user_id):
         return {"error": "Failed to toggle like."}, 500
 
 
-def getGamesSorted(sort_type, limit=30):
-    conn = getDbConnection()
-
-    if sort_type == "liked":
-        games = conn.execute(
-            """
-            SELECT g.id, g.title, g.user_id as author, g.description, g.plays, g.created_at, g.updated_at, COUNT(l.id) as likes
-            FROM games g LEFT JOIN likes l ON g.id = l.game_id
-            GROUP BY g.id
-            ORDER BY likes DESC
-            LIMIT ?
-        """,
-            (limit,),
-        ).fetchall()
-
-    elif sort_type == "played":
-        games = conn.execute(
-            "SELECT id, title, user_id as author, description, plays, created_at, updated_at FROM games ORDER BY plays DESC LIMIT ?",
-            (limit,),
-        ).fetchall()
-
-    elif sort_type == "recent":
-        games = conn.execute(
-            "SELECT id, title, user_id as author, description, plays, created_at, updated_at FROM games ORDER BY created_at DESC LIMIT ?",
-            (limit,),
-        ).fetchall()
-
-    else:
-        games = conn.execute(
-            "SELECT id, title, user_id as author, description, plays, created_at, updated_at FROM games ORDER BY updated_at DESC LIMIT ?",
-            (limit,),
-        ).fetchall()
-
-    conn.close()
-    return [
-        {
-            "id": game["id"],
-            "title": game["title"],
-            "author": game["author"],
-            "description": game["description"],
-            "plays": game["plays"],
-            "created_at": game["created_at"],
-            "updated_at": game["updated_at"],
-        }
-        for game in games
-    ], 200
-
-
+# Purchases
 def getPurchases(user_id):
     if not user_id:
         return {"error": "User ID is required."}, 400
@@ -1125,3 +1160,125 @@ def addGamePurchase(game_id, item_id):
         except Exception:
             pass
         return {"error": "Failed to add item to game purchases"}, 400
+
+
+# Variables
+def getGlobalVariable(game_id, var_name):
+    if not game_id or not var_name:
+        return {"error": "Game ID and variable name are requried."}, 400
+
+    conn = getDbConnection()
+    try:
+        var = conn.execute(
+            "SELECT * FROM global_variables WHERE game_id = ? AND var_name = ?",
+            (game_id, var_name),
+        ).fetchone()
+        conn.close()
+
+        if not var:
+            return {"error": "Variable not found."}, 404
+
+        return {
+            "id": var["id"],
+            "game_id": var["game_id"],
+            "var_name": var["var_name"],
+            "var_value": var["var_value"],
+            "created_at": var["created_at"],
+            "updated_at": var["updated_at"],
+        }, 200
+    except Exception as e:
+        try:
+            conn.close()
+        except Exception:
+            pass
+        return {"error": "Failed to get global variable."}, 500
+
+
+def getAllGlobalVariables(game_id):
+    if not game_id:
+        return {"error": "Game ID is required."}, 400
+
+    conn = getDbConnection()
+    try:
+        variables = conn.execute(
+            "SELECT * FROM global_variables WHERE game_id = ? ORDER BY var_name",
+            (game_id,),
+        ).fetchall()
+        conn.close()
+
+        return [
+            {
+                "id": var["id"],
+                "game_id": var["game_id"],
+                "var_name": var["var_name"],
+                "var_value": var["var_value"],
+                "created_at": var["created_at"],
+                "updated_at": var["updated_at"],
+            }
+            for var in variables
+        ], 200
+
+    except Exception as e:
+        try:
+            conn.close()
+        except Exception:
+            pass
+        return {"error": "Failed to get global variables."}, 500
+
+
+def setGlobalVariable(game_id, var_name, var_value):
+    if not game_id or not var_name:
+        return {"error": "Game ID and variable name are required."}, 400
+
+    conn = getDbConnection()
+    try:
+        game = conn.execute(
+            "SELECT id, global_variable_slots FROM games WHERE id = ?", (game_id,)
+        ).fetchone()
+        if not game:
+            conn.close()
+            return {"error": "Game not found."}, 404
+
+        current_count = conn.execute(
+            "SELECT COUNT(*) as cnt FROM global_variables WHERE game_id = ?", (game_id,)
+        ).fetchone()["cnt"]
+
+        existing_var = conn.execute(
+            "SELECT id FROM global_variables WHERE game_id = ? AND var_name = ?",
+            (game_id, var_name),
+        ).fetchone()
+
+        if not existing_var and current_count >= game["global_variable_slots"]:
+            conn.close()
+            return {
+                "error": f"Global variable slot limit ({game['global_variable_slots']}) reached. Purchase more slots from the game overview."
+            }, 400
+
+        value_str = str(var_value) if var_value is not None else ""
+
+        if existing_var:
+            conn.execute(
+                "UPDATE global_variables SET var_value = ?, updated_at = CAST(strftime('%s', 'now') AS INTEGER) WHERE game_id = ? AND var_name = ?",
+                (value_str, game_id, var_name),
+            )
+        else:
+            conn.execute(
+                "INSERT INTO global_variables (game_id, var_name, var_value) VALUES (?, ?, ?)",
+                (game_id, var_name, value_str),
+            )
+
+        conn.commit()
+        conn.close()
+
+        return {
+            "message": "Global variable set successfully.",
+            "var_name": var_name,
+            "var_value": value_str,
+        }, 200
+
+    except Exception as e:
+        try:
+            conn.close()
+        except Exception:
+            pass
+        return {"error": "Failed to set global variable."}, 500

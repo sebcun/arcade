@@ -37,6 +37,7 @@ from routes.api.games.saveGame import save_game_bp
 from routes.api.games.like import like_bp
 from routes.api.games.play import play_bp
 from routes.api.games.create import create_game_bp
+from routes.api.games.variables import variables_bp
 
 # Others
 from routes.api.images import images_bp
@@ -73,6 +74,7 @@ app.register_blueprint(save_game_bp, url_prefix="/api")
 app.register_blueprint(like_bp, url_prefix="/api")
 app.register_blueprint(play_bp, url_prefix="/api")
 app.register_blueprint(create_game_bp, url_prefix="/api")
+app.register_blueprint(variables_bp, url_prefix="/api")
 
 # Other Blueprints
 app.register_blueprint(static_bp)

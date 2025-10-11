@@ -1,1 +1,4 @@
-PARTICLES magic AT 100,100
+TEXT "High Score: ${highscore}"
+ONKEY 'w'
+  PARTICLES magic AT 100,100
+ENDKEY
